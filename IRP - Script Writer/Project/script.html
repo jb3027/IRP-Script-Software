@@ -146,6 +146,7 @@
 
     function login() {
       const usernameInput = document.querySelector("#username");
+      const passwordInput = document.querySelector("#password");
 
       function usernameCheck(json_file) { //A json file needs to be passed in
           fetch(json_file, {method: 'GET'}) //Get the file
@@ -154,11 +155,18 @@
                   const usernameList = result.usernames.map(element => {
                       return element.toLowerCase() //Turns it to lower case
                   })
+
+                  const passwordList = result.passwords.map(element => {
+                    return element.toLowerCase() //Turns it to lower case
+                  })
+
                   const targetUsername = usernameInput.value.toLowerCase();
+                  const targetPassword = passwordInput.value.toLowerCase();
                   let authenticated = false;
 
                   for(let i = 0; i < usernameList.length; i++) {
-                      if(targetUsername === usernameList[i]) {
+                    console.log(targetUsername, usernameList[i], targetPassword, passwordList[i]);
+                      if(targetUsername === usernameList[i] && targetPassword === passwordList[i]) {
                           $('#login-form').hide();
                           $('#project-login').show();
                           authenticated = true;
@@ -192,11 +200,11 @@
                 const projectList = result.productions.map(element => {
                     return element.toLowerCase() //Turns it to lower case
                 })
-                const targetProject = projectName.value.toLowerCase();
+                const targetProject = projectName.toLowerCase();
                 let authenticated = false;
 
                 for(let i = 0; i < productions.length; i++) {
-                    if(targetProject.contains(projectList[i])) {
+                    if(targetProject === projectList[i]) {
                         $('#login-form').hide();
                         $('#project-login').show();
                         authenticated = true;
@@ -211,16 +219,7 @@
             .catch(error => console.log("Error", error)) //Error handling
         }
 
-      // if (projectName === "project") { //Check if project exists (ALSO CHECK USER HAS ACCESS)
-      //   $('#project-login').hide(); //Hide project login page
-        
-      //   $(document).ready(function() {
-      //     $('.main-content').show(); //Show main page
-      //   });
-  
-      // } else {
-      //   alert('Project does not exist'); //Error message for project name
-      // }
+        projectCheck("productions.json"); //Use the function above
     }
     
     $(document).ready(function() {
