@@ -1,4 +1,4 @@
-a<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <title>Studio Script Writer</title>
@@ -140,32 +140,38 @@ a<!DOCTYPE html>
       login();
     });
 
+    document.getElementById('projectLogBtn').addEventListener('click', function() {
+      projectLogin();
+    });
+
     function login() {
-        const usernameInput = document.querySelector("#username");
+      const usernameInput = document.querySelector("#username");
 
-        function usernameCheck(json_file) { //A json file needs to be passed in
-            fetch(json_file, {method: 'GET'}) //Get the file
-                .then(response => response.json()) //Put them in json format
-                .then(result => {
-                    const usernameList = result.usernames.map(element => {
-                        return element.toLowerCase() //Turns it to lower case
-                    })
-                    const targetUsername = usernameInput.value.toLowerCase();
+      function usernameCheck(json_file) { //A json file needs to be passed in
+          fetch(json_file, {method: 'GET'}) //Get the file
+              .then(response => response.json()) //Put them in json format
+              .then(result => {
+                  const usernameList = result.usernames.map(element => {
+                      return element.toLowerCase() //Turns it to lower case
+                  })
+                  const targetUsername = usernameInput.value.toLowerCase();
+                  let authenticated = false;
 
-                    for(let i = 0; i < usernameList.length; i++) {
-                        if(targetUsername === usernameList[i]) {
-                            $('#login-form').hide();
-                            $('#project-login').show();
-                            break;
-                        }
-                        else {
-                            alert("Username or password is incorrect");
-                            break;
-                        }
-                    }
-                })
-                .catch(error => console.log("Error", error)) //Error handling
-            }
+                  for(let i = 0; i < usernameList.length; i++) {
+                      if(targetUsername === usernameList[i]) {
+                          $('#login-form').hide();
+                          $('#project-login').show();
+                          authenticated = true;
+                          break;
+                      }
+                  }
+
+                  if(!authenticated) {
+                    alert("Username or password is incorrect");
+                  } 
+              })
+              .catch(error => console.log("Error", error)) //Error handling
+          }
         
 
         var username = document.getElementById('username').value;
@@ -179,259 +185,42 @@ a<!DOCTYPE html>
     function projectLogin() {
       var projectName = document.getElementById('projectName').value;
 
-      if (projectName === "project") { //Check if project exists (ALSO CHECK USER HAS ACCESS)
-        $('#project-login').hide(); //Hide project login page
-        
-        $(document).ready(function() {
-          $('.main-content').show(); //Show main page
-        });
-  
-      } else {
-        alert('Project does not exist'); //Error message for project name
-      }
-    }
-    
-    $(document).ready(function() {
-        var highlight = true;
+      function projectCheck(json_file) { //A json file needs to be passed in
+        fetch(json_file, {method: 'GET'}) //Get the file
+            .then(response => response.json()) //Put them in json format
+            .then(result => {
+                const projectList = result.productions.map(element => {
+                    return element.toLowerCase() //Turns it to lower case
+                })
+                const targetProject = projectName.value.toLowerCase();
+                let authenticated = false;
 
-        var tableData = [
-            { eventNum: '1', shotType: '', content: 'Add your script here', details: 'E.g., Music Cues' },
-        ];
+                for(let i = 0; i < productions.length; i++) {
+                    if(targetProject.contains(projectList[i])) {
+                        $('#login-form').hide();
+                        $('#project-login').show();
+                        authenticated = true;
+                        break;
+                    }
+                }
 
-        var dropdownOptions = ['SHOT TYPE', 'ES', 'WS', '2S', '3S', 'MS', 'MCU', 'CU', 'ECU', 'AS DIRECTED'];
-
-        function createShotTypeCell(shotType, firstTime) {
-            var selectHTML = '<select class="form-control shot-type-select">';
-            dropdownOptions.forEach(function(option) {
-                selectHTML += '<option value="' + option + '"' + (shotType === option ? ' selected' : '') + '>' + option + '</option>';
-            });
-            selectHTML += '</select>';
-
-            var widthCalc = dropdownOptions.length * 8;
-            var placeHolderText1 = firstTime? '<div class="editable-cell"><span> Camera Number/Position </span></div>' : '';
-            var placeHolderText2 = firstTime ? ' Shot Subject (E.g., HOST) ' : '';
-            var placeHolderText3 = firstTime ? ' Additional Info (E.g., TRACK OUT) ' : '';
-
-            return '<div>' +
-                placeHolderText1 +
-                '<div style="display:flex; align-items:center; justify-content:space-between;">' +
-                    '<div style="flex-shrink: 0;">' + selectHTML + '</div>' +
-                    '<div contenteditable="true" style="flex-grow: 1; margin-left: 8px;" class="editable-text">' + placeHolderText2 + '</div>' +
-                '</div>' +
-                '<div contenteditable="true" style="margin-bottom: 8px;">' + placeHolderText3 + '</div>' +
-            '</div>';
+                if(!authenticated) {
+                  alert("Username or password is incorrect");
+                } 
+            })
+            .catch(error => console.log("Error", error)) //Error handling
         }
 
-        // Populate the table with data on document ready
-        tableData.forEach(function(row) {
-            var newRow = '<tr>' +
-                '<td contenteditable="true"; style="text-align:center";>' + row.eventNum + '</td>' +
-                '<td contenteditable="true";>' + createShotTypeCell("SHOT TYPE", true) + '</td>' +
-                '<td contenteditable="true">' + row.content + '</td>' +
-                '<td contenteditable="true"; style="text-align:center";>' + row.details.replace('\n','<br>') + '</td>' +
-                '<td style="border:none; width:100px"><button class="btn btn-primary add-button">+</button><button class="btn btn-danger remove-button">-</button></td>' +
-                '</tr>';
-            $('#event-table tbody').append(newRow);
-        });
-
-        // Add new row to the table
-        $(document).on('click', '.add-button', function() {
-            var newRow = '<tr>' +
-                '<td contenteditable="true"; style="text-align:center";></td>' +
-                '<td contenteditable="true"></td>' +
-                '<td contenteditable="true"></td>' +
-                '<td contenteditable="true"; style="text-align:center";></td>' +
-                '<td style="border: none"><button class="btn btn-primary add-button">+</button><button class="btn btn-danger remove-button">-</button></td>' +
-                '</tr>';
-            $(this).closest('tr').after(newRow);
-        });
-
-        // Remove row from the table
-        $(document).on('click', '.remove-button', function() {
-            if ($('#event-table tbody tr').length > 1) {
-                $(this).closest('tr').remove();
-            }
-        });
+      // if (projectName === "project") { //Check if project exists (ALSO CHECK USER HAS ACCESS)
+      //   $('#project-login').hide(); //Hide project login page
         
-        //ADD EVENT FUNCTION ON CLICK
-        $('.addEvent-button').on('click', function() {
-          //Find the highlighted row and update the cell 
-        });
-    });
-  </script>
-</body>
-</html>       <!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Studio Script Writer</title>
-  <style>
-    body {
-      padding-top: 70px;
-    }
-
-    /* Hide the main content by default */
-    .main-content {
-      display: none;
-    }
-
-    table {
-      width:1240px;
-      table-layout: fixed;
-    }
-
-    td[contenteditable='true'],
-    div[contenteditable='true'] {
-        border: 0px solid rgb(214, 235, 255);
-    }
-
-    .table .shot-type-select {
-      width: fit-content;
-      border: 0px solid rgb(214, 235, 255);
-    }
-
-    /*Creates a nav bar that has a fixed position at top of page*/
-    ul {
-      list-style-type: none;
-      margin: 0;
-      padding: 25px;
-      overflow: hidden;
-      background-color: rgb(70, 70, 70); 
-      position: fixed; 
-      top: 0;
-      width: 100%;
-      z-index: 1000; /* Nav bar is above content of page */
-    }
-
-    li {
-      float: right;
-    }
-
-    .button2 {
-      background-color: rgb(70, 70, 70) !important;
-      color: white !important;
-      padding: 15px 32px;
-      text-align: center;
-      display: inline-block;
-      font-size: 16px;
-    }
-
-    .button2:hover {
-      background-color: black !important;
-      color: white !important;
-    }
-
-    .editable-cell {
-      display: block;
-      width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      position: relative;
-    }
-
-    .editable-cell span {
-      display: inline-block;
-      position: relative;
-      width: 100%;
-    }
-
-    .editable-cell span::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: 3px;
-      width: 100%;
-      height: 1px;
-      background-color: black;
-    }
-  </style>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-</head>
-
-<body>
-  <!-- Login Form -->
-  <div id="login-form" style="text-align:center;">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username"><br><br>
-    <input type="password" id="password" placeholder="Password"><br><br>
-    <button id="loginButton">Login</button>
-  </div>
-
-  <!-- Project Login Form -->
-  <div id="project-login" style="text-align:center;">
-    <h2>Project Name:</h2>
-    <input type="text" id="projectName" placeholder="Enter Project Name"><br><br>
-    <button id="projectLogBtn">Select</button>
-  </div>
-
-  <!-- Main Page -->
-  <div class="main-content">
-    <ul>
-      <li><button class="btn button2 save-button">SAVE</button></li>
-      <li style="float: left; margin-left: 20px; margin-right: 50px;"><button class="btn button2 addEvent-button">ADD EVENT</button></li>
-      <li style="float: left; margin-left: 100px; margin-right: 10px;"><button class="btn button2 textBold-button">B</button></li>
-      <li style="float: left; margin-right: 10px;"><button class="btn button2 textItalic-button">I</button></li>
-      <li style="float: left; margin-right: 10px;"><button class="btn button2 textUnderline-button">U</button></li>
-    </ul>
-
-    <div class="square"></div>
-
-    <div class="container">
-      <table style="margin-top:100px;" id="event-table" class="table">
-          <thead>
-              <tr>
-                  <th scope="col" style="border: 1px solid black; width:100px; text-align: center;">Event number</th>
-                  <th scope="col" style="border: 1px solid black; width:350px; text-align: center;">Shot</th>
-                  <th scope="col" style="border: 1px solid black; width:450px; text-align: center;">Script</th>
-                  <th scope="col" style="border: 1px solid black; width:150px; text-align: center;">Details</th>
-                  <th scope="col" style="border: none; width:100px; text-align: center;"></th>
-              </tr>
-          </thead>
-          <tbody>
-          </tbody>
-      </table>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-    var role;
-    $('#project-login').hide();
-
-    document.getElementById('loginButton').addEventListener('click', function() {
-      login();
-    });
-
-    function login() {
-      var username = document.getElementById('username').value;
-      var password = document.getElementById('password').value;
-      
-      if (username === 'user' && password === 'pass') { // Simple check for demonstration
-        $('#login-form').hide(); // Hide the login form
-        $('#project-login').show(); //Show the project login page
-
-        document.getElementById('projectLogBtn').addEventListener('click', function() {
-          projectLogin();
-        });
-
-      } else {
-        alert('Username or Password is incorrect'); //Error message for user login
-      }
-    }
-
-    function projectLogin() {
-      var projectName = document.getElementById('projectName').value;
-
-      if (projectName === "project") { //Check if project exists (ALSO CHECK USER HAS ACCESS)
-        $('#project-login').hide(); //Hide project login page
-        
-        $(document).ready(function() {
-          $('.main-content').show(); //Show main page
-        });
+      //   $(document).ready(function() {
+      //     $('.main-content').show(); //Show main page
+      //   });
   
-      } else {
-        alert('Project does not exist'); //Error message for project name
-      }
+      // } else {
+      //   alert('Project does not exist'); //Error message for project name
+      // }
     }
     
     $(document).ready(function() {
