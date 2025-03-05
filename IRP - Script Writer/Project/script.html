@@ -180,39 +180,51 @@
               .catch(error => console.log("Error", error)) //Error handling
           }
         
-
         var username = document.getElementById('username').value;
         var password = document.getElementById('password').value;
     
         usernameCheck("userPass.json"); //Use the function above
-
     }
     
 
     function projectLogin() {
       var projectName = document.getElementById('projectName').value;
 
+    
+
       function projectCheck(json_file) { //A json file needs to be passed in
         fetch(json_file, {method: 'GET'}) //Get the file
             .then(response => response.json()) //Put them in json format
             .then(result => {
                 const projectList = result.productions.map(element => {
-                    return element.toLowerCase() //Turns it to lower case
+                    return (element.toString()).toLowerCase() //Turns it to lower case
                 })
                 const targetProject = projectName.toLowerCase();
                 let authenticated = false;
 
-                for(let i = 0; i < productions.length; i++) {
-                    if(targetProject === projectList[i]) {
-                        $('#login-form').hide();
-                        $('#project-login').show();
-                        authenticated = true;
-                        break;
-                    }
+                // for(let i = 0; i < projectList.length; i++) {
+                //     if(targetProject === projectList[i]) {
+                //         $('#login-form').hide();
+                //         $('#project-login').show();
+                //         authenticated = true;
+                //         break;
+                //     }
+                // }
+
+                
+
+                for(let i = 0; i < projectList.length; i++) {
+                  
+                  if(projectList[i,'name'] === targetProject && projectList[i,'users'].includes(username)) {
+                    $('#login-form').hide();
+                    $('#project-login').show();
+                    authenticated = true;
+                    break;
+                  }
                 }
 
                 if(!authenticated) {
-                  alert("Username or password is incorrect");
+                  alert("Production does not exist or you do not have access");
                 } 
             })
             .catch(error => console.log("Error", error)) //Error handling
