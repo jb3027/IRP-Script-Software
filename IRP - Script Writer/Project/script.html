@@ -196,36 +196,25 @@
         fetch(json_file, {method: 'GET'}) //Get the file
             .then(response => response.json()) //Put them in json format
             .then(result => {
-                const projectList = result.productions.map(element => {
-                    return (element.toString()).toLowerCase() //Turns it to lower case
-                })
-                const targetProject = projectName.toLowerCase();
-                let authenticated = false;
+              const projectList = result.productions.map(element => {
+                  return element 
+              })
+              const targetProject = projectName.toLowerCase();
+              
+              let authenticated = false;
 
-                // for(let i = 0; i < projectList.length; i++) {
-                //     if(targetProject === projectList[i]) {
-                //         $('#login-form').hide();
-                //         $('#project-login').show();
-                //         authenticated = true;
-                //         break;
-                //     }
-                // }
-
-                
-
-                for(let i = 0; i < projectList.length; i++) {
-                  
-                  if(projectList[i,'name'] === targetProject && projectList[i,'users'].includes(username)) {
-                    $('#login-form').hide();
-                    $('#project-login').show();
+              for(let i = 0; i < projectList.length; i++) {
+                if(targetProject === projectList[i]['name'] && projectList[i]['users'].includes(document.getElementById('username').value)) {
+                    $('#project-login').hide();
+                    $('.main-content').show();
                     authenticated = true;
                     break;
-                  }
                 }
+              }
 
-                if(!authenticated) {
-                  alert("Production does not exist or you do not have access");
-                } 
+              if(!authenticated) {
+                alert("Production does not exist or you do not have access");
+              } 
             })
             .catch(error => console.log("Error", error)) //Error handling
         }
