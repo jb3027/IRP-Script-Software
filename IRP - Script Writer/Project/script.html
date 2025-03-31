@@ -111,6 +111,7 @@
       <li style="float: left; margin-left: 100px; margin-right: 10px;"><button class="btn button2 textBold-button">B</button></li>
       <li style="float: left; margin-right: 10px;"><button class="btn button2 textItalic-button">I</button></li>
       <li style="float: left; margin-right: 10px;"><button class="btn button2 textUnderline-button">U</button></li>
+      <li style="float: left; margin-left: 20px; margin-right: 10px;"><button class="btn button2 addCut-button">ADD CUT</button></li>
     </ul>
 
     <div class="square"></div>
@@ -287,6 +288,11 @@
         //ADD EVENT FUNCTION ON CLICK
         $('.addEvent-button').on('click', function() {
           //Find the highlighted row and update the cell 
+        });
+
+        //ADD CUT FUNCTION ON CLICK
+        $('.addCut-button').on('click', function() {
+          //Find the highlighted text and add a line
         });
     });
   </script>
