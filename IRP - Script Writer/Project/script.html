@@ -20,12 +20,13 @@
     td[contenteditable='true'],
     div[contenteditable='true'] {
         border: 0px solid rgb(214, 235, 255);
-    }
+    } 
 
     .table .shot-type-select {
       width: fit-content;
       text-align: left;
       border: 0px solid rgb(214, 235, 255);
+      outline: 1px solid blue;
     }
 
     /*Creates a nav bar that has a fixed position at top of page*/
@@ -59,13 +60,18 @@
       color: white !important;
     }
 
-    .editable-cell {
+    .editable-cell,
+    .editable-text,
+    div[contenteditable='true'] {
       display: block;
       width: 100%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       position: relative;
+      outline: 0.5px solid blue;
+      min-height: 24px; /* Add minimum height */
+      user-select: text; /* Allow text selection only */
     }
 
     .editable-cell span {
@@ -82,6 +88,7 @@
       width: 100%;
       height: 1px;
       background-color: black;
+      outline: 1px solid blue;
     }
 
     .cut-line {
@@ -98,6 +105,21 @@
       background-color: black;
       z-index: 1;
       pointer-events: none;
+    }
+
+    .shot-type-flex-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .shot-type-text {
+        flex-grow: 1;
+        margin-left: 8px;
+    }
+    
+    .shot-type-dropdown {
+        flex-shrink: 0;
     }
 
   </style>
@@ -152,6 +174,57 @@
   </div>
 
   <script type="text/javascript">
+    function preventDeletion(event, defaultContent) {
+      const element = event.target;
+      const row = element.closest('tr');
+
+      
+      
+      // Use setTimeout to get the updated content after the current event cycle
+      setTimeout(() => {
+        const shotSubject = row.querySelector('.shotSubject');
+        const cameraType = row.querySelector('.cameraType');
+        const extraInfo = row.querySelector('.extraInfo');
+
+        // Check if any of the cells are empty
+        if (shotSubject.textContent.length === 0) {
+          // Restore the previous content
+          shotSubject.textContent = '\u00A0';
+          const range = document.createRange();
+          const selection = window.getSelection();
+          range.selectNodeContents(shotSubject);
+          range.collapse(false); // false means collapse to end
+          selection.removeAllRanges();
+          selection.addRange(range);     
+        }
+
+        if (cameraType.textContent.length === 0) {
+          // Restore the previous content
+          cameraType.textContent = '\u00A0';
+          const range = document.createRange();
+          const selection = window.getSelection();
+          range.selectNodeContents(shotSubject);
+          range.collapse(false); // false means collapse to end
+          selection.removeAllRanges();
+          selection.addRange(range);     
+        }
+
+        if (extraInfo.textContent.length === 0) {
+          // Restore the previous content
+          extraInfo.textContent = '\u00A0';
+          const range = document.createRange();
+          const selection = window.getSelection();
+          range.selectNodeContents(shotSubject);
+          range.collapse(false); // false means collapse to end
+          selection.removeAllRanges();
+          selection.addRange(range);     
+        }
+      }, 0);
+          
+          
+    }
+    
+
     var role;
     $('#project-login').hide();
 
@@ -204,7 +277,6 @@
     
         usernameCheck("userPass.json"); //Use the function above
     }
-    
 
     function projectLogin() {
       var projectName = document.getElementById('projectName').value;
@@ -252,23 +324,30 @@
         function createShotTypeCell(shotType, firstTime) {
             var selectHTML = '<select class="form-control shot-type-select">';
             dropdownOptions.forEach(function(option) {
-                selectHTML += '<option value="' + option + '"' + (shotType === option ? ' selected' : '') + '>' + option + '</option>';
+                var optionValue = option || '';  
+                var isSelected = optionValue === (shotType || '');  
+                selectHTML += '<option value="' + optionValue + '"' + (isSelected ? ' selected' : '') + '>' + optionValue + '</option>';
             });
             selectHTML += '</select>';
 
-            var widthCalc = dropdownOptions.length * 8;
-            var placeHolderText1 = firstTime? '<div class="editable-cell"> Camera Number/Position </div>' : '';
-            var placeHolderText2 = firstTime ? ' Shot Subject (E.g., HOST) ' : '';
-            var placeHolderText3 = firstTime ? ' Additional Info (E.g., TRACK OUT) ' : '';
+            var placeHolderText1 = firstTime ? 'Camera Number/Position' : '\u00A0';
+            var placeHolderText2 = firstTime ? 'Shot Subject (E.g., HOST)' : '\u00A0';
+            var placeHolderText3 = firstTime ? 'Additional Info (E.g., TRACK OUT)' : '\u00A0';
 
             return '<div>' +
-                placeHolderText1 +
-                '<div style="display:flex; align-items:center; justify-content:space-between;">' +
-                    '<div style="flex-shrink: 0;">' + selectHTML + '</div>' +
-                    '<div contenteditable="true" style="flex-grow: 1; margin-left: 8px;" class="editable-text">' + placeHolderText2 + '</div>' +
+                '<div class="editable-cell cameraType" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText1 + '\')">' + placeHolderText1 + '</div>' +
+                '<div class="shot-type-flex-container">' +
+                    '<div class="shotTypeDropdown">' + selectHTML + '</div>' +
+                    '<div class="editable-text shotSubject" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText2 + '\')" >' + placeHolderText2 + '</div>' +
                 '</div>' +
-                '<div contenteditable="true" style="margin-bottom: 8px;">' + placeHolderText3 + '</div>' +
+                '<div class="editable-cell extraInfo" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText3 + '\')">' + placeHolderText3 + '</div>' +
             '</div>';
+        }
+
+        function updateEventNumbers() {
+            $('#event-table tbody tr').each(function(index) {
+                $(this).find('td:first').text(index + 1);
+            });
         }
 
         // Populate the table with data on document ready
@@ -283,28 +362,50 @@
             $('#event-table tbody').append(newRow);
         });
 
-        // Add new row to the table
+        // Modify the add-button click handler
         $(document).on('click', '.add-button', function() {
-            var newRow = '<tr>' +
-                '<td contenteditable="true"; style="text-align:center";></td>' +
-                '<td contenteditable="true"></td>' +
-                '<td contenteditable="true"></td>' +
-                '<td contenteditable="true"; style="text-align:center";></td>' +
-                '<td style="border: none"><button class="btn btn-primary add-button">+</button><button class="btn btn-danger remove-button">-</button></td>' +
-                '</tr>';
-            $(this).closest('tr').after(newRow);
+            $('.addEvent-button').trigger('click');
+            updateEventNumbers();
         });
 
-        // Remove row from the table
+        // Modify the remove-button click handler
         $(document).on('click', '.remove-button', function() {
             if ($('#event-table tbody tr').length > 1) {
                 $(this).closest('tr').remove();
+                updateEventNumbers();
             }
         });
         
-        //ADD EVENT FUNCTION ON CLICK
+        // Modify the addEvent-button click handler
         $('.addEvent-button').on('click', function() {
-          //Find the highlighted row and update the cell 
+            var selection = window.getSelection();
+            var targetRow;
+
+            if (selection.rangeCount > 0) {
+                var range = selection.getRangeAt(0);
+                // First try to find the closest td, then find its parent tr
+                var cell = range.commonAncestorContainer.nodeType === 1 
+                    ? range.commonAncestorContainer.closest('td')?.closest('tr')
+                    : range.commonAncestorContainer.parentElement.closest('td')?.closest('tr');
+                if (cell) {
+                    targetRow = cell;
+                }
+            }
+
+            var newRow = '<tr>' +
+                '<td contenteditable="true"; style="text-align:center";></td>' +
+                '<td contenteditable="true";>' + createShotTypeCell("SHOT TYPE", false) + '</td>' +
+                '<td contenteditable="true"></td>' +
+                '<td contenteditable="true"; style="text-align:center";></td>' +
+                '<td style="border:none; width:100px"><button class="btn btn-primary add-button">+</button><button class="btn btn-danger remove-button">-</button></td>' +
+                '</tr>';
+
+            if (targetRow) {
+                $(targetRow).after(newRow);
+            } else {
+                $('#event-table tbody').append(newRow);
+            }
+            updateEventNumbers();
         });
 
         //UNDERLINE
@@ -322,7 +423,7 @@
           document.execCommand('italic', false, null);
         });
 
-        //ADD CUT FUNCTION ON CLICK
+        //ADD CUT ON CLICK
         $('.addCut-button').on('click', function() {
           var selection = window.getSelection();
           if (selection.rangeCount > 0) {
@@ -352,6 +453,9 @@
             }
           }
         });
+
+        // Update the event listener to use 'input' instead of 'keydown'
+        $(document).on('input', '[contenteditable="true"]', preventDeletion);
     });
   </script>
 </body>
