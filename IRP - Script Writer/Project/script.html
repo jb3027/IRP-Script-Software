@@ -468,7 +468,7 @@
               var existingCutLine = cell.querySelector('.cut-line');
               
               if (existingCutLine) {
-                showQuestionModal("Replace cut line or add new event?", "Replace", "Add new event", 
+                showQuestionModal("Replace or Add to new event?", "Replace", "Add to new event", 
                   function replaceCutLine() {
                     // Safely remove the cut line
                     if (existingCutLine && existingCutLine.parentNode) {
@@ -488,7 +488,6 @@
                     //Store highlighted text/range information immediately
                     var selectedText = selection.toString();
 
-                    
                     //adds a new event row
                     $('.addEvent-button').trigger('click');
                     updateEventNumbers();
@@ -496,13 +495,28 @@
                     //finds the newly created row and inserts the selected text
                     var newRow = cell.closest('tr').nextElementSibling;
                     var newScriptCell = newRow.cells[2];
-                    newScriptCell.textContent = selectedText;
+
+                    //creates a cut line for selectedText in the new event cell
+                    var cutLineSpan = document.createElement('span');
+                    cutLineSpan.className = 'cut-line';
+                    cutLineSpan.textContent = selectedText;
+                    newScriptCell.appendChild(cutLineSpan);
                     
+                    // Add the slash after the cut line
+                    newScriptCell.appendChild(document.createTextNode(' / '));
+
                     //deletes the highlighted text from the current row
                     var previousRow = cell.closest('tr');
                     var scriptCell = previousRow.cells[2];
-                    scriptCell.textContent = scriptCell.textContent.replace(selectedText, '');
                     
+                    // Create a new range to remove just the selected text
+                    var range = selection.getRangeAt(0);
+                    range.deleteContents();
+                    
+                    // If the cell is now empty, ensure it has content
+                    if (scriptCell.textContent.trim() === '') {
+                        scriptCell.textContent = '';
+                    }
                   }
                 );
               } else { 
@@ -512,11 +526,11 @@
                   span.className = 'cut-line';
                   range.surroundContents(span);
                   
-                  // Add text after the cut line
+                  //adds text after the cut line
                   var textNode = document.createTextNode(" / ");
                   span.after(textNode);
                   
-                  // Move cursor after the inserted text
+                  //moves cursor after the inserted text
                   range = document.createRange();
                   range.setStartAfter(textNode);
                   range.collapse(true);
