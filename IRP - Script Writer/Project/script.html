@@ -98,8 +98,8 @@
     .cut-line::after {
       content: '';
       position: absolute;
-      left: -400px; /* Adjust this value to reach the Shot Type column */
-      right: 0;
+      left: -400px; 
+      right: 0; 
       bottom: -3px;
       height: 2px;
       background-color: black;
@@ -428,46 +428,47 @@
           var selection = window.getSelection();
           if (selection.rangeCount > 0) {
             var range = selection.getRangeAt(0);
+            // Closest cell (td) element from either the container or its parent
             var cell = range.commonAncestorContainer.nodeType === 1 
               ? range.commonAncestorContainer.closest('td')
               : range.commonAncestorContainer.parentElement.closest('td');
-            
             // Check if we're in the script column (3rd column)
             if (cell && cell.cellIndex === 2) {
               // Check if this cell already has a cut-line
               var existingCutLine = cell.querySelector('.cut-line');
               
-              if (existingCutLine) {
-                // Remove existing cut line
-                var parent = existingCutLine.parentNode;
-                while (existingCutLine.firstChild) {
-                  parent.insertBefore(existingCutLine.firstChild, existingCutLine);
-                }
-                parent.removeChild(existingCutLine);
-              } else {
-                // Add new cut line
-                var span = document.createElement('span');
-                span.className = 'cut-line';
-                
-                // Get the selected text's position relative to the cell
-                var cellRect = cell.getBoundingClientRect();
-                var rangeRect = range.getBoundingClientRect();
-                
-                // Calculate the right offset based on selection end
-                var rightOffset = cellRect.right - rangeRect.right;
-                
-                // Apply the custom right offset
-                span.style.setProperty('--cut-end', rightOffset + 'px');
-                
-                range.surroundContents(span);
+            if (existingCutLine) {
+              var parent = existingCutLine.parentNode;
+              while (existingCutLine.firstChild) {
+                parent.insertBefore(existingCutLine.firstChild, existingCutLine);
               }
+              parent.removeChild(existingCutLine);
+              // Removes the '/' cut 
+              cell.textContent = cell.textContent.replace(/\//g, '');
+            } else { 
+              // Adds new cut line
+              var span = document.createElement('span');
+              span.className = 'cut-line';
+              range.surroundContents(span);
+              
+              // Add text after the cut line
+              var textNode = document.createTextNode(" / ");
+              span.after(textNode);
+              
+              // Move cursor after the inserted text
+              range = document.createRange();
+              range.setStartAfter(textNode);
+              range.collapse(true);
+              selection.removeAllRanges();
+              selection.addRange(range);
             }
           }
-        });
+        }
+      });
 
-        // Update the event listener to use 'input' instead of 'keydown'
-        $(document).on('input', '[contenteditable="true"]', preventDeletion);
-    });
+      // Update the event listener to use 'input' instead of 'keydown'
+      $(document).on('input', '[contenteditable="true"]', preventDeletion);
+      });
   </script>
 </body>
 </html>       
