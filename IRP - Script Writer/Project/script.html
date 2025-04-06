@@ -13,8 +13,9 @@
     }
 
     table {
-      width:1240px;
+      width: 794px !important;
       table-layout: fixed;
+      margin: 0 auto;
     }
 
     td[contenteditable='true'],
@@ -29,7 +30,7 @@
       outline: 1px solid blue;
     }
 
-    /*Creates a nav bar that has a fixed position at top of page*/
+    /*Nav bar that has a fixed position at top of page*/
     ul {
       list-style-type: none;
       margin: 0;
@@ -110,7 +111,7 @@
     .shot-type-flex-container {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        gap: 4px; /* Add gap between shot type and subject in view mode */
     }
     
     .shot-type-text {
@@ -120,9 +121,14 @@
     
     .shot-type-dropdown {
         flex-shrink: 0;
+        margin-right: 6px; /* Add small margin to separate from subject */
     }
 
-    /* Add these styles for the modal */
+    .shotSubject {
+        flex: 1; /* Control gap between shot type and shot subject */
+        min-width: 0; /* Prevents flex item from overflowing */
+    }
+
     .modal-dialog {
       margin-top: 15%;
       text-align: center;
@@ -132,6 +138,7 @@
       text-align: center;
       gap: 15px;
     }
+
 
   </style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -157,12 +164,18 @@
   <!-- Main Page -->
   <div class="main-content">
     <ul>
-      <li><button class="btn button2 save-button">SAVE</button></li>
-      <li style="float: left; margin-left: 20px; margin-right: 50px;"><button class="btn button2 addEvent-button">ADD EVENT</button></li>
-      <li style="float: left; margin-left: 100px; margin-right: 10px;"><button class="btn button2 textBold-button">B</button></li>
-      <li style="float: left; margin-right: 10px;"><button class="btn button2 textItalic-button">I</button></li>
-      <li style="float: left; margin-right: 10px;"><button class="btn button2 textUnderline-button">U</button></li>
-      <li style="float: left; margin-left: 20px; margin-right: 10px;"><button class="btn button2 addCut-button">ADD CUT</button></li>
+      <li style="float: right;"><button class="btn button2 view-button">VIEW</button></li> 
+      <li style="float: right; margin-left: 100px;"><button class="btn button2 save-button">SAVE</button></li>
+      <li style="float: left; margin-left: 10px; margin-right: 10px;"><button class="btn button2 textBold-button">B</button></li>
+      <li style="float: left; margin-left: 20px; margin-right: 10px;"><button class="btn button2 textItalic-button">I</button></li>
+      <li style="float: left; margin-left: 30px; margin-right: 10px;"><button class="btn button2 textUnderline-button">U</button></li>
+      <li style="float: left; margin-right: 10px;"><button class="btn button2 undo-button">UNDO</button></li>
+      <li style="float: left; margin-right: 10px;"><button class="btn button2 redo-button">REDO</button></li>
+      <li style="float: right; margin-left: 10px;"><button class="btn button2 addCut-button">ADD CUT</button></li>     
+      <li style="float: right; margin-left: 10px;"><button class="btn button2 add-item-button">ADD ITEM</button></li>
+      <li style="float: right; margin-left: 10px;"><button class="btn button2 addEvent-button">ADD EVENT</button></li>
+      
+
     </ul>
 
     <div class="square"></div>
@@ -206,10 +219,25 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   
   <script type="text/javascript">
+    //checks if user is already logged in
+    window.onload = function() {
+        const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+        const projectName = sessionStorage.getItem('projectName');
+        
+        if (isLoggedIn === 'true') {
+            $('#login-form').hide();
+            if (projectName) {
+                $('#project-login').hide();
+                $('.main-content').show();
+            } else {
+                $('#project-login').show();
+            }
+        }
+    };
+
     function preventDeletion(event, defaultContent) {
       const element = event.target;
       const row = element.closest('tr');
-
       
       
       // Use setTimeout to get the updated content after the current event cycle
@@ -293,6 +321,9 @@
                           $('#login-form').hide();
                           $('#project-login').show();
                           authenticated = true;
+                          // Add these lines to store login state
+                          sessionStorage.setItem('isLoggedIn', 'true');
+                          sessionStorage.setItem('username', targetUsername);
                           break;
                       }
                   }
@@ -329,6 +360,8 @@
                     $('#project-login').hide();
                     $('.main-content').show();
                     authenticated = true;
+                    // Add this line to store project name
+                    sessionStorage.setItem('projectName', targetProject);
                     break;
                 }
               }
@@ -348,7 +381,7 @@
         var cutLine = true;
 
         var tableData = [
-            { eventNum: '1', shotType: '', content: 'Add your script here and here is an extra line so that you can text the add new event button', details: 'E.g., Music Cues' },
+            { eventNum: '1', shotType: '', content: 'Add your script here and add an extra line', details: 'E.g., Music Cues' },
         ];
 
         var dropdownOptions = ['SHOT TYPE', 'ES', 'WS', '2S', '3S', 'MS', 'MCU', 'CU', 'ECU', 'AS DIRECTED'];
@@ -377,9 +410,18 @@
         }
 
         function updateEventNumbers() {
-            $('#event-table tbody tr').each(function(index) {
-                $(this).find('td:first').text(index + 1);
-            });
+          let eventNumber = 1;
+          $('#event-table tbody tr').each(function() {
+              // Check if there is an event in the row (If Shot column has any content)
+              const hasContent = $(this).find('td:nth-child(2)').text().trim().length > 0;
+              
+              if (hasContent) {
+                  $(this).find('td:first').text(eventNumber);
+                  eventNumber++;
+              } else {
+                  $(this).find('td:first').text('');
+              }
+          });
         }
 
         // Populate the table with data on document ready
@@ -394,13 +436,19 @@
             $('#event-table tbody').append(newRow);
         });
 
-        // Modify the add-button click handler
+        //ADD NEW ROW
         $(document).on('click', '.add-button', function() {
-            $('.addEvent-button').trigger('click');
-            updateEventNumbers();
+          var newRow = '<tr>' +
+                '<td contenteditable="true"; style="text-align:center";></td>' +
+                '<td contenteditable="true"></td>' +
+                '<td contenteditable="true"></td>' +
+                '<td contenteditable="true"; style="text-align:center";></td>' +
+                '<td style="border: none"><button class="btn btn-primary add-button">+</button><button class="btn btn-danger remove-button">-</button></td>' +
+                '</tr>';
+            $(this).closest('tr').after(newRow);
         });
 
-        // Modify the remove-button click handler
+        //REMOVE ROW
         $(document).on('click', '.remove-button', function() {
             if ($('#event-table tbody tr').length > 1) {
                 $(this).closest('tr').remove();
@@ -408,7 +456,7 @@
             }
         });
         
-        // Modify the addEvent-button click handler
+        //ADD EVENT 
         $('.addEvent-button').on('click', function() {
             var selection = window.getSelection();
             var targetRow;
@@ -420,10 +468,17 @@
                     ? range.commonAncestorContainer.closest('td')?.closest('tr')
                     : range.commonAncestorContainer.parentElement.closest('td')?.closest('tr');
                 if (cell) {
-                    targetRow = cell;
+                    targetRow = $(cell);
+                    // Populate the selected row with new event content
+                    targetRow.find('td:eq(1)').html(createShotTypeCell("SHOT TYPE", false));
+                    targetRow.find('td:eq(2)').empty(); // Clear script cell
+                    targetRow.find('td:eq(3)').empty(); // Clear details cell
+                    updateEventNumbers();
+                    return; // Exit early since we've updated the existing row
                 }
             }
 
+            // If no selection, create new row at the end
             var newRow = '<tr>' +
                 '<td contenteditable="true"; style="text-align:center";></td>' +
                 '<td contenteditable="true";>' + createShotTypeCell("SHOT TYPE", false) + '</td>' +
@@ -431,12 +486,7 @@
                 '<td contenteditable="true"; style="text-align:center";></td>' +
                 '<td style="border:none; width:100px"><button class="btn btn-primary add-button">+</button><button class="btn btn-danger remove-button">-</button></td>' +
                 '</tr>';
-
-            if (targetRow) {
-                $(targetRow).after(newRow);
-            } else {
-                $('#event-table tbody').append(newRow);
-            }
+            $('#event-table tbody').append(newRow);
             updateEventNumbers();
         });
 
@@ -457,92 +507,286 @@
 
         //ADD CUT ON CLICK
         $('.addCut-button').on('click', function() {
-          var selection = window.getSelection();
-          if (selection.rangeCount > 0) {
-            var range = selection.getRangeAt(0);
-            var cell = range.commonAncestorContainer.nodeType === 1 
-              ? range.commonAncestorContainer.closest('td')
-              : range.commonAncestorContainer.parentElement.closest('td');
-              
-            if (cell && cell.cellIndex === 2) {
-              var existingCutLine = cell.querySelector('.cut-line');
-              
-              if (existingCutLine) {
-                showQuestionModal("Replace or Add to new event?", "Replace", "Add to new event", 
-                  function replaceCutLine() {
-                    // Safely remove the cut line
-                    if (existingCutLine && existingCutLine.parentNode) {
-                      var parent = existingCutLine.parentNode;
-                      var fragment = document.createDocumentFragment();
-                      while (existingCutLine.firstChild) {
-                        fragment.appendChild(existingCutLine.firstChild);
-                      }
-                      parent.insertBefore(fragment, existingCutLine);
-                      parent.removeChild(existingCutLine);
-                      // Removes the '/' cut 
-                      cell.textContent = cell.textContent.replace(/\//g, '');
-                    }
-                  }, 
-                  
-                  function addIntoNewEvent() {
-                    //Store highlighted text/range information immediately
-                    var selectedText = selection.toString();
+            const selection = window.getSelection();
+            let lineCount = 1; // Default to 1
 
-                    //adds a new event row
-                    $('.addEvent-button').trigger('click');
-                    updateEventNumbers();
-
-                    //finds the newly created row and inserts the selected text
-                    var newRow = cell.closest('tr').nextElementSibling;
-                    var newScriptCell = newRow.cells[2];
-
-                    //creates a cut line for selectedText in the new event cell
-                    var cutLineSpan = document.createElement('span');
-                    cutLineSpan.className = 'cut-line';
-                    cutLineSpan.textContent = selectedText;
-                    newScriptCell.appendChild(cutLineSpan);
-                    
-                    // Add the slash after the cut line
-                    newScriptCell.appendChild(document.createTextNode(' / '));
-
-                    //deletes the highlighted text from the current row
-                    var previousRow = cell.closest('tr');
-                    var scriptCell = previousRow.cells[2];
-                    
-                    // Create a new range to remove just the selected text
-                    var range = selection.getRangeAt(0);
-                    range.deleteContents();
-                    
-                    // If the cell is now empty, ensure it has content
-                    if (scriptCell.textContent.trim() === '') {
-                        scriptCell.textContent = '';
-                    }
-                  }
-                );
-              } else { 
-                try {
-                  // Adds new cut line
-                  var span = document.createElement('span');
-                  span.className = 'cut-line';
-                  range.surroundContents(span);
-                  
-                  //adds text after the cut line
-                  var textNode = document.createTextNode(" / ");
-                  span.after(textNode);
-                  
-                  //moves cursor after the inserted text
-                  range = document.createRange();
-                  range.setStartAfter(textNode);
-                  range.collapse(true);
-                  selection.removeAllRanges();
-                  selection.addRange(range);
-                } catch (e) {
-                  console.log("Could not add cut line: Selection may be invalid");
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const rects = range.getClientRects();
+                
+                // Get all unique y-coordinates of the rectangles
+                const uniqueYPositions = new Set();
+                for (const rect of rects) {
+                    uniqueYPositions.add(Math.round(rect.top)); // Round to handle minor pixel differences
                 }
-              }
+                
+                lineCount = uniqueYPositions.size;
+
+                // Get the cell containing the selection
+                const cell = range.commonAncestorContainer.nodeType === 1 
+                    ? range.commonAncestorContainer.closest('td')
+                    : range.commonAncestorContainer.parentElement.closest('td');
+
+                if (cell) {
+                    const row = cell.closest('tr');
+                    const shotCell = row.querySelector('td:nth-child(2)');
+                    
+                    // Adjust the position of text boxes in the Shot column
+                    if (shotCell) {
+                        const lineHeight = 24; // CSS line height
+                        const offset = (lineCount - 1) * lineHeight; // Calc offset
+                        
+                        // Make shot row and highlighted cut line up (Move text box down)
+                        const cameraType = shotCell.querySelector('.cameraType');
+                        if (cameraType) {
+                            cameraType.style.marginTop = `${offset}px`;
+                        }
+                    }
+                }
             }
-          }
+
+            if (!selection.rangeCount) return;
+
+            const range = selection.getRangeAt(0);
+            const cell = range.commonAncestorContainer.nodeType === 1 
+                ? range.commonAncestorContainer.closest('td')
+                : range.commonAncestorContainer.parentElement.closest('td');
+                
+            if (!cell || cell.cellIndex !== 2) return;
+
+            const selectedText = selection.toString();
+            const existingCutLine = cell.querySelector('.cut-line');
+
+            function createCutLine(text) {
+                const span = document.createElement('span');
+                span.className = 'cut-line';
+                span.textContent = text;
+                return span;
+            }
+
+            function addSlashAfter(element) {
+                const textNode = document.createTextNode(" / ");
+                element.after(textNode);
+                return textNode;
+            }
+
+            function moveCursorAfter(node) {
+                const newRange = document.createRange();
+                newRange.setStartAfter(node);
+                newRange.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            }
+
+            if (existingCutLine) {
+                showQuestionModal(
+                    "Replace or Add to new event?", //question
+                    "Replace", //option 1
+                    "Add to new event", //option 2
+
+                    //REPLACE
+                    function() {
+                      var selection = window.getSelection();
+                      var range = selection.getRangeAt(0);
+                      var newText = selection.toString();
+                      // Removes the '/' cut within the highlight
+                      newText = newText.replace(/ \/ /g, ' ').trim();           
+
+                      // Get the cell containing the selection
+                      const cell = range.commonAncestorContainer.nodeType === 1 
+                          ? range.commonAncestorContainer.closest('td')
+                          : range.commonAncestorContainer.parentElement.closest('td');
+                      
+                      // Find and remove the existing cut line
+                      const existingCutLine = cell.querySelector('.cut-line');
+                      if (existingCutLine) {
+                        // Remove the cut line and the following slash
+                        const nextNode = existingCutLine.nextSibling;
+                        if (nextNode && nextNode.nodeType === Node.TEXT_NODE && nextNode.textContent.includes('/')) {
+                          nextNode.remove();
+                        }
+                        existingCutLine.remove();
+                      }
+
+                      // Create the new cut line span
+                      const newLineSpan = document.createElement('span');
+                      newLineSpan.className = 'cut-line';
+                      newLineSpan.textContent = newText;
+
+                      // Replace only the selected content
+                      range.deleteContents();
+                      range.insertNode(newLineSpan);
+                      
+                      // Add the slash after the new span
+                      const slashText = document.createTextNode(' / ');
+                      newLineSpan.after(slashText);
+
+                      // Move cursor after the slash
+                      const newRange = document.createRange();
+                      newRange.setStartAfter(slashText);
+                      newRange.collapse(true);
+                      selection.removeAllRanges();
+                      selection.addRange(newRange);
+                    },
+                    //ADD TO NEW EVENT
+                    function() {
+                        const selectedText = selection.toString();
+
+                        $('.addEvent-button').trigger('click');
+                        updateEventNumbers();
+
+                        const newRow = cell.closest('tr').nextElementSibling;
+                        const newScriptCell = newRow.cells[2];
+
+                        const cutLineSpan = createCutLine(selectedText);
+                        newScriptCell.appendChild(cutLineSpan);
+                        addSlashAfter(cutLineSpan);
+
+                        range.deleteContents();
+                        if (cell.textContent.trim() === '') {
+                            cell.textContent = '';
+                        }
+                    }
+                );
+            } else {
+                try {
+                    const newSpan = createCutLine(selectedText);
+                    range.deleteContents();
+                    range.insertNode(newSpan);
+                    const textNode = addSlashAfter(newSpan);
+                    moveCursorAfter(textNode);
+                } catch (e) {
+                    console.log("Could not add cut line: Selection may be invalid");
+                }
+            }
         });
+
+        //UNDO
+        $('.undo-button').on('click', function() {
+          document.execCommand('undo', false, null);
+        });
+
+        //REDO
+        $('.redo-button').on('click', function() {
+          document.execCommand('redo', false, null);
+        });
+
+        //TITLE
+        $('.add-item-button').on('click', function() {
+          document.execCommand('underline', false, null);
+          document.execCommand('bold', false, null);
+        });
+
+
+        //VIEW MODE
+        $('.view-button').on('click', function() {
+            const tableClone = $('.container').clone();
+            
+            // Show dropdown as the selected value
+            const originalSelects = $('.container .shot-type-select');
+            tableClone.find('.shot-type-select').each(function(index) {
+                const originalSelect = originalSelects.eq(index);
+                const selectedText = originalSelect.find('option:selected').text();
+                $(this).replaceWith($('<span>').text(selectedText));
+            });
+            
+            // Make all contenteditable elements non-editable in view mode
+            tableClone.find('[contenteditable="true"]').attr('contenteditable', 'false');
+            
+            // Create new window/tab and write content
+            const viewWindow = window.open('', '_blank');
+            viewWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>View Mode</title>
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+                    <style>
+                        body { 
+                            padding-top: 20px;
+                        }
+                        table {
+                            width: 794px !important;
+                            table-layout: fixed;
+                            margin: 0 auto;
+                        }  
+
+                        td, th{
+                            border: none !important;
+                            outline: none !important;
+                        }
+                        .editable-cell,
+                        .editable-text,
+                        div[contenteditable] {
+                            outline: none !important;
+                            border: none !important;
+                            min-height: 24px;
+                        }
+                        .shot-type-select {
+                            border: none !important;
+                            outline: none !important;
+                            appearance: none;
+                            background: none;
+                            pointer-events: none;
+                        }
+                        .btn {
+                            display: none;
+                        }
+                        .cut-line {
+                            position: relative;
+                        }
+                        .cut-line::after {
+                            content: '';
+                            position: absolute;
+                            left: -400px;
+                            right: 0;
+                            bottom: -3px;
+                            height: 2px;
+                            background-color: black;
+                            z-index: 1;
+                            pointer-events: none;
+                        }
+                        .shot-type-flex-container {
+                            display: flex;
+                            align-items: center;
+                            gap: 2px; /* Add small gap for view mode */
+                        }
+                        .shot-type-text {
+                            flex-grow: 1;
+                            margin-left: 8px;
+                        }
+                        .shotTypeDropdown {
+                            flex-shrink: 0;
+                            margin-right: 4px; /* Add small margin to separate from subject */
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${tableClone.html()}
+                </body>
+                </html>
+            `);
+            
+            // Remove the last column (the add/remove buttons)
+            viewWindow.document.querySelectorAll('tr').forEach(row => {
+                const lastCell = row.lastElementChild;
+                if (lastCell) {
+                    lastCell.remove();
+                }
+            });
+
+            // Remove the text in the header
+            viewWindow.document.querySelectorAll('th').forEach(header => {
+                header.textContent = '';
+            });
+            
+            viewWindow.document.close();
+            });
+
+            //SAVE
+            $('.save-button').on('click', function() {
+              
+            });
       });
 
     // Pop up question modal
