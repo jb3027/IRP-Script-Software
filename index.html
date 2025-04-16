@@ -307,42 +307,42 @@
       const row = element.closest('tr');
       
       
-      // Use setTimeout to get the updated content after the current event cycle
+      //Use setTimeout to get the updated content after the current event cycle
       setTimeout(() => {
         const shotSubject = row.querySelector('.shotSubject');
         const cameraType = row.querySelector('.cameraType');
         const extraInfo = row.querySelector('.extraInfo');
 
-        // Check if any of the cells are empty
+        //Check if any of the cells are empty
         if (shotSubject.textContent.length === 0) {
-          // Restore the previous content
+          //Restore the previous content
           shotSubject.textContent = '\u00A0';
           const range = document.createRange();
           const selection = window.getSelection();
           range.selectNodeContents(shotSubject);
-          range.collapse(false); // false means collapse to end
+          range.collapse(false); //false means collapse to end
           selection.removeAllRanges();
           selection.addRange(range);     
         }
 
         if (cameraType.textContent.length === 0) {
-          // Restore the previous content
+          //Restore the previous content
           cameraType.textContent = '\u00A0';
           const range = document.createRange();
           const selection = window.getSelection();
           range.selectNodeContents(shotSubject);
-          range.collapse(false); // false means collapse to end
+          range.collapse(false); //false means collapse to end
           selection.removeAllRanges();
           selection.addRange(range);     
         }
 
         if (extraInfo.textContent.length === 0) {
-          // Restore the previous content
+          //Restore the previous content
           extraInfo.textContent = '\u00A0';
           const range = document.createRange();
           const selection = window.getSelection();
           range.selectNodeContents(shotSubject);
-          range.collapse(false); // false means collapse to end
+          range.collapse(false); //false means collapse to end
           selection.removeAllRanges();
           selection.addRange(range);     
         }
@@ -427,7 +427,7 @@
                     $('#project-login').hide();
                     $('.main-content').show();
                     authenticated = true;
-                    // Add this line to store project name
+                    //Add this line to store project name
                     sessionStorage.setItem('projectName', targetProject);
                     break;
                 }
@@ -499,7 +499,7 @@
         function updateEventNumbers() {
           let eventNumber = 1;
           $('#event-table tbody tr').each(function() {
-              // Check if there is an event in the row (If Shot column has any content)
+              //Check if there is an event in the row (If Shot column has any content)
               const hasEvent = $(this).find('td:nth-child(2)').text().trim().length > 0;
               const hasInsert = $(this).find('td:nth-child(3)').text().trim().length > 0;
               
@@ -512,7 +512,7 @@
           });
         }
 
-        // Populate the table with data on document ready
+        //Populate the table with data on document ready
         tableData.forEach(function(row) {
             var newRow = '<tr>' +
                 '<td contenteditable="true"; style="text-align:center";>' + row.eventNum + '</td>' +
@@ -524,16 +524,16 @@
             $('#event-table tbody').append(newRow);
         });
 
-        //ADD NEW ROW
-        $(document).on('click', '.add-button', function() {
+        //ADD ROW
+        $(document).on('click', '.add-button', function(type) {
           var newRow = '<tr>' +
-                '<td contenteditable="true"; style="text-align:center";></td>' +
-                '<td contenteditable="true"></td>' +
-                '<td contenteditable="true"></td>' +
-                '<td contenteditable="true"; style="text-align:center";></td>' +
-                '<td style="border: none"><button class="btn btn-primary add-button">+</button><button class="btn btn-danger remove-button">-</button></td>' +
-                '</tr>';
-            $(this).closest('tr').after(newRow);
+              '<td contenteditable="true"; style="text-align:center";></td>' +
+              '<td contenteditable="true"></td>' +
+              '<td contenteditable="true"></td>' +
+              '<td contenteditable="true"; style="text-align:center";></td>' +
+              '<td style="border: none"><button class="btn btn-primary add-button">+</button><button class="btn btn-danger remove-button">-</button></td>' +
+              '</tr>';
+          $(this).closest('tr').after(newRow);
         });
 
         //REMOVE ROW
@@ -541,6 +541,29 @@
             if ($('#event-table tbody tr').length > 1) {
                 $(this).closest('tr').remove();
                 updateEventNumbers();
+            }
+        });
+
+        //ADD ROW RUNNING ORDER
+        $(document).on('click', '.addRunningOrder-button', function(type) {
+          var newRow = '<tr>' +
+              '<td contenteditable="true"></td>' +
+              '<td contenteditable="true"></td>' +
+              '<td contenteditable="true"></td>' +
+              '<td contenteditable="true"></td>' +
+              '<td contenteditable="true"></td>' +
+              '<td contenteditable="true"></td>' +
+              '<td contenteditable="false"; style="border: none"><button class="btn btn-primary addRunningOrder-button">+</button><button class="btn btn-danger removeRunningOrder-button">-</button></td>' +
+              '</tr>';
+          $(this).closest('tr').after(newRow);
+          accumulatedTimeCalc();
+        });
+
+        //REMOVE ROW RUNNING ORDER
+        $(document).on('click', '.removeRunningOrder-button', function() {
+            if ($('#runningOrder-table tbody tr').length > 1) {
+                $(this).closest('tr').remove();
+                accumulatedTimeCalc();
             }
         });
         
@@ -551,28 +574,28 @@
 
             if (selection.rangeCount > 0) {
                 var range = selection.getRangeAt(0);
-                // First try to find the closest td, then find its parent tr
+                //First try to find the closest td, then find its parent tr
                 var cell = range.commonAncestorContainer.nodeType === 1 
                     ? range.commonAncestorContainer.closest('td')?.closest('tr')
                     : range.commonAncestorContainer.parentElement.closest('td')?.closest('tr');
                 if (cell) {
                     targetRow = $(cell);
-                    // Populate the selected row with new event content
+                    //Populate the selected row with new event content
                     targetRow.find('td:eq(1)').html(createShotTypeCell("SHOT TYPE", false));
-                    targetRow.find('td:eq(2)').empty(); // Clear script cell
-                    targetRow.find('td:eq(3)').empty(); // Clear details cell
+                    targetRow.find('td:eq(2)').empty(); //Clear script cell
+                    targetRow.find('td:eq(3)').empty(); //Clear details cell
                     updateEventNumbers();
-                    return; // Exit early since we've updated the existing row
+                    return; //Exit early since we've updated the existing row
                 }
             }
 
-            // If no selection, create new row at the end
+            //If no selection, create new row at the end
             var newRow = '<tr>' +
                 '<td contenteditable="true"; style="text-align:center";></td>' +
                 '<td contenteditable="true";>' + createShotTypeCell("SHOT TYPE", false) + '</td>' +
                 '<td contenteditable="true"></td>' +
                 '<td contenteditable="true"; style="text-align:center";></td>' +
-                '<td style="border:none; width:100px"><button class="btn btn-primary add-button">+</button><button class="btn btn-danger remove-button">-</button></td>' +
+                '<td style="border:none; width:100px"><button class="btn btn-primary add-button" type="script">+</button><button class="btn btn-danger remove-button">-</button></td>' +
                 '</tr>';
             $('#event-table tbody').append(newRow);
             updateEventNumbers();
@@ -619,21 +642,21 @@
         //ADD CUT ON CLICK
         $('.addCut-button').on('click', function() {
             const selection = window.getSelection();
-            let lineCount = 1; // Default to 1
+            let lineCount = 1; //Default to 1
 
             if (selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0);
                 const rects = range.getClientRects();
                 
-                // Get all unique y-coordinates of the rectangles
+                //Get all unique y-coordinates of the rectangles
                 const uniqueYPositions = new Set();
                 for (const rect of rects) {
-                    uniqueYPositions.add(Math.round(rect.top)); // Round to handle minor pixel differences
+                    uniqueYPositions.add(Math.round(rect.top)); //Round to handle minor pixel differences
                 }
                 
                 lineCount = uniqueYPositions.size;
 
-                // Get the cell containing the selection
+                //Get the cell containing the selection
                 const cell = range.commonAncestorContainer.nodeType === 1 
                     ? range.commonAncestorContainer.closest('td')
                     : range.commonAncestorContainer.parentElement.closest('td');
@@ -642,12 +665,12 @@
                     const row = cell.closest('tr');
                     const shotCell = row.querySelector('td:nth-child(2)');
                     
-                    // Adjust the position of text boxes in the Shot column
+                    //Adjust the position of text boxes in the Shot column
                     if (shotCell) {
-                        const lineHeight = 24; // CSS line height
-                        const offset = (lineCount - 1) * lineHeight; // Calc offset
+                        const lineHeight = 24; //CSS line height
+                        const offset = (lineCount - 1) * lineHeight; //Calc offset
                         
-                        // Make shot row and highlighted cut line up (Move text box down)
+                        //Make shot row and highlighted cut line up (Move text box down)
                         const cameraType = shotCell.querySelector('.cameraType');
                         if (cameraType) {
                             cameraType.style.marginTop = `${offset}px`;
@@ -700,18 +723,18 @@
                       var selection = window.getSelection();
                       var range = selection.getRangeAt(0);
                       var newText = selection.toString();
-                      // Removes the '/' cut within the highlight
+                      //Removes the '/' cut within the highlight
                       newText = newText.replace(/ \/ /g, ' ').trim();           
 
-                      // Get the cell containing the selection
+                      //Get the cell containing the selection
                       const cell = range.commonAncestorContainer.nodeType === 1 
                           ? range.commonAncestorContainer.closest('td')
                           : range.commonAncestorContainer.parentElement.closest('td');
                       
-                      // Find and remove the existing cut line
+                      //Find and remove the existing cut line
                       const existingCutLine = cell.querySelector('.cut-line');
                       if (existingCutLine) {
-                        // Remove the cut line and the following slash
+                        //Remove the cut line and the following slash
                         const nextNode = existingCutLine.nextSibling;
                         if (nextNode && nextNode.nodeType === Node.TEXT_NODE && nextNode.textContent.includes('/')) {
                           nextNode.remove();
@@ -719,20 +742,20 @@
                         existingCutLine.remove();
                       }
 
-                      // Create the new cut line span
+                      //Create the new cut line span
                       const newLineSpan = document.createElement('span');
                       newLineSpan.className = 'cut-line';
                       newLineSpan.textContent = newText;
 
-                      // Replace only the selected content
+                      //Replace only the selected content
                       range.deleteContents();
                       range.insertNode(newLineSpan);
                       
-                      // Add the slash after the new span
+                      //Add the slash after the new span
                       const slashText = document.createTextNode(' / ');
                       newLineSpan.after(slashText);
 
-                      // Move cursor after the slash
+                      //Move cursor after the slash
                       const newRange = document.createRange();
                       newRange.setStartAfter(slashText);
                       newRange.collapse(true);
@@ -805,7 +828,7 @@
         $('.view-button').on('click', function() {
             const tableClone = $('.container').clone();
             
-            // Show dropdown as the selected value
+            //Show dropdown as the selected value
             const originalSelects = $('.container .shot-type-select');
             tableClone.find('.shot-type-select').each(function(index) {
                 const originalSelect = originalSelects.eq(index);
@@ -813,7 +836,7 @@
                 $(this).replaceWith($('<span>').text(selectedText));
             });
             
-            // Make all contenteditable elements non-editable in view mode
+            //Make all contenteditable elements non-editable in view mode
             tableClone.find('[contenteditable="true"]').attr('contenteditable', 'false');
 
             //Make all duration elements uneditable strings
@@ -823,7 +846,7 @@
                 $(this).replaceWith($('<span>').text(`${minutes}'${seconds}"`));
             });
             
-            // Create new window/tab and write content
+            //Create new window/tab and write content
             const viewWindow = window.open('', '_blank');
             viewWindow.document.write(`
                 <!DOCTYPE html>
@@ -943,7 +966,7 @@
           '<td contenteditable="true"; style="text-align:center";></td>' +
           '<td contenteditable="true"; style="text-align:center";></td>' +
           '<td contenteditable="true"; style="text-align:center";></td>' +
-          '<td style="border:none; width:100px"><button class="btn btn-primary add-button">+</button><button class="btn btn-danger remove-button">-</button></td>' +
+          '<td style="border:none; width:100px"><button class="btn btn-primary add-button" type="script">+</button><button class="btn btn-danger remove-button" type="script">-</button></td>' +
           '</tr>';
         $('#event-table tbody').append(newRow);
         updateEventNumbers();
@@ -958,9 +981,11 @@
 
     //RUNNING ORDER
     $(document).on('click', '.runningOrder-button', function() {
+        
+        
         const showScriptButton = $('<button class="btn button2" title="Show Script"><i class="fas fa-list-ol"></i> Show Script</button>');
         
-        // Store the original content
+        //Store the original content
         const originalContent = $('.container').html();
         
         //Event > Item numbers
@@ -974,7 +999,7 @@
 
         function wordCalulation(content) {
           const wordCount = content.trim().split(' ').length;
-          const wordsPerSecond = 2.5; // Average words per second
+          const wordsPerSecond = 2.5; //Average words per second
           const totalSeconds = wordCount * wordsPerSecond;
           return timeConvert(totalSeconds);
         }
@@ -995,53 +1020,53 @@
           return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        $('#event-table tbody tr').each(function() {
+        $('#event-table tbody tr').each(function(index) {
             const eventNum = $(this).find('td:first').text().trim();
             const hasEvent = $(this).find('td:nth-child(2)').text().trim().length > 0;
 
             if (eventNum) {
                 eventNumbers.push(eventNum);
 
-                //Type > Source
                 if (hasEvent) {
-                  sourceType.push("CAMS");
-                  soundSource.push("");
+                    sourceType.push("CAMS");
+                    soundSource.push("");
 
-                  //Content > Item Length
-                  const content = $(this).find('td:nth-child(3)').text().trim();
-                  itemLength.push(wordCalulation(content));
+                    const content = $(this).find('td:nth-child(3)').text().trim();
+                    itemLength.push(wordCalulation(content));
                 } else {
-                  sourceType.push("VT");
-                  soundSource.push("VT");
+                    sourceType.push("VT");
+                    soundSource.push("VT");
+                    
+                    const durationInput = $(this).find('input[type="time"]');
+                    
+                    let durValue = "00:00";
+                    if (durationInput.length > 0) {
+                        const timeValue = durationInput.val();
+                        if (timeValue) {
+                            const [minutes, seconds] = timeValue.split(':');
+                            durValue = `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+                        }
+                    }
+                    
+                    itemLength.push(durValue);
                 }
             }     
-          });
+        });
 
-
-        //ACCUMULATED TIME
-        for(let i = 0; i < sourceType.length; i++) {
-          if(sourceType[i] === "CAMS") {
-            accumulatedCalc = accumulatedCalc + secondCalc(itemLength[i]);
-            accumulatedTime.push(timeConvert(accumulatedCalc));
-          }
-          if(sourceType[i] === "VT") {
-            const vtRow = $('#event-table tbody tr').eq(i); // Get row
-            const durationInput = vtRow.find('input[type="time"]'); // Get the time input
-            
-            let durValue = "00:00";
-            if (durationInput.length > 0) {
-                const timeValue = durationInput.val();
-                if (timeValue) {
-                    const [minutes, seconds] = timeValue.split(':');
-                    durValue = `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
-                }
+        function accumulatedTimeCalc() {
+          for(let i = 0; i < itemLength.length; i++) {
+            if(accumulatedTime.length > 0) {
+              accumulatedTime.length = 0;
             }
-            
-            itemLength.push(durValue);
-            accumulatedCalc = accumulatedCalc + secondCalc(durValue);
-            accumulatedTime.push(timeConvert(accumulatedCalc));
+            if(i == 0) {
+              accumulatedTime.push(timeConvert(secondCalc(itemLength[i])));
+            } else {
+              accumulatedTime.push(timeConvert(secondCalc(itemLength[i]) + secondCalc(accumulatedTime[i-1])));
+            }
           }
-        }
+       }
+
+        accumulatedTimeCalc();
         
         $('.container').html(`
             <table style="margin-top:100px; text-align:center;" id="runningOrder-table" class="table">
@@ -1064,6 +1089,7 @@
                             <td>${soundSource[num-1]}</td>
                             <td>${itemLength[num-1]}</td>
                             <td>${accumulatedTime[num-1]}</td>
+                            <td style="border:none; width:100px"><button class="btn btn-primary addRunningOrder-button" type="runningOrder">+</button><button class="btn btn-danger removeRunningOrder-button">-</button></td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -1078,6 +1104,8 @@
         
         //Attach click handler to show script button
         showScriptButton.on('click', function() {
+            //Store the script content
+            const runningOrderContent = $('#runningOrder-table').html();
             $('.container').html(originalContent);
             $(this).remove(); //Remove this show script button
             
@@ -1092,28 +1120,28 @@
         
 
 
-    // Pop up question modal
+    //Pop up question modal
     function showQuestionModal(question, option1Text, option2Text, option1Callback, option2Callback) {
       const modalElement = document.getElementById('questionModal');
       const modal = new bootstrap.Modal(modalElement);
       
-      // Set the question
+      //Set the question
       document.querySelector('#questionModal .modal-body').textContent = question;
       
-      // Set button text
+      //Set button text
       const option1Button = document.getElementById('modalOption1');
       const option2Button = document.getElementById('modalOption2');
       option1Button.textContent = option1Text;
       option2Button.textContent = option2Text;
       
-      // Store the element that had focus before opening the modal
+      //Store the element that had focus before opening the modal
       const previousActiveElement = document.activeElement;
       
-      // Set up button click handlers
+      //Set up button click handlers
       option1Button.onclick = function() {
         modal.hide();
         option1Callback();
-        // Return focus to the previous element
+        //Return focus to the previous element
         if (previousActiveElement) {
           previousActiveElement.focus();
         }
@@ -1121,15 +1149,15 @@
       option2Button.onclick = function() {
         modal.hide();
         option2Callback();
-        // Return focus to the previous element
+        //Return focus to the previous element
         if (previousActiveElement) {
           previousActiveElement.focus();
         }
       };
       
-      // Handle modal events
+      //Handle modal events
       modalElement.addEventListener('hidden.bs.modal', function () {
-        // Return focus to the previous element when modal is hidden
+        //Return focus to the previous element when modal is hidden
         if (previousActiveElement) {
           previousActiveElement.focus();
         }
@@ -1139,7 +1167,7 @@
     }
 
     function formatTime(event) {
-        // Allow only numbers, backspace, delete, tab, arrows, and colon
+        //Allow only numbers, backspace, delete, tab, arrows, and colon
         if (!(['0','1','2','3','4','5','6','7','8','9','Backspace','Delete','Tab','ArrowLeft','ArrowRight',':'].includes(event.key))) {
             event.preventDefault();
             return false;
@@ -1147,21 +1175,21 @@
     }
 
     function formatTimeInput(element) {
-        let value = element.textContent.replace(/[^\d]/g, ''); // Remove non-digits
+        let value = element.textContent.replace(/[^\d]/g, ''); //Remove non-digits
         
-        // Pad with zeros if necessary
+        //Pad with zeros if necessary
         while (value.length < 4) {
             value = '0' + value;
         }
         
-        // Limit to 4 digits
+        //Limit to 4 digits
         value = value.slice(0, 4);
         
-        // Format as MM:SS
+        //Format as MM:SS
         const minutes = value.slice(0, 2);
         const seconds = value.slice(2, 4);
         
-        // Validate seconds
+        //Validate seconds
         if (parseInt(seconds) > 59) {
             element.textContent = minutes + ':59';
         } else {
