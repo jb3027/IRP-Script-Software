@@ -602,17 +602,17 @@
         });
 
         //UNDERLINE
-        $('.textUnderline-button').on('click', function() {
+        $('.underline-button').on('click', function() {
           document.execCommand('underline', false, null);
         });
 
         //BOLD
-        $('.textBold-button').on('click', function() {
+        $('.bold-button').on('click', function() {
           document.execCommand('bold', false, null);
         });
 
         //ITALIC
-        $('.textItalic-button').on('click', function() {
+        $('.italic-button').on('click', function() {
           document.execCommand('italic', false, null);
         });
 
@@ -730,11 +730,11 @@
 
             if (existingCutLine) {
                 showQuestionModal(
-                    "Replace or Add to new event?", //question
-                    "Replace", //option 1
-                    "Add to new event", //option 2
+                    "Remove or Add new event?", //question
+                    "Remove", //option 1
+                    "Add new event", //option 2
 
-                    //REPLACE
+                    //REMOVE
                     function() {
                       var selection = window.getSelection();
                       var range = selection.getRangeAt(0);
@@ -757,26 +757,6 @@
                         }
                         existingCutLine.remove();
                       }
-
-                      //Create the new cut line span
-                      const newLineSpan = document.createElement('span');
-                      newLineSpan.className = 'cut-line';
-                      newLineSpan.textContent = newText;
-
-                      //Replace only the selected content
-                      range.deleteContents();
-                      range.insertNode(newLineSpan);
-                      
-                      //Add the slash after the new span
-                      const slashText = document.createTextNode(' / ');
-                      newLineSpan.after(slashText);
-
-                      //Move cursor after the slash
-                      const newRange = document.createRange();
-                      newRange.setStartAfter(slashText);
-                      newRange.collapse(true);
-                      selection.removeAllRanges();
-                      selection.addRange(newRange);
                     },
                     //ADD TO NEW EVENT
                     function() {
