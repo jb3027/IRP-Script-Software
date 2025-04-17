@@ -140,7 +140,7 @@
     .cut-line::after {
       content: '';
       position: absolute;
-      left: -400px; 
+      left: -350px !important; 
       right: 0; 
       bottom: -3px;
       height: 2px;
@@ -239,7 +239,7 @@
         </div>
 
         <div class="toolbar-group right">
-            <button class="btn button2 primary" title="Save"><i class="fas fa-save"></i> Save</button>
+            <!-- <button class="btn button2 primary" title="Save"><i class="fas fa-save"></i> Save</button> -->
             <button class="btn button2 view-button" title="View"><i class="fas fa-eye"></i> View</button>
             <button class="btn button2 runningOrder-button" title="Running Order"><i class="fas fa-list-ol"></i> Running Order</button>
         </div>
@@ -665,16 +665,32 @@
                     const row = cell.closest('tr');
                     const shotCell = row.querySelector('td:nth-child(2)');
                     
-                    //Adjust the position of text boxes in the Shot column
+                    //Move down the shot type cell to align with cut line
                     if (shotCell) {
-                        const lineHeight = 24; //CSS line height
-                        const offset = (lineCount - 1) * lineHeight; //Calc offset
+                        // Get the script cell (3rd column) content
+                        const scriptCell = row.querySelector('td:nth-child(3)');
+                        const scriptContent = scriptCell ? scriptCell.textContent : '';
+                        const characterCount = scriptContent.length;
+
+                        const charactersPerLine = 60; //Characters per line
+                        const lineHeight = 24; //Pixels per line
+
+                        //How many lines to move the shot cell down by
+                        const offset = lineHeight * Math.floor(characterCount / charactersPerLine);
+
+                        //Make shot row and highlighted cut line up
+                        const allElements = shotCell.querySelectorAll('.editable-cell, .shot-type-flex-container');
+                        allElements.forEach(element => {
+                            element.style.position = 'relative';
+                            element.style.top = `${offset}px`;
+                        });
                         
-                        //Make shot row and highlighted cut line up (Move text box down)
-                        const cameraType = shotCell.querySelector('.cameraType');
-                        if (cameraType) {
-                            cameraType.style.marginTop = `${offset}px`;
-                        }
+                        // Extend the row height
+                        const cells = row.querySelectorAll('td');
+                        cells.forEach(cell => {
+                            cell.style.height = `${offset + 100}px`; // Add extra padding
+                            cell.style.verticalAlign = 'top';
+                        });
                     }
                 }
             }
@@ -972,17 +988,15 @@
         updateEventNumbers();
       });
 
-      //SAVE
-      $('.save-button').on('click', function() {
+      // //SAVE
+      // $('.save-button').on('click', function() {
         
-      });
+      // });
           
     });
 
     //RUNNING ORDER
-    $(document).on('click', '.runningOrder-button', function() {
-        
-        
+    $(document).on('click', '.runningOrder-button', function() { 
         const showScriptButton = $('<button class="btn button2" title="Show Script"><i class="fas fa-list-ol"></i> Show Script</button>');
         
         //Store the original content
@@ -1047,7 +1061,6 @@
                             durValue = `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
                         }
                     }
-                    
                     itemLength.push(durValue);
                 }
             }     
@@ -1055,9 +1068,6 @@
 
         function accumulatedTimeCalc() {
           for(let i = 0; i < itemLength.length; i++) {
-            if(accumulatedTime.length > 0) {
-              accumulatedTime.length = 0;
-            }
             if(i == 0) {
               accumulatedTime.push(timeConvert(secondCalc(itemLength[i])));
             } else {
@@ -1082,14 +1092,14 @@
                 </thead>
                 <tbody>
                     ${eventNumbers.map(num => `
-                        <tr contenteditable="true">
-                            <td>${num}</td>
-                            <td>${sourceType[num-1]}</td>
-                            <td></td>
-                            <td>${soundSource[num-1]}</td>
-                            <td>${itemLength[num-1]}</td>
-                            <td>${accumulatedTime[num-1]}</td>
-                            <td style="border:none; width:100px"><button class="btn btn-primary addRunningOrder-button" type="runningOrder">+</button><button class="btn btn-danger removeRunningOrder-button">-</button></td>
+                        <tr>
+                            <td contenteditable="false">${num}</td>
+                            <td contenteditable="true">${sourceType[num-1]}</td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true">${soundSource[num-1]}</td>
+                            <td contenteditable="false">${itemLength[num-1]}</td>
+                            <td contenteditable="false">${accumulatedTime[num-1]}</td>
+                            <!-- <td style="border:none; width:100px"><button class="btn btn-primary addRunningOrder-button" type="runningOrder">+</button><button class="btn btn-danger removeRunningOrder-button">-</button></td> -->
                         </tr>
                     `).join('')}
                 </tbody>
