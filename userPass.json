@@ -1,15 +1,9 @@
 {
     "usernames": [
-        "user",
-        "abc",
-        "more",
-        "name"
+        "user"
     ],
 
     "passwords": [
-        "123",
-        "def",
-        "extra",
-        "pass"
+        "123"
     ]
 }

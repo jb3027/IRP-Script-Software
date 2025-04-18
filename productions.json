@@ -1,16 +1,8 @@
 {
     "productions": [
         {
-            "name": "production1",
+            "name": "prod1",
             "users": ["user"]
-        },
-        {
-            "name": "production2", 
-            "users": ["name"]
-        },
-        {
-            "name": "production3",
-            "users": ["abc", "name"]
         }
     ]
 }
