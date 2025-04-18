@@ -2,9 +2,12 @@
 <html lang="en">
 <head>
   <title>Studio Script Writer</title>
+  <!-- Roboto is one of the most accessible fonts for the web -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
       padding-top: 60px;
+      font-family: 'Roboto', sans-serif;
     }
 
     .main-content {
@@ -185,14 +188,46 @@
     }
 
     .insert-duration-container {
-        display: inline-block;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        margin: 0 auto;
         text-align: center;
-        white-space: nowrap;
+        padding-left: 35px;
     }
 
-    .insert-duration-container > * {
+    .insertDuration {
+        text-align: right;
+        margin: 0;
+        padding: 0;
+    }
+
+    .view-mode .insert-duration-container {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .view-mode .insertDuration {
+        padding-right: 4px;
+    }
+
+    .production-title-container {
+        text-align: left;
+        padding: 10px 0;
+        margin-top: 30px;
+        margin-bottom: -80px;
+        margin-left: 165px;
+    }
+
+    .production-title {
+        font-size: 24px;
+        font-weight: bold;
+        padding: 8px 16px;
+        outline: none !important;
+        border-radius: 4px;
         display: inline-block;
-        vertical-align: middle;
     }
 
   </style>
@@ -245,6 +280,10 @@
         </div>
     </nav>
 
+    <div class="production-title-container">
+        <div class="production-title" contenteditable="true"></div>
+    </div>
+
     <div class="square"></div>
 
     <div class="container">
@@ -296,6 +335,8 @@
             if (projectName) {
                 $('#project-login').hide();
                 $('.main-content').show();
+                $('.production-title').text(projectName);
+                document.title = projectName + ' - Studio Script Writer';
             } else {
                 $('#project-login').show();
             }
@@ -411,9 +452,9 @@
     function projectLogin() {
       var projectName = document.getElementById('projectName').value;
 
-      function projectCheck(json_file) { //A json file needs to be passed in
-        fetch(json_file, {method: 'GET'}) //Get the file
-            .then(response => response.json()) //Put them in json format
+      function projectCheck(json_file) {
+        fetch(json_file, {method: 'GET'})
+            .then(response => response.json())
             .then(result => {
               const projectList = result.productions.map(element => {
                   return element 
@@ -426,8 +467,9 @@
                 if(targetProject === projectList[i]['name'] && projectList[i]['users'].includes(document.getElementById('username').value)) {
                     $('#project-login').hide();
                     $('.main-content').show();
+                    $('.production-title').text(projectName);
+                    document.title = projectName + ' - Studio Script Writer';
                     authenticated = true;
-                    //Add this line to store project name
                     sessionStorage.setItem('projectName', targetProject);
                     break;
                 }
@@ -437,10 +479,10 @@
                 alert("Production does not exist or you do not have access");
               } 
             })
-            .catch(error => console.log("Error", error)) //Error handling
+            .catch(error => console.log("Error", error))
         }
 
-        projectCheck("productions.json"); //Use the function above
+        projectCheck("productions.json");
     }
     
     $(document).ready(function() {
@@ -452,6 +494,9 @@
         ];
 
         var dropdownOptions = ['SHOT TYPE', 'ES', 'WS', '2S', '3S', 'MS', 'MCU', 'CU', 'ECU', 'AS DIRECTED'];
+
+        //Create title for script
+        
 
         //CREATE SHOT TYPE CELL
         function createShotTypeCell(shotType, firstTime) {
@@ -486,12 +531,12 @@
 
           return '<div>' +
             '<u><div class="editable-cell insertTitle"; style="text-align:center; outline: none;" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText1 + '\')">' + placeHolderText1 + '</u></div>' +
-            '<div class="editable-text insertIn"; style="text-align:center; padding-right: 10px; outline: none; contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText2 + '\')" >' + placeHolderText2 + '</div>' +
+            '<div class="editable-text insertIn"; style="text-align:center; outline: none; padding-right: 10px;" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText2 + '\')" >' + placeHolderText2 + '</div>' +
             '<div class="insert-duration-container">' +
-                '<span class="editable-cell insertDuration" style="text-align: center; padding-left: 140px; outline: none;">' + placeHolderText3 + '</span>' +
-                '<input type="time" id="durationVT" name="durationVT" style="border: none; width: auto; text-align: center;">' +
+                '<span class="insertDuration">' + placeHolderText3 + '</span>' +
+                '<input type="time" id="durationVT" name="durationVT" style="border: none; width: auto;">' +
             '</div>' +
-            '<div class="editable-cell insertOut"; style="text-align:center; outline: none; contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText4 + '\')">' + placeHolderText4 + '</div>' +
+            '<div class="editable-cell insertOut"; style="text-align:center; outline: none;" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText4 + '\')">' + placeHolderText4 + '</div>' +
           '</div>';
         }
 
@@ -823,6 +868,7 @@
         //VIEW MODE
         $('.view-button').on('click', function() {
             const tableClone = $('.container').clone();
+            const productionTitle = $('.production-title').text(); // Get the production title
             
             //Show dropdown as the selected value
             const originalSelects = $('.container .shot-type-select');
@@ -912,9 +958,35 @@
                             flex-shrink: 0;
                             margin-right: 4px;
                         }
+                        .insert-duration-container {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            text-align: center;
+                            margin: 0 auto;
+                        }
+                        .insert-duration-container > * {
+                            display: inline-block;
+                            vertical-align: middle;
+                            margin: 0;
+                        }
+                        .insertDuration {
+                            padding-right: 4px !important;
+                            text-align: right !important;
+                        }
+                        .production-title {
+                            text-align: left;
+                            font-size: 24px;
+                            font-weight: bold;
+                            padding: 8px 16px;
+                            margin-top: 100px;
+                            margin-bottom: -75px;
+                            margin-left: 250px;
+                        }
                     </style>
                 </head>
-                <body>
+                <body class="view-mode">
+                    <div class="production-title">${productionTitle}</div>
                     ${tableClone.html()}
                 </body>
                 </html>
@@ -934,7 +1006,7 @@
             });
             
             viewWindow.document.close();
-            });
+        });
       
 
       //ADD INSERT
@@ -982,6 +1054,12 @@
         //Store the original content
         const originalContent = $('.container').html();
         
+        //Store all duration input values
+        const durationValues = {};
+        $('.container input[type="time"]').each(function(index) {
+            durationValues[index] = $(this).val();
+        });
+
         //Event > Item numbers
         const eventNumbers = [];
         const sourceType = [];
@@ -1097,6 +1175,14 @@
             //Store the script content
             const runningOrderContent = $('#runningOrder-table').html();
             $('.container').html(originalContent);
+            
+            //Restore duration input values
+            $('.container input[type="time"]').each(function(index) {
+                if (durationValues[index]) {
+                    $(this).val(durationValues[index]);
+                }
+            });
+
             $(this).remove(); //Remove this show script button
             
             //Add back the running order button
