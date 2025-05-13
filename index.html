@@ -44,12 +44,11 @@
     thead tr th {
       background-color: #f8f8f8 !important;
       color: rgb(16, 16, 16) !important;
-      border-radius: 12px 12px 12px 12px; /* top-left top-right bottom-right bottom-left */
-      text-align: center !important;  /* Horizontal centering */
-      vertical-align: middle !important;  /* Vertical centering */
-      height: 40px !important;  /* Fixed height for header cells */
-      line-height: 1.5 !important;  /* Reduced from 40px to bring text closer together */
-      padding: 0 !important;  /* Remove default padding */
+      border-radius: 12px 12px 12px 12px; 
+      text-align: center !important;  
+      vertical-align: middle !important;  
+      height: 40px !important;  
+      line-height: 1.5 !important;  /* Changes position of 'event number' */
     }
 
     /* Default cell styling */
@@ -358,6 +357,56 @@
         outline: none !important;
         border: none !important;
         color: rgb(16, 16, 16) !important;
+    }
+
+    /* Row action buttons styling */
+    .row-actions {
+        display: flex;
+        gap: 4px;
+        justify-content: center;
+        align-items: center;
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+    }
+
+    .row-actions:hover {
+        opacity: 1;
+    }
+
+    .row-button {
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border: none;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        background: transparent;
+        color: #000000;
+    }
+
+    .row-button:hover {
+        transform: translateY(-1px);
+    }
+
+    .row-button.add {
+        background: rgba(14, 243, 98, 0.809);
+    }
+
+    .row-button.add:hover {
+        background: rgba(16, 250, 98, 0.917);
+        color: #000000;
+    }
+
+    .row-button.remove {
+        background: rgba(222, 49, 30, 0.737);
+    }
+
+    .row-button.remove:hover {
+        background: rgba(228, 32, 11, 0.898);
+        color: #000000;
     }
 
   </style>
@@ -692,62 +741,53 @@
           });
         }
 
+        function createRowButtons() {
+            return `<div class="row-actions">
+                <button class="row-button add" title="Add Row">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="row-button remove" title="Remove Row">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>`;
+        }
+
+        // Update the table row creation code
+        function createTableRow(type = 'default') {
+            return `<tr class="${type}_highlighted">
+                <td contenteditable="true" style="text-align:center"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true" style="text-align:center"></td>
+                <td style="border:none; width:90px">${createRowButtons()}</td>
+            </tr>`;
+        }
+
         //Populate the table with data on document ready
         tableData.forEach(function(row) {
-            var newRow = '<tr class="event_highlighted">' +
-                '<td contenteditable="true"; style="text-align:center";>' + row.eventNum + '</td>' +
-                '<td contenteditable="true";>' + createShotTypeCell("SHOT TYPE", true) + '</td>' +
-                '<td contenteditable="true">' + row.content + '</td>' +
-                '<td contenteditable="true"; style="text-align:center";>' + row.details.replace('\n','<br>') + '</td>' +
-                '<td style="border:none; width: 90px"><button class="btn btn-primary add-button" style="border-radius: 100%;">+</button><button class="btn btn-danger remove-button" style="border-radius: 100%;">-</button></td>' +
-                '</tr>';
+            var newRow = `<tr class="event_highlighted">
+                <td contenteditable="true" style="text-align:center">${row.eventNum}</td>
+                <td contenteditable="true">${createShotTypeCell("SHOT TYPE", true)}</td>
+                <td contenteditable="true">${row.content}</td>
+                <td contenteditable="true" style="text-align:center">${row.details.replace('\n','<br>')}</td>
+                <td style="border:none; width:90px">${createRowButtons()}</td>
+            </tr>`;
             $('#event-table tbody').append(newRow);
         });
 
-        //Modify the ADD ROW function
-        $(document).on('click', '.add-button', function(type) {
-          var newRow = '<tr class="default_highlighted">' + // Remove highlighted class from initial creation
-              '<td contenteditable="true"; style="text-align:center";></td>' +
-              '<td contenteditable="true"></td>' +
-              '<td contenteditable="true"></td>' +
-              '<td contenteditable="true"; style="text-align:center";></td>' +
-              '<td style="border:none; width: 90px"><button class="btn btn-primary add-button" style="border-radius: 100%;">+</button><button class="btn btn-danger remove-button" style="border-radius: 100%;">-</button></td>' +
-              '</tr>';
-          $(this).closest('tr').after(newRow);
-          updateEventNumbers(); // This will handle highlighting based on content
+        // Update event handlers
+        $(document).on('click', '.row-button.add', function() {
+            $(this).closest('tr').after(createTableRow());
+            updateEventNumbers();
         });
 
-        //REMOVE ROW
-        $(document).on('click', '.remove-button', function() {
+        $(document).on('click', '.row-button.remove', function() {
             if ($('#event-table tbody tr').length > 1) {
                 $(this).closest('tr').remove();
                 updateEventNumbers();
             }
         });
 
-        //ADD ROW RUNNING ORDER
-        $(document).on('click', '.addRunningOrder-button', function(type) {
-          var newRow = '<tr class="default_highlighted">' +
-              '<td contenteditable="true"></td>' +
-              '<td contenteditable="true"></td>' +
-              '<td contenteditable="true"></td>' +
-              '<td contenteditable="true"></td>' +
-              '<td contenteditable="true"></td>' +
-              '<td contenteditable="true"></td>' +
-              '<td contenteditable="false"; style="border: none"><button class="btn btn-primary addRunningOrder-button">+</button><button class="btn btn-danger removeRunningOrder-button">-</button></td>' +
-              '</tr>';
-          $(this).closest('tr').after(newRow);
-          accumulatedTimeCalc();
-        });
-
-        //REMOVE ROW RUNNING ORDER
-        $(document).on('click', '.removeRunningOrder-button', function() {
-            if ($('#runningOrder-table tbody tr').length > 1) {
-                $(this).closest('tr').remove();
-                accumulatedTimeCalc();
-            }
-        });
-        
         //ADD EVENT 
         $('.addEvent-button').on('click', function() {
             var selection = window.getSelection();
@@ -776,7 +816,7 @@
                 '<td contenteditable="true";>' + createShotTypeCell("SHOT TYPE", false) + '</td>' +
                 '<td contenteditable="true"></td>' +
                 '<td contenteditable="true"; style="text-align:center";></td>' +
-                '<td style="border:none; width:100px"><button class="btn btn-primary add-button"; style="border-radius: 100%;" type="script">+</button><button class="btn btn-danger remove-button"; style="border-radius: 100%;" type="script">-</button></td>' +
+                '<td style="border:none; width:90px"><button class="btn btn-primary add-button" style="border-radius: 100%; transform: translateY(50%);">+</button><button class="btn btn-danger remove-button" style="border-radius: 100%; transform: translateY(50%);">-</button></td>' +
                 '</tr>';
             $('#event-table tbody').append(newRow);
             updateEventNumbers();
@@ -1171,7 +1211,7 @@
           '<td contenteditable="true"; style="text-align:center";></td>' +
           '<td contenteditable="true"; style="text-align:center";></td>' +
           '<td contenteditable="true"; style="text-align:center";></td>' +
-          '<td style="border:none; width:100px"><button class="btn btn-primary add-button" style="border-radius: 100%;" type="script">+</button><button class="btn btn-danger remove-button" style="border-radius: 100%;" type="script">-</button></td>' +
+          '<td style="border:none; width:90px"><button class="btn btn-primary add-button" style="border-radius: 100%; transform: translateY(50%);">+</button><button class="btn btn-danger remove-button" style="border-radius: 100%; transform: translateY(50%);">-</button></td>' +
           '</tr>';
         $('#event-table tbody').append(newRow);
         updateEventNumbers();
