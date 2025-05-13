@@ -14,22 +14,15 @@
       padding-top: 60px;
       /* Arial as primary, OpenDyslexic as backup */
       font-family: Arial, 'OpenDyslexic', sans-serif !important;
-      /*Off-white background colour and dark blue text colour for accessibility*/
+      /*Off-white background colour and dark blue text colour for accessibility */
       background-color: #f8f8f8 !important;
       color: rgb(16, 16, 16) !important;
+      line-height: 1.5; /* Increased line space for accessibility */
     }
 
     .main-content {
       display: none;
       width: device-width;
-    }
-
-    input {
-      background-color: #f8f8f8 !important;
-      color: rgb(16, 16, 16) !important;
-      border: 1px solid #2c3e50;
-      padding: 8px;
-      border-radius: 4px;
     }
 
     table {
@@ -38,35 +31,128 @@
       margin: 0 auto;
       background-color: #f8f8f8 !important;
       color: rgb(16, 16, 16) !important;
+      border-collapse: separate !important;
+      border-spacing: 0;
     }
 
-    th {
+    /* Header styling */
+    thead tr {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    thead tr th {
+      background-color: #f8f8f8 !important;
+      color: rgb(16, 16, 16) !important;
+      border-radius: 12px 12px 12px 12px; /* top-left top-right bottom-right bottom-left */
+      text-align: center !important;  /* Horizontal centering */
+      vertical-align: middle !important;  /* Vertical centering */
+      height: 40px !important;  /* Fixed height for header cells */
+      line-height: 1.5 !important;  /* Reduced from 40px to bring text closer together */
+      padding: 0 !important;  /* Remove default padding */
+    }
+
+    /* Default cell styling */
+    tr td {
       background-color: #f8f8f8 !important;
       color: rgb(16, 16, 16) !important;
     }
 
-    td {
-      background-color: #f8f8f8 !important;
-      color: rgb(16, 16, 16) !important;
+    /*--------------------- CELL DESIGN ----------------------*/
+    /* Colour of event cells*/
+    tr.event_highlighted td:not(:last-child) {
+      background-color: rgba(218, 230, 255, 0.3) !important;
+      position: relative;
+    }
+    /* Colour of insert cells*/
+    tr.insert_highlighted td:not(:last-child) {
+      background-color: rgba(255, 231, 250, 0.5) !important;
+      position: relative;
     }
 
-    td[contenteditable='true'],
+    /* Styling colour of event cells*/
+    tr.event_highlighted::after {
+      outline: 2px solid rgba(5, 88, 189, 0.6) !important;
+      box-shadow: 0 0 2px rgba(58, 118, 214, 0.3) !important;
+    }
+    /* Styling colour of insert cells*/
+    tr.insert_highlighted::after {
+      outline: 2px solid rgba(255, 66, 233, 0.6) !important;
+      box-shadow: 0 0 2px rgba(141, 36, 149, 0.3) !important;
+    }
+
+    /* Remove cell borders */
+    tr.event_highlighted td,
+    tr.insert_highlighted td {
+      border: none !important; 
+    }
+    tr.event_highlighted,
+    tr.insert_highlighted {
+      position: relative;
+    }
+
+    /* Hover */
+    tr.event_highlighted:hover td:not(:last-child),
+    tr.insert_highlighted:hover td:not(:last-child),
+    tr.insert_highlighted:hover .insert-duration-container {
+      background-color: rgba(248, 248, 248, 0.9) !important;
+      transition: background-color 0.2s ease;
+    }
+
+    /* Structure design of cells*/
+    tr.event_highlighted::after,
+    tr.insert_highlighted::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 90px;
+      bottom: 0;
+      border-radius: 12px;
+      pointer-events: none;
+      transition: all 0.2s ease-in-out;
+    }
+
+    tr.event_highlighted td:first-child,
+    tr.insert_highlighted td:first-child {
+      border-top-left-radius: 12px;
+      border-bottom-left-radius: 12px;
+    }
+
+    tr.event_highlighted td:nth-child(4),
+    tr.insert_highlighted td:nth-child(4) {
+      border-top-right-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+
+    /* General editable cell styling */
+    .editable-cell,
+    .editable-text,
     div[contenteditable='true'] {
-        border: 0px solid rgb(214, 235, 255);
-        background-color: #f8f8f8 !important;
+        border: 0.5px solid rgb(155, 180, 203);
+        border-radius: 8px;
+        background-color: rgba(240, 240, 240, 0.3) !important;
         color: rgb(16, 16, 16) !important;
-    } 
+    }
+
+    /* Specific styling for insert cells */
+    tr.insert_highlighted .editable-cell,
+    tr.insert_highlighted .editable-text,
+    tr.insert_highlighted div[contenteditable='true'] {
+        background-color: rgba(255, 231, 250, 0.5);
+        border: 0px solid rgb(255, 214, 235);
+    }
 
     .table .shot-type-select {
       width: fit-content;
       text-align: left;
       border: 0px solid rgb(214, 235, 255);
-      outline: 1px solid blue;
-      background-color: #f8f8f8 !important;
+      outline: 0.2px solid rgba(61, 113, 255, 0.5);
+      background-color: rgba(240, 240, 240, 0.3) !important;
     }
 
     .shot-type-select option {
-      background-color: #f8f8f8 !important;
+      background-color: rgba(218, 237, 255, 0.3) !important;
       color: rgb(16, 16, 16) !important;
     }
 
@@ -143,20 +229,19 @@
         background-color: #c0392b !important;
     }
 
-    .editable-cell,
-    .editable-text,
-    div[contenteditable='true'] {
+    .editable-cell:not(.production-title),
+    .editable-text:not(.production-title),
+    div[contenteditable='true']:not(.production-title) {
       display: block;
       width: 100%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       position: relative;
-      outline: 0.5px solid blue;
       min-height: 24px; 
       user-select: text; 
-      background-color: #f8f8f8 !important;
-      color: rgb(16, 16, 16) !important;
+      background-color: rgba(244, 244, 244, 0.3) !important;
+      outline: 0px !important;
     }
 
     .editable-cell span {
@@ -235,7 +320,7 @@
         margin: 0 auto;
         text-align: center;
         padding-left: 35px;
-        background-color: #f8f8f8 !important;
+        background-color: transparent !important;
         color: rgb(16, 16, 16) !important;
     }
 
@@ -267,9 +352,12 @@
         font-size: 24px;
         font-weight: bold;
         padding: 8px 16px;
-        outline: none !important;
         border-radius: 4px;
         display: inline-block;
+        background-color: #f8f8f8 !important;
+        outline: none !important;
+        border: none !important;
+        color: rgb(16, 16, 16) !important;
     }
 
   </style>
@@ -336,7 +424,7 @@
                   <th scope="col" style="border: 1px solid black; width:350px; text-align: center;">Shot</th>
                   <th scope="col" style="border: 1px solid black; width:450px; text-align: center;">Script</th>
                   <th scope="col" style="border: 1px solid black; width:150px; text-align: center;">Details</th>
-                  <th scope="col" style="border: none; width:100px; text-align: center;"></th>
+                  <th scope="col" style="border: none; width:90px; text-align: center;"></th>
               </tr>
           </thead>
           <tbody>
@@ -536,8 +624,6 @@
         ];
 
         var dropdownOptions = ['SHOT TYPE', 'ES', 'WS', '2S', '3S', 'MS', 'MCU', 'CU', 'ECU', 'AS DIRECTED'];
-
-        //Create title for script
         
 
         //CREATE SHOT TYPE CELL
@@ -555,12 +641,12 @@
             var placeHolderText3 = firstTime ? 'Additional Info (E.g., TRACK OUT)' : '\u00A0';
 
             return '<div>' +
-                '<div class="editable-cell cameraType" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText1 + '\')">' + placeHolderText1 + '</div>' +
-                '<div class="shot-type-flex-container">' +
+                '<div class="editable-cell cameraType event_highlighted" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText1 + '\')">' + placeHolderText1 + '</div>' +
+                '<div class="shot-type-flex-container event_highlighted">' +
                     '<div class="shotTypeDropdown">' + selectHTML + '</div>' +
                     '<div class="editable-text shotSubject" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText2 + '\')" >' + placeHolderText2 + '</div>' +
                 '</div>' +
-                '<div class="editable-cell extraInfo" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText3 + '\')">' + placeHolderText3 + '</div>' +
+                '<div class="editable-cell extraInfo event_highlighted" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText3 + '\')">' + placeHolderText3 + '</div>' +
             '</div>';
         }
 
@@ -582,45 +668,53 @@
           '</div>';
         }
 
-        //UPDATE EVENT NUMBERS
+        //UPDATE EVENT NUMBERS AND HIGHLIGHTING
         function updateEventNumbers() {
           let eventNumber = 1;
           $('#event-table tbody tr').each(function() {
-              //Check if there is an event in the row (If Shot column has any content)
+              //Check if there is an event in the row (If Shot column or Insert has content)
               const hasEvent = $(this).find('td:nth-child(2)').text().trim().length > 0;
               const hasInsert = $(this).find('td:nth-child(3)').text().trim().length > 0;
               
-              if (hasEvent || hasInsert) {
+              if (hasEvent) {
                   $(this).find('td:first').text(eventNumber);
+                  $(this).addClass('event_highlighted');
+                  eventNumber++;
+              } else if (hasInsert) {
+                  $(this).find('td:first').text(eventNumber);
+                  $(this).addClass('insert_highlighted');
                   eventNumber++;
               } else {
                   $(this).find('td:first').text('');
+                  $(this).removeClass('event_highlighted');
+                  $(this).removeClass('insert_highlighted');
               }
           });
         }
 
         //Populate the table with data on document ready
         tableData.forEach(function(row) {
-            var newRow = '<tr>' +
+            var newRow = '<tr class="event_highlighted">' +
                 '<td contenteditable="true"; style="text-align:center";>' + row.eventNum + '</td>' +
                 '<td contenteditable="true";>' + createShotTypeCell("SHOT TYPE", true) + '</td>' +
                 '<td contenteditable="true">' + row.content + '</td>' +
                 '<td contenteditable="true"; style="text-align:center";>' + row.details.replace('\n','<br>') + '</td>' +
-                '<td style="border:none; width:100px"><button class="btn btn-primary add-button">+</button><button class="btn btn-danger remove-button">-</button></td>' +
+                '<td style="border:none; width: 90px"><button class="btn btn-primary add-button" style="border-radius: 100%;">+</button><button class="btn btn-danger remove-button" style="border-radius: 100%;">-</button></td>' +
                 '</tr>';
             $('#event-table tbody').append(newRow);
         });
 
-        //ADD ROW
+        //Modify the ADD ROW function
         $(document).on('click', '.add-button', function(type) {
-          var newRow = '<tr>' +
+          var newRow = '<tr class="default_highlighted">' + // Remove highlighted class from initial creation
               '<td contenteditable="true"; style="text-align:center";></td>' +
               '<td contenteditable="true"></td>' +
               '<td contenteditable="true"></td>' +
               '<td contenteditable="true"; style="text-align:center";></td>' +
-              '<td style="border: none"><button class="btn btn-primary add-button">+</button><button class="btn btn-danger remove-button">-</button></td>' +
+              '<td style="border:none; width: 90px"><button class="btn btn-primary add-button" style="border-radius: 100%;">+</button><button class="btn btn-danger remove-button" style="border-radius: 100%;">-</button></td>' +
               '</tr>';
           $(this).closest('tr').after(newRow);
+          updateEventNumbers(); // This will handle highlighting based on content
         });
 
         //REMOVE ROW
@@ -633,7 +727,7 @@
 
         //ADD ROW RUNNING ORDER
         $(document).on('click', '.addRunningOrder-button', function(type) {
-          var newRow = '<tr>' +
+          var newRow = '<tr class="default_highlighted">' +
               '<td contenteditable="true"></td>' +
               '<td contenteditable="true"></td>' +
               '<td contenteditable="true"></td>' +
@@ -677,12 +771,12 @@
             }
 
             //If no selection, create new row at the end
-            var newRow = '<tr>' +
+            var newRow = '<tr class="event_highlighted">' +
                 '<td contenteditable="true"; style="text-align:center";></td>' +
                 '<td contenteditable="true";>' + createShotTypeCell("SHOT TYPE", false) + '</td>' +
                 '<td contenteditable="true"></td>' +
                 '<td contenteditable="true"; style="text-align:center";></td>' +
-                '<td style="border:none; width:100px"><button class="btn btn-primary add-button" type="script">+</button><button class="btn btn-danger remove-button">-</button></td>' +
+                '<td style="border:none; width:100px"><button class="btn btn-primary add-button"; style="border-radius: 100%;" type="script">+</button><button class="btn btn-danger remove-button"; style="border-radius: 100%;" type="script">-</button></td>' +
                 '</tr>';
             $('#event-table tbody').append(newRow);
             updateEventNumbers();
@@ -712,7 +806,6 @@
     
           const highlightSpan = range.commonAncestorContainer.closest?.('.highlight') || 
                                range.commonAncestorContainer.parentElement?.closest?.('.highlight');
-
           if (highlightSpan) { //If the text is already highlighted, remove it
               const parent = highlightSpan.parentNode;
               while (highlightSpan.firstChild) {
@@ -1024,6 +1117,8 @@
                             margin-top: 100px;
                             margin-bottom: -75px;
                             margin-left: 250px;
+                            outline: none !important;
+                            border: none !important;
                         }
                     </style>
                 </head>
@@ -1071,12 +1166,12 @@
         }
 
         //If there is no selection, create a new row at the end
-        var newRow = '<tr>' +
+        var newRow = '<tr class="insert_highlighted">' +
           '<td contenteditable="true";>' + createInsertCell() + '</td>' +
           '<td contenteditable="true"; style="text-align:center";></td>' +
           '<td contenteditable="true"; style="text-align:center";></td>' +
           '<td contenteditable="true"; style="text-align:center";></td>' +
-          '<td style="border:none; width:100px"><button class="btn btn-primary add-button" type="script">+</button><button class="btn btn-danger remove-button" type="script">-</button></td>' +
+          '<td style="border:none; width:100px"><button class="btn btn-primary add-button" style="border-radius: 100%;" type="script">+</button><button class="btn btn-danger remove-button" style="border-radius: 100%;" type="script">-</button></td>' +
           '</tr>';
         $('#event-table tbody').append(newRow);
         updateEventNumbers();
