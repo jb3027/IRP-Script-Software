@@ -2,16 +2,23 @@
 <html lang="en">
 <head>
   <title>Studio Script Writer</title>
-  <!-- Roboto is one of the most accessible fonts for the web -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
+    @font-face {
+      font-family: 'OpenDyslexic';
+      src: url('lib/libraries/fonts/OpenDyslexic-Regular.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    
     body {
       padding-top: 60px;
-      font-family: 'Roboto', sans-serif;
+      /* Arial as primary, OpenDyslexic as backup */
+      font-family: Arial, 'OpenDyslexic', sans-serif !important; 
     }
 
     .main-content {
       display: none;
+      width: device-width;
     }
 
     table {
@@ -32,7 +39,7 @@
       outline: 1px solid blue;
     }
 
-    /*NAv bar*/
+    /*Nav bar*/
     ul {
       list-style-type: none;
       margin: 0;
