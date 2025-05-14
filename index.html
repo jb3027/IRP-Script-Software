@@ -367,10 +367,18 @@
         align-items: center;
         opacity: 0.6;
         transition: opacity 0.2s ease;
+        height: 100%; 
+        padding: 8px 0;
     }
 
     .row-actions:hover {
         opacity: 1;
+    }
+
+    /* Add/remove buttons */
+    td:last-child {
+        vertical-align: middle !important; 
+        position: relative; 
     }
 
     .row-button {
