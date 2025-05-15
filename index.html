@@ -32,33 +32,41 @@
       background-color: #f8f8f8 !important;
       color: rgb(16, 16, 16) !important;
       border-collapse: separate !important;
-      border-spacing: 0;
+      border-spacing: 0 10px;
     }
 
     /* Header styling */
     thead tr {
-      border-radius: 8px;
-      overflow: hidden;
+        border-radius: 12px;
+        overflow: hidden;
     }
 
     thead tr th:not(:last-child) {
-      background-color: #f8f8f8 !important; 
-      color: #2c3e50 !important; 
-      border-radius: 8px 8px 0 0;
-      text-align: center !important;
-      vertical-align: middle !important;
-      height: 48px !important;
-      line-height: 1.5 !important;
-      font-weight: 600 !important;
-      text-transform: uppercase !important; 
-      font-size: 0.9rem !important;
-      letter-spacing: 0.5px !important; 
-      border-bottom: 2px solid #e2e8f0 !important; 
-      box-shadow: 2px 2px 4px rgba(0,0,0,0.05) !important; 
+        /* better contrast for accessibility */
+        background-color: #2c3e50 !important;
+        color: #ffffff !important;
+        border-radius: 12px 12px 0 0;
+        
+        /* Text styling for better readability */
+        text-align: center !important;
+        vertical-align: middle !important;
+        height: 56px !important;
+        line-height: 1.6 !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        font-size: 1rem !important;
+        letter-spacing: 0.7px !important;
+        
+        /* Subtle border and shadow for depth */
+        border-bottom: 3px solid #34495e !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+        
+        /* Add padding for better spacing */
+        padding: 12px 16px !important;
     }
 
     thead tr th:last-child {
-      background-color: #f8f8f8 !important; 
+        background-color: transparent !important;
     }
 
     /* Default cell styling */
@@ -66,33 +74,38 @@
       background-color: #f8f8f8 !important;
       color: rgb(16, 16, 16) !important;
       vertical-align: top !important;
+      font-weight: 500 !important;
+    }
+
+    tr td:not(:last-child) {
+        padding: 10px;
     }
 
     /*--------------------- CELL DESIGN ----------------------*/
-    /* Colour of event cells*/
+    /* Colour of event cells  */
     tr.event_highlighted td:not(:last-child) {
-      background-color: rgba(218, 230, 255, 0.3) !important;
+      background-color: rgba(100, 181, 246, 0.4) !important; 
       position: relative;
     }
-    /* Colour of insert cells*/
+    /* Colour of insert cells  */
     tr.insert_highlighted td:not(:last-child) {
-      background-color: rgba(255, 231, 250, 0.5) !important;
+      background-color: rgba(149, 117, 205, 0.4) !important; 
       position: relative;
     }
-     /* Colour of item cells*/
-     tr.item_highlighted td:not(:last-child) {
-      background-color: rgba(255, 248, 203, 0.775) !important;
+    /* Colour of item cells */
+    tr.item_highlighted td:not(:last-child) {
+      background-color: rgba(255, 183, 77, 0.4) !important; 
       position: relative;
     }
 
     /* Styling colour of event cells*/
     tr.event_highlighted::after {
-      outline: 2px solid rgba(5, 88, 189, 0.6) !important;
+      outline: 2px solid rgba(2, 114, 250, 0.6) !important;
       box-shadow: 0 0 2px rgba(58, 118, 214, 0.3) !important;
     }
     /* Styling colour of insert cells*/
     tr.insert_highlighted::after {
-      outline: 2px solid rgba(255, 66, 233, 0.6) !important;
+      outline: 2px solid rgba(147, 2, 230, 0.6) !important;
       box-shadow: 0 0 2px rgba(141, 36, 149, 0.3) !important;
     }
     /* Styling colour of item cells*/
@@ -157,30 +170,48 @@
     div[contenteditable='true'] {
         border: 0.5px solid rgb(155, 180, 203);
         border-radius: 8px;
-        background-color: rgba(240, 240, 240, 0.3) !important;
+        background-color: inherit !important;
         color: rgb(16, 16, 16) !important;
         vertical-align: top !important;
+    }
+
+    tr.event_highlighted .editable-cell,
+    tr.event_highlighted .editable-text,
+    tr.event_highlighted div[contenteditable='true'] {
+        background-color: inherit !important;
     }
 
     /* Specific styling for insert cells */
     tr.insert_highlighted .editable-cell,
     tr.insert_highlighted .editable-text,
     tr.insert_highlighted div[contenteditable='true'] {
-        background-color: rgba(255, 231, 250, 0.5);
+        background-color: inherit !important;
         border: 0px solid rgb(255, 214, 235);
     }
 
+    /* Update shot type select styling */
     .table .shot-type-select {
-      width: fit-content;
-      text-align: left;
-      border: 0px solid rgb(214, 235, 255);
-      outline: 0.2px solid rgba(61, 113, 255, 0.5);
-      background-color: rgba(240, 240, 240, 0.3) !important;
+        width: fit-content;
+        text-align: left;
+        border: 0px solid rgb(214, 235, 255);
+        outline: 0.2px solid rgba(61, 113, 255, 0.5);
+        background-color: inherit !important;
     }
 
+    .shot-type-select {
+        background-color: inherit !important;
+    }
+
+    /* Style for dropdown options */
     .shot-type-select option {
-      background-color: rgba(218, 237, 255, 0.3) !important;
+      background-color: white !important;
       color: rgb(16, 16, 16) !important;
+      padding: 8px !important;
+    }
+
+    /* Style for when dropdown is opened */
+    .shot-type-select:focus {
+      background-color: rgba(240, 240, 240, 0.3) !important;
     }
 
     /* -------------------- Nav bar ---------------------------*/
@@ -198,7 +229,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: #2c3e50;
+        background-color: #2c3e50 !important;
         padding: 12px 24px;
         position: fixed;
         top: 0;
@@ -227,12 +258,16 @@
         padding: 8px 16px;
         border-radius: 4px;
         border: 1px solid transparent;
-        font-size: 14px;
-        font-weight: 500;
-        transition: all 0.2s ease;
+        text-align: center !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        font-size: 0.9rem !important;
+        letter-spacing: 0.5px !important;
+        line-height: 1.4 !important;
         display: flex;
         align-items: center;
         gap: 6px;
+        transition: all 0.2s ease;
     }
 
     .button2:hover {
@@ -322,11 +357,27 @@
     .shot-type-dropdown {
         flex-shrink: 0;
         margin-right: 6px; 
+        background-color: #f8f8f8 !important;
+        color: rgb(16, 16, 16) !important;
     }
 
     .shotSubject {
         flex: 1; 
         min-width: 0; 
+        color: rgb(16, 16, 16) !important;
+    }
+
+    /* Styles for placeholder texts */
+    .shotSubject::placeholder, 
+    .cameraType::placeholder,
+    .extraInfo::placeholder {
+        color: rgb(16, 16, 16) !important;
+    }
+
+    .shotSubject::-moz-placeholder,
+    .cameraType::-moz-placeholder,
+    .extraInfo::-moz-placeholder {
+        color: rgb(16, 16, 16) !important;
     }
 
     .modal-dialog {
@@ -339,10 +390,7 @@
       gap: 15px;
     }
 
-    .highlight {
-      background-color: yellow;
-    }
-
+    /* Update insert duration container styling */
     .insert-duration-container {
         display: flex;
         justify-content: center;
@@ -351,8 +399,24 @@
         margin: 0 auto;
         text-align: center;
         padding-left: 35px;
-        background-color: transparent !important;
+        background-color: inherit !important;
         color: rgb(16, 16, 16) !important;
+    }
+
+    /* Update time input styling */
+    input[type="time"] {
+        background-color: rgba(149, 117, 205, 0.4) !important;
+        border: none;
+        color: rgb(16, 16, 16) !important;
+    }
+
+    tr.insert_highlighted input[type="time"] {
+        background-color: rgba(149, 117, 205, 0.4) !important;
+    }
+
+    tr.insert_highlighted:hover input[type="time"] {
+        background-color: rgba(248, 248, 248, 0.9) !important;
+        transition: background-color 0.2s ease;
     }
 
     .insertDuration {
@@ -445,11 +509,12 @@
         background-color: #ed0606; 
     }
 
+    /* Update custom shot type styling */
     .custom-shot-type {
         width: 100%;
         border: 0.5px solid rgb(155, 180, 203);
         border-radius: 8px;
-        background-color: rgba(240, 240, 240, 0.3) !important;
+        background-color: inherit !important;
         color: rgb(16, 16, 16) !important;
         padding: 2px 6px;
         display: none;
@@ -458,7 +523,7 @@
     /* New styles for drag and drop */
     tr.dragging {
         opacity: 0.5;
-        background-color: #f0f0f0;
+        background-color: #e3e3e3;
     }
     
     tbody tr {
@@ -467,6 +532,21 @@
 
     .row-button.drag {
         cursor: move;  /* Show move cursor only on drag button */
+    }
+
+    /* Insert styling */
+    .insertTitle::placeholder,
+    .insertIn::placeholder,
+    .insertOut::placeholder,
+    .item-content::placeholder {
+        color: rgb(16, 16, 16) !important;
+    }
+
+    .item-content {
+        border: none !important; 
+        margin-left: -3px;
+        background-color: transparent !important;
+        text-decoration: underline;
     }
 
   </style>
@@ -753,13 +833,12 @@
             var placeHolderText3 = firstTime ? 'Additional Info (E.g., TRACK OUT)' : '\u00A0';
 
             return '<div>' +
-                '<input type="text" name="cameraType" class="editable-cell cameraType event_highlighted" class="form-control" placeholder=' + placeHolderText1 + id="fullscreen-search-term" autocomplete="off" value="">' + 
-                '<div id="defaultText" class="editable-cell cameraType event_highlighted" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText1 + '\')" placeholder="' + placeHolderText1 + '"></div>' +
+                '<input type="text" class="editable-cell cameraType event_highlighted" placeholder="Camera Number/Position">' + 
                 '<div class="shot-type-flex-container event_highlighted">' +
                     '<div class="shotTypeDropdown">' + selectHTML + '</div>' +
-                    '<div class="editable-text shotSubject" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText2 + '\')" >' + placeHolderText2 + '</div>' +
+                    '<input class="editable-text shotSubject" placeholder="Shot Subject (E.g., HOST)">' +
                 '</div>' +
-                '<div class="editable-cell extraInfo event_highlighted" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText3 + '\')">' + placeHolderText3 + '</div>' +
+                '<input type="text" class="editable-cell extraInfo event_highlighted" placeholder="Additional Info (E.g., TRACK OUT)"' +
             '</div>';
         }
 
@@ -767,26 +846,25 @@
 
         //CREATE INSERT CELL
         function createInsertCell() {
-          var placeHolderText1 = 'Ven: TITLES';
-          var placeHolderText2 = 'In: Music';
-          var placeHolderText3 = 'Dur: ';
-          var placeHolderText4 = 'Out: Music';
-
-          return '<div>' +
-            '<u><div class="editable-cell insertTitle"; style="text-align:center; outline: none;" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText1 + '\')">' + placeHolderText1 + '</u></div>' +
-            '<div class="editable-text insertIn"; style="text-align:center; outline: none; padding-right: 10px;" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText2 + '\')" >' + placeHolderText2 + '</div>' +
+          return '<div style="text-align:center;" class="insert-content">' +
+            '<u><input type="text" class="editable-cell insertTitle" style="text-align:center; outline: none; color: rgb(16, 16, 16);" placeholder="Ven: Title"></u>' +
+            '<input type="text" class="editable-text insertIn" style="text-align:center; margin-left: -5px; color: rgb(16, 16, 16);" placeholder="In: Music">' +
             '<div class="insert-duration-container">' +
-                '<span class="insertDuration">' + placeHolderText3 + '</span>' +
-                '<input type="time" id="durationVT" name="durationVT" style="border: none; width: auto;">' +
+                '<span style="white-space: nowrap; color: rgb(16, 16, 16);">Dur: ' +
+                '<input type="time" id="durationVT" name="durationVT" value="00:00" style="border: none; width: auto; margin-left: 2px; color: rgb(16, 16, 16);">' +
+                '</span>' +
             '</div>' +
-            '<div class="editable-cell insertOut"; style="text-align:center; outline: none;" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText4 + '\')">' + placeHolderText4 + '</div>' +
+            '<input type="text" class="editable-cell insertOut" style="text-align:center; outline: none; color: rgb(16, 16, 16);" placeholder="Out: Music">' +
           '</div>';
         }
 
         //CREATE ITEM CELL
         function createItemCell() {
           const currentItemCount = $('#event-table tbody tr.item_highlighted').length + 1;
-          return '<b><u>ITEM ' + currentItemCount + ':</b><span contenteditable="true" class="item-content"> New Item</u></span>';
+          return '<div class="item-cell-container">' +
+                 '<span><b><u>ITEM ' + currentItemCount + ':&nbsp;</u></b>' +
+                 '<input type="text" class="item-content" placeholder="New Item"></span>' +
+                 '</div>';
         }
 
         //UPDATE EVENT NUMBERS AND HIGHLIGHTING
@@ -1165,7 +1243,33 @@
                 const [minutes, seconds] = timeValue.split(':');
                 $(this).replaceWith($('<span>').text(`${minutes}'${seconds}"`));
             });
+
+            //Replace Camera Type with what the user has inputted
+            tableClone.find('td:nth-child(2) .cameraType').each(function() {
+                const userInput = $(this).val() || $(this).text() || '\u00A0';
+                $(this).replaceWith($('<span>').text(userInput));
+            });
+
+            //Replace Shot Subject with what the user has inputted
+            tableClone.find('td:nth-child(2) .shotSubject').each(function() {
+                const userInput = $(this).val() || $(this).text() || '\u00A0';
+                $(this).replaceWith($('<span>').text(userInput));
+            });
+
+            //Replace Extra Info with what the user has inputted
+            tableClone.find('td:nth-child(2) .extraInfo').each(function() {
+                const userInput = $(this).val() || $(this).text() || '\u00A0';
+                $(this).replaceWith($('<span>').text(userInput));
+            });
+
+            //Replace 'New Item' with what the user has inputted
+            tableClone.find('td:nth-child(3) .item-content').each(function() {
+                const userInput = $(this).val() || $(this).text() || 'New Item';
+                $(this).replaceWith($('<span style="text-decoration: underline;">').text(userInput));
+            });
             
+
+         
             //Create new window/tab and write content
             const viewWindow = window.open('', '_blank');
             viewWindow.document.write(`
@@ -1345,12 +1449,14 @@
                 : range.commonAncestorContainer.parentElement.closest('td')?.closest('tr');
             if (cell) {
                 targetRow = $(cell);
-                var newRow = $('<tr>').addClass('item_highlighted')
-                    .append($('<td>').attr('contenteditable', 'true').css('text-align', 'center'))
-                    .append($('<td>').attr('contenteditable', 'true').css('text-align', 'center'))
-                    .append($('<td>').attr('contenteditable', 'true').html('<b><u>' + createItemCell() + '</u></b>'))
-                    .append($('<td>').attr('contenteditable', 'true').css('text-align', 'center'))
-                    .append($('<td>').css('border', 'none').css('width', '90px').html(createRowButtons()))
+                // Convert the string to a jQuery object using $()
+                var newRow = $('<tr class="item_highlighted">' +
+                    '<td contenteditable="true" style="text-align:center"></td>' +
+                    '<td contenteditable="true" style="text-align:center"></td>' +
+                    '<td contenteditable="true">' + createItemCell() + '</td>' +
+                    '<td contenteditable="true" style="text-align:center"></td>' +
+                    '<td style="border:none; width:90px">' + createRowButtons() + '</td>' +
+                    '</tr>');
                 newRow.insertAfter(targetRow);
                 updateItemNumbers();
                 initDraggable();
@@ -1358,15 +1464,15 @@
             }
         }
 
-        //If there is no selection, create new row with formatted item
-        $('#event-table tbody').append(
-            $('<tr>').addClass('item_highlighted')
-                .append($('<td>').attr('contenteditable', 'true').css('text-align', 'center'))
-                .append($('<td>').attr('contenteditable', 'true').css('text-align', 'center'))
-                .append($('<td>').attr('contenteditable', 'true').html('<b><u>' + createItemCell() + '</u></b>'))
-                .append($('<td>').attr('contenteditable', 'true').css('text-align', 'center'))
-                .append($('<td>').css('border', 'none').css('width', '90px').html(createRowButtons()))
-        );
+        //If there is no selection, append to end of table
+        var newRow = $('<tr class="item_highlighted">' +
+            '<td contenteditable="true" style="text-align:center"></td>' +
+            '<td contenteditable="true" style="text-align:center"></td>' +
+            '<td contenteditable="true">' + createItemCell() + '</td>' +
+            '<td contenteditable="true" style="text-align:center"></td>' +
+            '<td style="border:none; width:90px">' + createRowButtons() + '</td>' +
+            '</tr>');
+        $('#event-table tbody').append(newRow);
         updateItemNumbers();
         initDraggable();
       });
@@ -1466,11 +1572,9 @@
             const endIndex = nextItem ? nextItem.index : $('#event-table tbody tr').length;
 
             //Get the item title and push it into the list
-            const itemContent = $('#event-table tbody tr').eq(currentItem.index).find('td:nth-child(3)').text().trim();
-            const contentMatch = itemContent.match(/ITEM\s+\d+:(.*)/i);
-            const itemNum = parseInt(currentItem.itemNumber) - 1;
-            itemTitle[itemNum] = contentMatch ? contentMatch[1].trim() : '';
-            itemNumbers.push(currentItem.itemNumber); 
+            const itemContent = $('#event-table tbody tr').eq(currentItem.index).find('.item-content').val().trim();
+            itemTitle[currentItem.itemNumber - 1] = itemContent;
+            itemNumbers.push(currentItem.itemNumber);
             
             //Initialize aggregated time for this item
             let totalSeconds = 0;
@@ -1539,7 +1643,7 @@
                         <tr>
                             <td contenteditable="false">${num}</td>
                             <td contenteditable="true">${sourceType[num-1]}</td>
-                            <td contenteditable="true">${itemTitle[num-1]}</td>
+                            <td contenteditable="true" style="text-align:left; margin-left: 50px;">${itemTitle[num-1]}</td>
                             <td contenteditable="true">${soundSource[num-1]}</td>
                             <td contenteditable="false">${itemLength[num-1]}</td>
                             <td contenteditable="false">${accumulatedTime[num-1]}</td>
