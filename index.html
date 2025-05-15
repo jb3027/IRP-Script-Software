@@ -1339,6 +1339,7 @@
                     .append($('<td>').css('border', 'none').css('width', '90px').html(createRowButtons()))
                 newRow.insertAfter(targetRow);
                 updateItemNumbers();
+                initDraggable();
                 return;
             }
         }
