@@ -65,6 +65,7 @@
     tr td {
       background-color: #f8f8f8 !important;
       color: rgb(16, 16, 16) !important;
+      vertical-align: top !important;
     }
 
     /*--------------------- CELL DESIGN ----------------------*/
@@ -158,6 +159,7 @@
         border-radius: 8px;
         background-color: rgba(240, 240, 240, 0.3) !important;
         color: rgb(16, 16, 16) !important;
+        vertical-align: top !important;
     }
 
     /* Specific styling for insert cells */
@@ -477,7 +479,7 @@
   <!-- Login Form -->
   <div id="login-form" style="text-align:center;">
     <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username"><br><br>
+    <input idtype="text" id="username" placeholder="Username"><br><br>
     <input type="password" id="password" placeholder="Password"><br><br>
     <button id="loginButton">Login</button>
   </div>
@@ -751,7 +753,8 @@
             var placeHolderText3 = firstTime ? 'Additional Info (E.g., TRACK OUT)' : '\u00A0';
 
             return '<div>' +
-                '<div class="editable-cell cameraType event_highlighted" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText1 + '\')">' + placeHolderText1 + '</div>' +
+                '<input type="text" name="cameraType" class="editable-cell cameraType event_highlighted" class="form-control" placeholder=' + placeHolderText1 + id="fullscreen-search-term" autocomplete="off" value="">' + 
+                '<div id="defaultText" class="editable-cell cameraType event_highlighted" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText1 + '\')" placeholder="' + placeHolderText1 + '"></div>' +
                 '<div class="shot-type-flex-container event_highlighted">' +
                     '<div class="shotTypeDropdown">' + selectHTML + '</div>' +
                     '<div class="editable-text shotSubject" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText2 + '\')" >' + placeHolderText2 + '</div>' +
@@ -759,6 +762,8 @@
                 '<div class="editable-cell extraInfo event_highlighted" contenteditable="true" onkeydown="preventDeletion(event, \'' + placeHolderText3 + '\')">' + placeHolderText3 + '</div>' +
             '</div>';
         }
+
+
 
         //CREATE INSERT CELL
         function createInsertCell() {
@@ -1119,8 +1124,6 @@
             document.execCommand('backColor', false, 'transparent');
           }
         });
-        
-
 
         //VIEW MODE
         $('.view-button').on('click', function() {
@@ -1728,6 +1731,11 @@
     $(document).on('click', '.row-button.drag, .addEvent-button, .addInsert-button, .addItem-button', function() {
         setTimeout(initDraggable, 0);
     });
+
+    //Clear default text when the user types in the box
+    function clearText() {
+      document.getElementById('defaultText').value = '';
+    }
   </script>
 </body>
 </html>       
