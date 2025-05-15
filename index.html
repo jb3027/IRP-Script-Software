@@ -1110,6 +1110,17 @@
           document.execCommand('redo', false, null);
         });
 
+        //HIGHLIGHT
+        $('.highlight-button').on('click', function() {
+          $(this).toggleClass('active');
+          if ($(this).hasClass('active')) {
+            document.execCommand('backColor', false, 'yellow');
+          } else {
+            document.execCommand('backColor', false, 'transparent');
+          }
+        });
+        
+
 
         //VIEW MODE
         $('.view-button').on('click', function() {
@@ -1323,7 +1334,7 @@
         var selection = window.getSelection();
         var targetRow;
         
-        //If there is a selection, add an item cell to the target row
+        //If there is a selection, add item after selected row
         if (selection.rangeCount > 0) {
             var range = selection.getRangeAt(0);
             var cell = range.commonAncestorContainer.nodeType === 1 
