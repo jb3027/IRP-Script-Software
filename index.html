@@ -12,8 +12,8 @@
     
     body {
       padding-top: 60px;
-      /* Arial as primary, OpenDyslexic as backup */
-      font-family: Arial, 'OpenDyslexic', sans-serif !important;
+      /* Remove !important from font-family */
+      font-family: Arial, 'OpenDyslexic', sans-serif;
       /*Off-white background colour and dark blue text colour for accessibility */
       background-color: #f8f8f8 !important;
       color: rgb(16, 16, 16) !important;
@@ -41,14 +41,24 @@
       overflow: hidden;
     }
 
-    thead tr th {
-      background-color: #f8f8f8 !important;
-      color: rgb(16, 16, 16) !important;
-      border-radius: 12px 12px 12px 12px; 
-      text-align: center !important;  
-      vertical-align: middle !important;  
-      height: 40px !important;  
-      line-height: 1.5 !important;  /* Changes position of 'event number' */
+    thead tr th:not(:last-child) {
+      background-color: #f8f8f8 !important; 
+      color: #2c3e50 !important; 
+      border-radius: 8px 8px 0 0;
+      text-align: center !important;
+      vertical-align: middle !important;
+      height: 48px !important;
+      line-height: 1.5 !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important; 
+      font-size: 0.9rem !important;
+      letter-spacing: 0.5px !important; 
+      border-bottom: 2px solid #e2e8f0 !important; 
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.05) !important; 
+    }
+
+    thead tr th:last-child {
+      background-color: #f8f8f8 !important; 
     }
 
     /* Default cell styling */
@@ -68,6 +78,11 @@
       background-color: rgba(255, 231, 250, 0.5) !important;
       position: relative;
     }
+     /* Colour of item cells*/
+     tr.item_highlighted td:not(:last-child) {
+      background-color: rgba(255, 248, 203, 0.775) !important;
+      position: relative;
+    }
 
     /* Styling colour of event cells*/
     tr.event_highlighted::after {
@@ -79,20 +94,28 @@
       outline: 2px solid rgba(255, 66, 233, 0.6) !important;
       box-shadow: 0 0 2px rgba(141, 36, 149, 0.3) !important;
     }
+    /* Styling colour of item cells*/
+    tr.item_highlighted::after {
+      outline: 2px solid rgb(255, 221, 0) !important;
+      box-shadow: 0 0 2px rgba(250, 222, 41, 0.3) !important;
+    }
 
     /* Remove cell borders */
     tr.event_highlighted td,
-    tr.insert_highlighted td {
+    tr.insert_highlighted td,
+    tr.item_highlighted td {
       border: none !important; 
     }
     tr.event_highlighted,
-    tr.insert_highlighted {
+    tr.insert_highlighted,
+    tr.item_highlighted {
       position: relative;
     }
 
     /* Hover */
     tr.event_highlighted:hover td:not(:last-child),
     tr.insert_highlighted:hover td:not(:last-child),
+    tr.item_highlighted:hover td:not(:last-child),
     tr.insert_highlighted:hover .insert-duration-container {
       background-color: rgba(248, 248, 248, 0.9) !important;
       transition: background-color 0.2s ease;
@@ -100,7 +123,8 @@
 
     /* Structure design of cells*/
     tr.event_highlighted::after,
-    tr.insert_highlighted::after {
+    tr.insert_highlighted::after,
+    tr.item_highlighted::after {
       content: '';
       position: absolute;
       top: 0;
@@ -113,13 +137,15 @@
     }
 
     tr.event_highlighted td:first-child,
-    tr.insert_highlighted td:first-child {
+    tr.insert_highlighted td:first-child,
+    tr.item_highlighted td:first-child {
       border-top-left-radius: 12px;
       border-bottom-left-radius: 12px;
     }
 
     tr.event_highlighted td:nth-child(4),
-    tr.insert_highlighted td:nth-child(4) {
+    tr.insert_highlighted td:nth-child(4),
+    tr.item_highlighted td:nth-child(4) {
       border-top-right-radius: 12px;
       border-bottom-right-radius: 12px;
     }
@@ -155,7 +181,7 @@
       color: rgb(16, 16, 16) !important;
     }
 
-    /*Nav bar*/
+    /* -------------------- Nav bar ---------------------------*/
     ul {
       list-style-type: none;
       margin: 0;
@@ -227,6 +253,10 @@
     .button2.warning:hover {
         background-color: #c0392b !important;
     }
+
+   
+   
+    /* ---------------------------------------------------------*/
 
     .editable-cell:not(.production-title),
     .editable-text:not(.production-title),
@@ -375,7 +405,7 @@
         opacity: 1;
     }
 
-    /* Add/remove buttons */
+    /* move/remove buttons */
     td:last-child {
         vertical-align: middle !important; 
         position: relative; 
@@ -386,35 +416,55 @@
         height: 28px;
         padding: 0;
         border: none;
-        border-radius: 6px;
+        border-radius: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all 0.2s ease;
         background: transparent;
-        color: #000000;
+        color: #2c3e50; 
     }
 
-    .row-button:hover {
-        transform: translateY(-1px);
+    .row-button.drag {
+        color: #ffffff;
+        background-color: #0c0c0c; 
     }
 
-    .row-button.add {
-        background: rgba(14, 243, 98, 0.809);
-    }
-
-    .row-button.add:hover {
-        background: rgba(16, 250, 98, 0.917);
-        color: #000000;
+    .row-button.drag:hover {
+        background-color: #34ca0b; 
     }
 
     .row-button.remove {
-        background: rgba(222, 49, 30, 0.737);
+        color: #ffffff;
+        background-color: #0c0c0c;   
     }
 
     .row-button.remove:hover {
-        background: rgba(228, 32, 11, 0.898);
-        color: #000000;
+        background-color: #ed0606; 
+    }
+
+    .custom-shot-type {
+        width: 100%;
+        border: 0.5px solid rgb(155, 180, 203);
+        border-radius: 8px;
+        background-color: rgba(240, 240, 240, 0.3) !important;
+        color: rgb(16, 16, 16) !important;
+        padding: 2px 6px;
+        display: none;
+    }
+
+    /* New styles for drag and drop */
+    tr.dragging {
+        opacity: 0.5;
+        background-color: #f0f0f0;
+    }
+    
+    tbody tr {
+        cursor: default;  /* Remove the move cursor from rows */
+    }
+
+    .row-button.drag {
+        cursor: move;  /* Show move cursor only on drag button */
     }
 
   </style>
@@ -450,6 +500,7 @@
             <button class="btn button2 italic-button" title="Italic"><i class="fas fa-italic"></i></button>
             <button class="btn button2 underline-button" title="Underline"><i class="fas fa-underline"></i></button>
             <button class="btn button2 highlight-button" title="Highlight"><i class="fas fa-highlighter"></i></button>
+            <button class="btn button2 font-button" title="Font"><i class="fas fa-font"></i></button>
         </div>
 
         <div class="toolbar-group center">
@@ -457,11 +508,11 @@
             <button class="btn button2 addInsert-button" title="Add Insert"><i class="fas fa-film"></i> Insert</button>
             <button class="btn button2 addCut-button" title="Add Cut"><i class="fas fa-cut"></i> Cut</button>
             <button class="btn button2 addDur-button" title="Add Duration"><i class="fas fa-clock"></i> Duration</button>
-            <!-- <button class="btn button2 addItem-button" title="Add Item"><i class="fas fa-list"></i> Item</button> -->
+            <button class="btn button2 addItem-button" title="Add Item"><i class="fas fa-list"></i> Item</button> 
         </div>
 
         <div class="toolbar-group right">
-            <!-- <button class="btn button2 primary" title="Save"><i class="fas fa-save"></i> Save</button> -->
+            <button class="btn button2 primary" title="Save"><i class="fas fa-save"></i> Save</button> 
             <button class="btn button2 view-button" title="View"><i class="fas fa-eye"></i> View</button>
             <button class="btn button2 runningOrder-button" title="Running Order"><i class="fas fa-list-ol"></i> Running Order</button>
         </div>
@@ -474,7 +525,7 @@
     <div class="square"></div>
 
     <div class="container">
-      <table style="margin-top:100px;" id="event-table" class="table">
+      <table style="margin-top:100px;" id="event-table" class="draggable-table">
           <thead>
               <tr>
                   <th scope="col" style="border: 1px solid black; width:100px; text-align: center;">Event number</th>
@@ -680,18 +731,20 @@
             { eventNum: '1', shotType: '', content: 'Add your script here and add an extra line', details: 'E.g., Music Cues' },
         ];
 
-        var dropdownOptions = ['SHOT TYPE', 'ES', 'WS', '2S', '3S', 'MS', 'MCU', 'CU', 'ECU', 'AS DIRECTED'];
+        var dropdownOptions = ['SHOT TYPE', 'ES', 'WS', '2S', '3S', 'MS', 'MCU', 'CU', 'ECU', 'AS DIRECTED',  'CUSTOM'];
         
 
         //CREATE SHOT TYPE CELL
         function createShotTypeCell(shotType, firstTime) {
-            var selectHTML = '<select class="form-control shot-type-select">';
-            dropdownOptions.forEach(function(option) {
-                var optionValue = option || '';  
-                var isSelected = optionValue === (shotType || '');  
-                selectHTML += '<option value="' + optionValue + '"' + (isSelected ? ' selected' : '') + '>' + optionValue + '</option>';
-            });
-            selectHTML += '</select>';
+            var selectHTML = `
+                <div class="shot-type-wrapper">
+                    <select class="form-control shot-type-select">
+                        ${dropdownOptions.map(option => `
+                            <option value="${option}" ${(option === shotType) ? 'selected' : ''}>${option}</option>
+                        `).join('')}
+                    </select>
+                    <input type="text" class="custom-shot-type" style="display:none">
+                </div>`;
 
             var placeHolderText1 = firstTime ? 'Camera Number/Position' : '\u00A0';
             var placeHolderText2 = firstTime ? 'Shot Subject (E.g., HOST)' : '\u00A0';
@@ -725,6 +778,12 @@
           '</div>';
         }
 
+        //CREATE ITEM CELL
+        function createItemCell() {
+          const currentItemCount = $('#event-table tbody tr.item_highlighted').length + 1;
+          return '<b><u>ITEM ' + currentItemCount + ':</b><span contenteditable="true" class="item-content"> New Item</u></span>';
+        }
+
         //UPDATE EVENT NUMBERS AND HIGHLIGHTING
         function updateEventNumbers() {
           let eventNumber = 1;
@@ -732,32 +791,44 @@
               //Check if there is an event in the row (If Shot column or Insert has content)
               const hasEvent = $(this).find('td:nth-child(2)').text().trim().length > 0;
               const hasInsert = $(this).find('td:nth-child(3)').text().trim().length > 0;
+              const isItem = $(this).hasClass('item_highlighted');
               
-              if (hasEvent) {
+              if ((hasEvent || hasInsert) && !isItem) {  // Only number non-item rows
                   $(this).find('td:first').text(eventNumber);
-                  $(this).addClass('event_highlighted');
-                  eventNumber++;
-              } else if (hasInsert) {
-                  $(this).find('td:first').text(eventNumber);
-                  $(this).addClass('insert_highlighted');
                   eventNumber++;
               } else {
-                  $(this).find('td:first').text('');
-                  $(this).removeClass('event_highlighted');
-                  $(this).removeClass('insert_highlighted');
+                  $(this).find('td:first').text('');  // Clear the number for items
               }
           });
         }
 
+        //UPDATE ITEM NUMBERS - Modified to preserve formatting
+        function updateItemNumbers() {
+          let itemNumber = 1;
+          $('#event-table tbody tr.item_highlighted').each(function() {
+              const itemCell = $(this).find('td:nth-child(3)');
+              const currentText = itemCell.html();
+              // Split at the colon and preserve any HTML formatting
+              const colonIndex = currentText.indexOf(':');
+              const content = colonIndex !== -1 ? currentText.substring(colonIndex + 1) : currentText;
+              // Create new text with formatting preserved
+              const newText = `<b><u>ITEM ${itemNumber}:</u></b>${content}`;
+              itemCell.html(newText);
+              itemNumber++;
+          });
+        }
+
+
         function createRowButtons() {
-            return `<div class="row-actions">
-                <button class="row-button add" title="Add Row">
-                    <i class="fas fa-plus"></i>
+            const buttons = `<div class="row-actions">
+                <button class="row-button drag" title="Drag Row">
+                    <i class="fas fa-grip-vertical"></i>
                 </button>
                 <button class="row-button remove" title="Remove Row">
                     <i class="fas fa-minus"></i>
                 </button>
             </div>`;
+            return buttons;
         }
 
         // Update the table row creation code
@@ -771,28 +842,24 @@
             </tr>`;
         }
 
-        //Populate the table with data on document ready
+        // Populate the table with data on document ready
         tableData.forEach(function(row) {
-            var newRow = `<tr class="event_highlighted">
-                <td contenteditable="true" style="text-align:center">${row.eventNum}</td>
-                <td contenteditable="true">${createShotTypeCell("SHOT TYPE", true)}</td>
-                <td contenteditable="true">${row.content}</td>
-                <td contenteditable="true" style="text-align:center">${row.details.replace('\n','<br>')}</td>
+            var newRow = `<tr class="item_highlighted">
+                <td contenteditable="true" style="text-align:center"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true">${createItemCell()}</td>
+                <td contenteditable="true" style="text-align:center"></td>
                 <td style="border:none; width:90px">${createRowButtons()}</td>
             </tr>`;
             $('#event-table tbody').append(newRow);
-        });
-
-        // Update event handlers
-        $(document).on('click', '.row-button.add', function() {
-            $(this).closest('tr').after(createTableRow());
-            updateEventNumbers();
         });
 
         $(document).on('click', '.row-button.remove', function() {
             if ($('#event-table tbody tr').length > 1) {
                 $(this).closest('tr').remove();
                 updateEventNumbers();
+                updateItemNumbers();
+                initDraggable(); // Reinitialize draggable after removing a row
             }
         });
 
@@ -809,12 +876,18 @@
                     : range.commonAncestorContainer.parentElement.closest('td')?.closest('tr');
                 if (cell) {
                     targetRow = $(cell);
-                    //Populate the selected row with new event content
-                    targetRow.find('td:eq(1)').html(createShotTypeCell("SHOT TYPE", false));
-                    targetRow.find('td:eq(2)').empty(); //Clear script cell
-                    targetRow.find('td:eq(3)').empty(); //Clear details cell
+                    var newRow = $('<tr class="event_highlighted">' +
+                        '<td contenteditable="true" style="text-align:center"></td>' +
+                        '<td contenteditable="true">' + createShotTypeCell("SHOT TYPE", false) + '</td>' +
+                        '<td contenteditable="true"></td>' +
+                        '<td contenteditable="true" style="text-align:center"></td>' +
+                        '<td style="border:none; width:90px">' + createRowButtons() + '</td>' +
+                        '</tr>');
+                    
+                    newRow.insertAfter(targetRow);
                     updateEventNumbers();
-                    return; //Exit early since we've updated the existing row
+                    initDraggable(); //Make it draggable
+                    return;
                 }
             }
 
@@ -824,10 +897,13 @@
                 '<td contenteditable="true";>' + createShotTypeCell("SHOT TYPE", false) + '</td>' +
                 '<td contenteditable="true"></td>' +
                 '<td contenteditable="true"; style="text-align:center";></td>' +
-                '<td style="border:none; width:90px"><button class="btn btn-primary add-button" style="border-radius: 100%; transform: translateY(50%);">+</button><button class="btn btn-danger remove-button" style="border-radius: 100%; transform: translateY(50%);">-</button></td>' +
+                '<td style="border:none; width:90px">' + createRowButtons() + '</td>' +
                 '</tr>';
             $('#event-table tbody').append(newRow);
             updateEventNumbers();
+            
+            // Initialize draggable on the newly added row
+            initDraggable();
         });
 
         //UNDERLINE
@@ -845,26 +921,19 @@
           document.execCommand('italic', false, null);
         });
 
-        //HIGHLIGHT
-        $('.highlight-button').on('click', function() {
-          const selection = window.getSelection();
-          if (!selection.rangeCount) return;
-
-          const range = selection.getRangeAt(0);
-    
-          const highlightSpan = range.commonAncestorContainer.closest?.('.highlight') || 
-                               range.commonAncestorContainer.parentElement?.closest?.('.highlight');
-          if (highlightSpan) { //If the text is already highlighted, remove it
-              const parent = highlightSpan.parentNode;
-              while (highlightSpan.firstChild) {
-                  parent.insertBefore(highlightSpan.firstChild, highlightSpan);
-              }
-              parent.removeChild(highlightSpan);
-          } else { //If the text is not highlighted, highlight it
-              const span = document.createElement('span');
-              span.className = 'highlight';
-              range.surroundContents(span);
-          }
+        //FONT
+        $('.font-button').on('click', function() {
+            const body = document.body;
+            const currentFont = window.getComputedStyle(body).fontFamily;
+            
+            //Toggle between Arial and Opendyselxic
+            if (currentFont.includes('OpenDyslexic')) {
+                body.style.setProperty('font-family', 'Arial, sans-serif', 'important');
+                localStorage.setItem('preferredFont', 'Arial');
+            } else {
+                body.style.setProperty('font-family', 'OpenDyslexic, Arial, sans-serif', 'important');
+                localStorage.setItem('preferredFont', 'OpenDyslexic');
+            }
         });
 
         //ADD CUT ON CLICK
@@ -1041,12 +1110,6 @@
           document.execCommand('redo', false, null);
         });
 
-        // //ADD ITEM
-        // $('.add-item-button').on('click', function() {
-        //   document.execCommand('underline', false, null);
-        //   document.execCommand('bold', false, null);
-        // });
-
 
         //VIEW MODE
         $('.view-button').on('click', function() {
@@ -1058,7 +1121,25 @@
             tableClone.find('.shot-type-select').each(function(index) {
                 const originalSelect = originalSelects.eq(index);
                 const selectedText = originalSelect.find('option:selected').text();
-                $(this).replaceWith($('<span>').text(selectedText));
+                if(selectedText === 'CUSTOM') {
+                    // If dropdown is CUSTOM then display the inserted text or default
+                    const customValue = originalSelect.siblings('.custom-shot-type').val();
+                    $(this).replaceWith($('<span>').text(customValue || ' '));
+                } 
+                // If no selection, display blank with margins for the structure
+                if(selectedText === "SHOT TYPE") {
+                  $(this).replaceWith($('<span style="margin: 40px;">').text(''));
+                }
+                // Otherwise, dusplay what the user selected
+                else {
+                    $(this).replaceWith($('<span>').text(selectedText));
+                }
+            });
+
+            //Remove editable custom cell from shot column
+            tableClone.find('td:nth-child(2) .custom-shot-type').each(function() {
+                const content = $(this).text().trim();
+                $(this).replaceWith($('<span>').text(' '));
             });
             
             //Make all contenteditable elements non-editable in view mode
@@ -1192,14 +1273,57 @@
             
             viewWindow.document.close();
         });
-      
 
       //ADD INSERT
       $('.addInsert-button').on('click', function() {
+            var selection = window.getSelection();
+            var targetRow;
+
+            if (selection.rangeCount > 0) {
+                var range = selection.getRangeAt(0);
+                //First try to find the closest td, then find its parent tr
+                var cell = range.commonAncestorContainer.nodeType === 1 
+                    ? range.commonAncestorContainer.closest('td')?.closest('tr')
+                    : range.commonAncestorContainer.parentElement.closest('td')?.closest('tr');
+                if (cell) {
+                    targetRow = $(cell);
+                    var newRow = $('<tr class="insert_highlighted">' +
+                        '<td contenteditable="true" style="text-align:center"></td>' +
+                        '<td contenteditable="true" style="text-align:center"></td>' +
+                        '<td contenteditable="true">' + createInsertCell() + '</td>' +
+                        '<td contenteditable="true" style="text-align:center"></td>' +
+                        '<td style="border:none; width:90px">' + createRowButtons() + '</td>' +
+                        '</tr>');
+                    
+                    newRow.insertAfter(targetRow);
+                    updateEventNumbers();
+                    initDraggable(); //Make it draggable
+                    return;
+                }
+            }
+
+            //If no selection, create new row at the end
+            var newRow = '<tr class="insert_highlighted">' +
+                '<td contenteditable="true"; style="text-align:center";></td>' +
+                '<td contenteditable="true"; style="text-align:center";></td>' +
+                '<td contenteditable="true">' + createInsertCell() + '</td>' +
+                '<td contenteditable="true"; style="text-align:center";></td>' +
+                '<td style="border:none; width:90px">' + createRowButtons() + '</td>' +
+                '</tr>';
+            $('#event-table tbody').append(newRow);
+            updateEventNumbers();
+            
+            // Initialize draggable on the newly added row
+            initDraggable();
+        });
+
+
+      //ADD ITEM
+      $('.addItem-button').on('click', function() {
         var selection = window.getSelection();
         var targetRow;
-
-        //If there is a selection, add an insert cell to the target row
+        
+        //If there is a selection, add an item cell to the target row
         if (selection.rangeCount > 0) {
             var range = selection.getRangeAt(0);
             var cell = range.commonAncestorContainer.nodeType === 1 
@@ -1207,23 +1331,48 @@
                 : range.commonAncestorContainer.parentElement.closest('td')?.closest('tr');
             if (cell) {
                 targetRow = $(cell);
-                targetRow.find('td:eq(2)').html(createInsertCell());
-                updateEventNumbers();
-                return; 
+                var newRow = $('<tr>').addClass('item_highlighted')
+                    .append($('<td>').attr('contenteditable', 'true').css('text-align', 'center'))
+                    .append($('<td>').attr('contenteditable', 'true').css('text-align', 'center'))
+                    .append($('<td>').attr('contenteditable', 'true').html('<b><u>' + createItemCell() + '</u></b>'))
+                    .append($('<td>').attr('contenteditable', 'true').css('text-align', 'center'))
+                    .append($('<td>').css('border', 'none').css('width', '90px').html(createRowButtons()))
+                newRow.insertAfter(targetRow);
+                updateItemNumbers();
+                return;
             }
         }
 
-        //If there is no selection, create a new row at the end
-        var newRow = '<tr class="insert_highlighted">' +
-          '<td contenteditable="true";>' + createInsertCell() + '</td>' +
-          '<td contenteditable="true"; style="text-align:center";></td>' +
-          '<td contenteditable="true"; style="text-align:center";></td>' +
-          '<td contenteditable="true"; style="text-align:center";></td>' +
-          '<td style="border:none; width:90px"><button class="btn btn-primary add-button" style="border-radius: 100%; transform: translateY(50%);">+</button><button class="btn btn-danger remove-button" style="border-radius: 100%; transform: translateY(50%);">-</button></td>' +
-          '</tr>';
-        $('#event-table tbody').append(newRow);
-        updateEventNumbers();
+        //If there is no selection, create new row with formatted item
+        $('#event-table tbody').append(
+            $('<tr>').addClass('item_highlighted')
+                .append($('<td>').attr('contenteditable', 'true').css('text-align', 'center'))
+                .append($('<td>').attr('contenteditable', 'true').css('text-align', 'center'))
+                .append($('<td>').attr('contenteditable', 'true').html('<b><u>' + createItemCell() + '</u></b>'))
+                .append($('<td>').attr('contenteditable', 'true').css('text-align', 'center'))
+                .append($('<td>').css('border', 'none').css('width', '90px').html(createRowButtons()))
+        );
+        updateItemNumbers();
+        initDraggable();
       });
+
+      //UPDATE ITEM NUMBERS - Modified to preserve formatting
+      function updateItemNumbers() {
+          let itemNumber = 1;
+          $('#event-table tbody tr.item_highlighted').each(function() {
+              const itemCell = $(this).find('td:nth-child(3)');
+              const currentText = itemCell.html();
+              // Split at the colon and preserve any HTML formatting
+              const colonIndex = currentText.indexOf(':');
+              const content = colonIndex !== -1 ? currentText.substring(colonIndex + 1) : currentText;
+              // Create new text with formatting preserved
+              const newText = `<b><u>ITEM ${itemNumber}:</u></b>${content}`;
+              itemCell.html(newText);
+              itemNumber++;
+          });
+      }
+
+       
 
       // //SAVE
       // $('.save-button').on('click', function() {
@@ -1232,7 +1381,9 @@
           
     });
 
-    //RUNNING ORDER
+
+
+    // RUNNING ORDER
     $(document).on('click', '.runningOrder-button', function() { 
         const showScriptButton = $('<button class="btn button2" title="Show Script"><i class="fas fa-list-ol"></i> Show Script</button>');
         
@@ -1247,11 +1398,13 @@
 
         //Event > Item numbers
         const eventNumbers = [];
+        const itemNumbers = [];
         const sourceType = [];
         const soundSource = [];
         const itemLength = [];
         const accumulatedTime = [];
         const timeStore = [];
+        const itemTitle = [];
         let accumulatedCalc = 0;
 
         function wordCalulation(content) {
@@ -1277,37 +1430,70 @@
           return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        $('#event-table tbody tr').each(function(index) {
-            const eventNum = $(this).find('td:first').text().trim();
-            const hasEvent = $(this).find('td:nth-child(2)').text().trim().length > 0;
+        let currentItem = null;
 
-            if (eventNum) {
-                eventNumbers.push(eventNum);
+        // First, find all item rows and their indices
+        const itemRows = [];
+        $('#event-table tbody tr').each(function(index) {
+            if ($(this).hasClass('item_highlighted')) {
+                itemRows.push({
+                    index: index,
+                    itemNumber: $(this).find('td:nth-child(3)').text().match(/ITEM\s+(\d+)/i)?.[1]
+                });
+            }
+        });
+
+        //Process rows between each pair of items
+        for (let i = 0; i < itemRows.length; i++) {
+            const currentItem = itemRows[i];
+            const nextItem = itemRows[i + 1];
+            const startIndex = currentItem.index + 1;
+            const endIndex = nextItem ? nextItem.index : $('#event-table tbody tr').length;
+
+            //Get the item title and push it into the list
+            const itemContent = $('#event-table tbody tr').eq(currentItem.index).find('td:nth-child(3)').text().trim();
+            const contentMatch = itemContent.match(/ITEM\s+\d+:(.*)/i);
+            const itemNum = parseInt(currentItem.itemNumber) - 1;
+            itemTitle[itemNum] = contentMatch ? contentMatch[1].trim() : '';
+            itemNumbers.push(currentItem.itemNumber); 
+            
+            //Initialize aggregated time for this item
+            let totalSeconds = 0;
+            let hasVT = false;
+
+            //Process all rows between current item and next item (or end of table)
+            for (let j = startIndex; j < endIndex; j++) {
+                const row = $('#event-table tbody tr').eq(j);
+                const hasEvent = row.find('td:nth-child(2)').text().trim().length > 0;
+                const hasInsert = row.find('input[type="time"]').length > 0;
 
                 if (hasEvent) {
-                    sourceType.push("CAMS");
-                    soundSource.push("");
-
-                    const content = $(this).find('td:nth-child(3)').text().trim();
-                    itemLength.push(wordCalulation(content));
-                } else {
-                    sourceType.push("VT");
-                    soundSource.push("VT");
+                    // Calculate timing based on word count for events
+                    const scriptCell = row.find('td:nth-child(3)');
+                    const content = scriptCell.clone()
+                        .find('.cut-line').remove().end()
+                        .text()
+                        .trim();
                     
-                    const durationInput = $(this).find('input[type="time"]');
-                    
-                    let durValue = "00:00";
-                    if (durationInput.length > 0) {
-                        const timeValue = durationInput.val();
-                        if (timeValue) {
-                            const [minutes, seconds] = timeValue.split(':');
-                            durValue = `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
-                        }
+                    const wordCount = content ? content.split(' ').length : 0;
+                    const wordsPerSecond = 2.5;
+                    totalSeconds += wordCount * wordsPerSecond;
+                } else if (hasInsert) {
+                    hasVT = true;
+                    // Add insert duration
+                    const durationInput = row.find('input[type="time"]');
+                    if (durationInput.length > 0 && durationInput.val()) {
+                        const [minutes, seconds] = durationInput.val().split(':');
+                        totalSeconds += parseInt(minutes) * 60 + parseInt(seconds);
                     }
-                    itemLength.push(durValue);
                 }
-            }     
-        });
+            }
+
+            // Push aggregated data for this item
+            sourceType.push(hasVT ? "VT" : "CAMS");
+            soundSource.push(hasVT ? "VT" : "");
+            itemLength.push(timeConvert(totalSeconds));
+        }
 
         function accumulatedTimeCalc() {
           for(let i = 0; i < itemLength.length; i++) {
@@ -1334,15 +1520,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    ${eventNumbers.map(num => `
+                    ${itemNumbers.map(num => `
                         <tr>
                             <td contenteditable="false">${num}</td>
                             <td contenteditable="true">${sourceType[num-1]}</td>
-                            <td contenteditable="true"></td>
+                            <td contenteditable="true">${itemTitle[num-1]}</td>
                             <td contenteditable="true">${soundSource[num-1]}</td>
                             <td contenteditable="false">${itemLength[num-1]}</td>
                             <td contenteditable="false">${accumulatedTime[num-1]}</td>
-                            <!-- <td style="border:none; width:100px"><button class="btn btn-primary addRunningOrder-button" type="runningOrder">+</button><button class="btn btn-danger removeRunningOrder-button">-</button></td> -->
                         </tr>
                     `).join('')}
                 </tbody>
@@ -1457,6 +1642,80 @@
             element.textContent = minutes + ':' + seconds;
         }
     }
+
+    // If CUSTOM option selected on dropdown, insert an editable cell instead
+    $(document).on('change', '.shot-type-select', function() {
+        const select = $(this);
+        const input = select.siblings('.custom-shot-type');
+        if (select.val() === 'CUSTOM') {
+            select.hide();
+            input.show().focus();
+        }
+    });
+
+    // Event handler for the CUSTOM input
+    $(document).on('blur', '.custom-shot-type', function() {
+        const input = $(this);
+        const select = input.siblings('.shot-type-select');
+        if (!input.val().trim()) {
+            input.hide();
+            select.show().val('SHOT TYPE');
+        }
+    });
+
+    // Add drag and drop function
+    function initDraggable() {
+        const tbody = document.querySelector('#event-table tbody');
+        
+        // Enable drag only on drag buttons
+        tbody.querySelectorAll('.row-button.drag').forEach(button => {
+            const row = button.closest('tr');
+            
+            // Make the drag button the drag handle
+            button.draggable = true; // Make the button draggable instead of the row
+            
+            // Handle drag events on the button
+            button.addEventListener('dragstart', (e) => {
+                row.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', '');
+                // Prevent text selection
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            
+            button.addEventListener('dragend', () => {
+                row.classList.remove('dragging');
+                // Update event and item numbers after drag
+                updateEventNumbers();
+                updateItemNumbers();
+            });
+        });
+        
+        tbody.addEventListener('dragover', e => {
+            e.preventDefault();
+            const draggingRow = tbody.querySelector('.dragging');
+            if (!draggingRow) return;
+            
+            const siblings = [...tbody.querySelectorAll('tr:not(.dragging)')];
+            const nextSibling = siblings.find(sibling => {
+                const box = sibling.getBoundingClientRect();
+                return e.clientY < box.top + box.height / 2;
+            });
+            
+            if (nextSibling) {
+                tbody.insertBefore(draggingRow, nextSibling);
+            } else {
+                tbody.appendChild(draggingRow);
+            }
+        });
+    }
+
+    //Initialize draggable on page load
+    initDraggable();
+    
+    //Make rows remain draggable when order is rearranged
+    $(document).on('click', '.row-button.drag, .addEvent-button, .addInsert-button, .addItem-button', function() {
+        setTimeout(initDraggable, 0);
+    });
   </script>
 </body>
 </html>       
