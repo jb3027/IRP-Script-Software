@@ -370,7 +370,7 @@
             </tr>`;
         }
 
-        // Make the first item's input expandable
+        //Make the first item's input expandable
         $('.item-content').first().css({
             'height': 'auto',
             'min-height': '24px'
@@ -464,7 +464,7 @@
         //ADD CUT ON CLICK
         $('.addCut-button').on('click', function() {
             const selection = window.getSelection();
-            let lineCount = 1; //Default to 1
+            let lineCount = 0; //Default to 1
 
             if (selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0);
@@ -492,14 +492,15 @@
                         //Get the script cell's content
                         const scriptCell = row.querySelector('td:nth-child(3)');
                         const scriptContent = scriptCell ? scriptCell.textContent : '';
-                        const characterCount = scriptContent.length;
+                        //Remove whitespace from character count
+                        const characterCount = scriptContent.replace(/\s/g, '').length; 
 
-                        const charactersPerLine = 60; //Characters per line
+                        const charactersPerLine = 80; //Characters per line
                         const lineHeight = 24; //Pixels per line
 
                         //How many lines to move the shot cell down by
-                        const offset = lineHeight * Math.ceil(characterCount / charactersPerLine);
-
+                        const offset = lineHeight * Math.floor(characterCount / charactersPerLine);
+                        
                         //Make shot row and highlighted cut line up
                         const allElements = shotCell.querySelectorAll('.editable-cell, .shot-type-flex-container');
                         allElements.forEach(element => {
@@ -650,47 +651,47 @@
             const tableClone = $('.container').clone();
             const productionTitle = $('.production-title').text();
             
-            //Display user input of insert cells - THIS WORKS
-            tableClone.find('.insert-content input').each(function() {
-                const value = $(this).val() || $(this).attr('placeholder');
-                $(this).replaceWith($('<span>').text(value));
-            });
-
-            // Show dropdown as the selected value and preserve positioning
-            tableClone.find('td:nth-child(2)').each(function() {
-                const cell = $(this);
-                const shotTypeSelect = cell.find('.shot-type-select');
-                
-                // Only log if there's actually a shot type select element
-                if (shotTypeSelect.length) {
-                    const shotType = shotTypeSelect.val();
-                    // Only log if it's a valid shot type
-                    if (shotType && shotType !== 'SHOT TYPE') {
-                        console.log("ST: " + shotType);
-                    }
-                }
-            });
-
-            //find events not just second column - not working?
+            //Handle shot type cells specifically
             tableClone.find('tr.event_highlighted').each(function() {
                 const row = $(this);
-                const cameraType = row.find('.cameraType').val() || row.find('.cameraType').text() || '';
-                const shotTypeSelect = row.find('.shot-type-select');
-                const shotType = shotTypeSelect.val() === 'CUSTOM' ? 
-                    (row.find('.custom-shot-type').val() || '') : 
-                    (shotTypeSelect.val() === 'SHOT TYPE' ? '' : shotTypeSelect.val());
-                const shotSubject = row.find('.shotSubject').val() || row.find('.shotSubject').text() || '';
-                const extraInfo = row.find('.extraInfo').val() || row.find('.extraInfo').text() || '';
+                const shotCell = row.find('td:nth-child(2)');
+                const cameraType = shotCell.find('.cameraType').val() || '';
+                const shotTypeSelect = shotCell.find('.shot-type-select');
+                const customInput = shotCell.find('.custom-shot-type');
 
-                console.log("CAMTYPE: " + cameraType);
-                console.log("SHOTSUB: " + shotSubject);
-                console.log("SHOTTPYE: " + shotType);
-                console.log("EEXTRAINT: " + extraInfo);
+                //Either get custom value or selected dropdown option
+                if(customInput.val() !== '') {
+                    const shotType = customInput.val();
+                } else {
+                    const originalSelects = $('.container .shot-type-select');
+                    tableClone.find('.shot-type-select').each(function(index) {
+                        const originalSelect = originalSelects.eq(index);
+                        const selectedText = originalSelect.find('option:selected').text();
+                        shotType = selectedText;
+                        if(shotType === 'SHOT TYPE') {
+                            shotType = '';
+                        }
+                    });
+                }
+                
+                const shotSubject = shotCell.find('.shotSubject').val() || '';
+                const extraInfo = shotCell.find('.extraInfo').val() || '';
 
+                //Copy structure of event shots from main page
+                const newContent = `
+                    <div>${cameraType}</div>
+                    <div class="shot-type-flex-container">
+                        <div>${shotType} &nbsp </div>
+                        <div>${shotSubject}</div>
+                    </div>
+                    <div>${extraInfo}</div>
+                `;
+
+                //Replace the shot cell with the user inputs
+                shotCell.html(newContent);
             });
 
-
-            // Preserve cut line positioning and styling
+            //Preserve cut line positioning and styling
             tableClone.find('.cut-line').each(function() {
                 const originalCutLine = $('.container').find('.cut-line').eq($(this).index('.cut-line'));
                 const originalOffset = originalCutLine.offset();
@@ -721,7 +722,8 @@
             //Replace 'New Item' with what the user has inputted
             tableClone.find('td:nth-child(3) .item-content').each(function() {
                 const userInput = $(this).val() || $(this).text() || 'New Item';
-                $(this).replaceWith($('<span style="text-decoration: underline;">').text(userInput));
+                const span = $('<span style="text-decoration: underline; margin-left: -8px; display: inline-block;">').text(userInput);
+                $(this).replaceWith(span);
             });
             
             //Create new window/tab and write content
@@ -813,6 +815,11 @@
                             align-items: center;
                             text-align: center;
                             margin: 0 auto;
+                        }
+                        .insert-duration-container > * {
+                            display: inline-block;
+                            vertical-align: middle;
+                            margin: 0;
                         }
                         .insert-duration-container > * {
                             display: inline-block;
@@ -996,7 +1003,7 @@
       //Store the original content
       const originalContent = $('.container').html();
       
-      // Store all input values before switching views
+      //Store all input values before switching views
       const storedInputs = {
           itemContents: $('.item-content').map(function() {
               return $(this).val() || $(this).text();
@@ -1070,7 +1077,7 @@
           const itemContent = $('#event-table tbody tr').eq(currentItem.index)
               .find('.item-content')
               .map(function() {
-                  // Try getting value first, then fall back to text content
+                  //Try getting value first, then fall back to text content
                   return $(this).val() || $(this).text();
               })
               .get(0)
@@ -1191,28 +1198,28 @@
       showScriptButton.on('click', function() {
           $('.container').html(originalContent);
           
-          // Restore item content values using the stored inputs
+          //Restore item content values using the stored inputs
           $('.item-content').each(function(index) {
               if (storedInputs.itemContents[index]) {
                   $(this).val(storedInputs.itemContents[index]);
               }
           });
 
-          // Restore insert input values
+          //Restore insert input values
           $('.insertTitle, .insertIn, .insertOut').each(function(index) {
               if (storedInputs.insertInputs[index]) {
                   $(this).val(storedInputs.insertInputs[index]);
               }
           });
 
-          // Restore time input values
+          //Restore time input values
           $('input[type="time"]').each(function(index) {
               if (storedInputs.timeInputs[index]) {
                   $(this).val(storedInputs.timeInputs[index]);
               }
           });
 
-          // Restore event values
+          //Restore event values
           $('.cameraType, .shotSubject, .extraInfo, .shot-type-select').each(function(index) {
               if (storedInputs.eventInputs[index]) {
                   $(this).val(storedInputs.eventInputs[index]);
