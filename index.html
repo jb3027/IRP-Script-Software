@@ -335,15 +335,15 @@
 
         //CREATE INSERT CELL
         function createInsertCell() {
-          return '<div style="text-align:center;" class="insert-content">' +
-            '<u><input type="text" class="editable-cell insertTitle" style="text-align:center; outline: none; color: rgb(16, 16, 16);" placeholder="Ven: Title"></u>' +
-            '<input type="text" class="editable-text insertIn" style="text-align:center; margin-left: -5px; color: rgb(16, 16, 16);" placeholder="In: Music">' +
-            '<div class="insert-duration-container">' +
+          return '<div style="text-align: left; width: 60%; margin: 0 auto;" class="insert-content">' +
+            '<u><input type="text" class="editable-cell insertTitle" style="text-align: left; width: 60%; margin: 0 auto; outline: none; color: rgb(16, 16, 16);" placeholder="Ven: Title"></u>' +
+            '<input type="text" class="editable-text insertIn" style="text-align: left; width: 60%; margin: 0 auto; outline: none; color: rgb(16, 16, 16);" placeholder="In: Music">' +
+            '<div class="insert-duration-container" style="text-align: left; width: 60%; margin: 0 auto; margin-left: 18px; outline: none; color: rgb(16, 16, 16);">' +
                 '<span style="white-space: nowrap; color: rgb(16, 16, 16);">Dur: ' +
-                '<input type="time" id="durationVT" name="durationVT" value="00:00" style="border: none; width: auto; margin-left: 2px; color: rgb(16, 16, 16);">' +
+                '<input type="time" id="durationVT" name="durationVT" value="00:00" style="border: none; width: auto; margin: 0 auto; color: rgb(16, 16, 16);">' +
                 '</span>' +
             '</div>' +
-            '<input type="text" class="editable-cell insertOut" style="text-align:center; outline: none; color: rgb(16, 16, 16);" placeholder="Out: Music">' +
+            '<input type="text" class="editable-cell insertOut" style="text-align: left; width: 60%; margin: 0 auto; outline: none; color: rgb(16, 16, 16);" placeholder="Out: Music">' +
           '</div>';
         }
 
@@ -712,18 +712,43 @@
             //Make all contenteditable elements non-editable in view mode
             tableClone.find('[contenteditable="true"]').attr('contenteditable', 'false');
 
-            //Make all duration elements uneditable strings
-            tableClone.find('input[type="time"]').each(function() {
+            function setDuration() {
+                //Make all duration elements uneditable strings
+                tableClone.find('input[type="time"]').each(function() {
                 const timeValue = $(this).val() || '00:00';
                 const [minutes, seconds] = timeValue.split(':');
                 $(this).replaceWith($('<span>').text(`${minutes}'${seconds}"`));
             });
+            }
 
             //Replace 'New Item' with what the user has inputted
             tableClone.find('td:nth-child(3) .item-content').each(function() {
                 const userInput = $(this).val() || $(this).text() || 'New Item';
                 const span = $('<span style="text-decoration: underline; margin-left: -8px; display: inline-block;">').text(userInput);
                 $(this).replaceWith(span);
+            });
+
+            //Replace Inserts with what the user has inputted
+            tableClone.find('td:nth-child(3) .insert-content').each(function() {
+                const insertTitle = $(this).find('.insertTitle').val() || 'Ven: Title';
+                const insertIn = $(this).find('.insertIn').val() || 'In: Music';
+                const insertOut = $(this).find('.insertOut').val() || 'Out: Music';
+                const timeValue = ($(this).find('input[type="time"]')).val();
+                const [minutes, seconds] = timeValue.split(':');
+
+                // Create a formatted insert display
+                const formattedInsert = `
+                    <div class="insert-content">
+                        <div style="text-align: left; width: 60%; margin: 0 auto;">
+                            <u>${insertTitle}</u>
+                            <div>${insertIn}</div>
+                            <div>Dur: ${`${minutes}'${seconds}"`}</div>
+                            <div>${insertOut}</div>
+                        </div>
+                    </div>
+                `;
+                
+                $(this).replaceWith(formattedInsert);
             });
             
             //Create new window/tab and write content
