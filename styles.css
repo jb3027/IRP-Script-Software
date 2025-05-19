@@ -1,0 +1,626 @@
+/* Load and style OpenDyslexic font */
+@font-face {
+    font-family: 'OpenDyslexic';
+    src: url('lib/libraries/fonts/OpenDyslexic-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+/* --------------- MAIN CONTENT ------------------ */
+  body {
+    padding-top: 60px;
+    /* Remove !important from font-family */
+    font-family: Arial, 'OpenDyslexic', sans-serif;
+    /*Off-white background colour and dark blue text colour for accessibility */
+    background-color: #f8f8f8 !important;
+    color: rgb(16, 16, 16) !important;
+    line-height: 1.5; /* Increased line space for accessibility */
+  }
+
+  .main-content {
+    display: none;
+    width: device-width;
+  }
+
+  /* ---------------- TABLE ------------ */
+
+  table {
+    width: 794px !important;
+    table-layout: fixed;
+    margin: 0 auto;
+    background-color: #f8f8f8 !important;
+    color: rgb(16, 16, 16) !important;
+    border-collapse: separate !important;
+    border-spacing: 0 10px;
+  }
+
+  /* HEADER */
+  thead tr {
+      border-radius: 12px;
+      overflow: hidden;
+  }
+
+  thead tr th:not(:last-child) {
+      /* better contrast for accessibility */
+      background-color: #2c3e50 !important;
+      color: #ffffff !important;
+      border-radius: 12px 12px 0 0;
+      
+      /* Text styling for better readability */
+      text-align: center !important;
+      vertical-align: middle !important;
+      height: 56px !important;
+      line-height: 1.6 !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      font-size: 1rem !important;
+      letter-spacing: 0.7px !important;
+      border-bottom: 3px solid #34495e !important;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+      padding: 12px 16px !important;
+  }
+
+
+  .event-table thead tr th:last-child {
+      background-color: transparent !important;
+  }
+
+  /*--------------------- CELL DESIGN ----------------------*/
+  /* DEFAULT */
+  tr td {
+    background-color: #f8f8f8 !important;
+    color: rgb(16, 16, 16) !important;
+    vertical-align: top !important;
+    font-weight: 500 !important;
+  }
+
+  /* DEFAULT PADDING */
+  tr td:not(:last-child) {
+      padding: 10px;
+  }
+
+  /* EVENT COLOUR  */
+  tr.event_highlighted td:not(:last-child) {
+    background-color: rgba(100, 181, 246, 0.4) !important; 
+    position: relative;
+  }
+  /* INSERT COLOUR  */
+  tr.insert_highlighted td:not(:last-child) {
+    background-color: rgba(149, 117, 205, 0.4) !important; 
+    position: relative;
+  }
+  /* ITEM COLOUR */
+  tr.item_highlighted td:not(:last-child) {
+    background-color: rgba(255, 183, 77, 0.4) !important; 
+    position: relative;
+  }
+
+  /* EVENT HIGHLIGHT */
+  tr.event_highlighted::after {
+    outline: 2px solid rgba(2, 114, 250, 0.6) !important;
+    box-shadow: 0 0 2px rgba(58, 118, 214, 0.3) !important;
+  }
+  /* INSERT HIGHLIGHT */
+  tr.insert_highlighted::after {
+    outline: 2px solid rgba(147, 2, 230, 0.6) !important;
+    box-shadow: 0 0 2px rgba(141, 36, 149, 0.3) !important;
+  }
+  /* ITEM HIGHLIGHT */
+  tr.item_highlighted::after {
+    outline: 2px solid rgb(255, 221, 0) !important;
+    box-shadow: 0 0 2px rgba(250, 222, 41, 0.3) !important;
+  }
+
+  /* INSERT */
+  .insertTitle::placeholder,
+  .insertIn::placeholder,
+  .insertOut::placeholder,
+  .item-content::placeholder {
+      color: rgb(16, 16, 16) !important;
+  }
+
+  .item-content {
+      border: none !important; 
+      margin-left: -3px;
+      background-color: transparent !important;
+      text-decoration: underline;
+      width: auto;
+      min-width: 85%;
+      max-width: 85%;
+      height: auto;
+      overflow: visible;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      padding: 4px 8px;
+      box-sizing: border-box;
+  }
+
+  /* REMOVE CELL BORDERS */
+  tr.event_highlighted td,
+  tr.insert_highlighted td,
+  tr.item_highlighted td {
+    border: none !important; 
+  }
+  tr.event_highlighted,
+  tr.insert_highlighted,
+  tr.item_highlighted {
+    position: relative;
+  }
+
+  /* HOVER EFFECT */
+  tr.event_highlighted:hover td:not(:last-child),
+  tr.insert_highlighted:hover td:not(:last-child),
+  tr.item_highlighted:hover td:not(:last-child),
+  tr.insert_highlighted:hover .insert-duration-container {
+    background-color: rgba(248, 248, 248, 0.9) !important;
+    transition: background-color 0.2s ease;
+  }
+
+  /* STRUCTURE */
+  tr.event_highlighted::after,
+  tr.insert_highlighted::after,
+  tr.item_highlighted::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 90px;
+    bottom: 0;
+    border-radius: 12px;
+    pointer-events: none;
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* ROUND EDGES */
+  tr.event_highlighted td:first-child,
+  tr.insert_highlighted td:first-child,
+  tr.item_highlighted td:first-child {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+  }
+
+  tr.event_highlighted td:nth-child(4),
+  tr.insert_highlighted td:nth-child(4),
+  tr.item_highlighted td:nth-child(4) {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+
+  /* EDITABLE CELL STYLING */
+  .editable-cell,
+  .editable-text,
+  div[contenteditable='true'] {
+      border: 0.5px solid rgb(155, 180, 203);
+      border-radius: 8px;
+      background-color: inherit !important;
+      color: rgb(16, 16, 16) !important;
+      vertical-align: top !important;
+      height: auto;
+      min-height: 24px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow: visible;
+      resize: vertical;
+      padding: 4px 8px;
+      width: 100%;
+      box-sizing: border-box;
+  }
+
+  tr.event_highlighted .editable-cell,
+  tr.event_highlighted .editable-text,
+  tr.event_highlighted div[contenteditable='true'] {
+      background-color: inherit !important;
+  }
+
+  /* EDITABLE INSERT CELLS */
+  tr.insert_highlighted .editable-cell,
+  tr.insert_highlighted .editable-text,
+  tr.insert_highlighted div[contenteditable='true'] {
+      background-color: inherit !important;
+      border: 0px solid rgb(255, 214, 235);
+  }
+
+  /* SHOT TYPE USER INPUT */
+  .table .shot-type-select {
+      width: fit-content;
+      text-align: left;
+      border: 0px solid rgb(214, 235, 255);
+      outline: 0.2px solid rgba(61, 113, 255, 0.5);
+      background-color: inherit !important;
+  }
+
+  .shot-type-select {
+      background-color: inherit !important;
+  }
+
+  /* DROP DOWN DEFAULT */
+  .shot-type-select option {
+    background-color: white !important;
+    color: rgb(16, 16, 16) !important;
+    padding: 8px !important;
+  }
+
+  /* DROP DOWN OPEN */
+  .shot-type-select:focus {
+    background-color: rgba(240, 240, 240, 0.3) !important;
+  }
+
+  /* -------------------- NAV BAR ---------------------------*/
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    float: none;
+  }
+
+  .nav-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #2c3e50 !important;
+      padding: 12px 24px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .toolbar-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+  }
+
+  .toolbar-group.left {
+      margin-right: auto;
+  }
+
+  .toolbar-group.right {
+      margin-left: auto;
+  }
+
+  /* ---------------- BUTTONS ----------- */
+  .button2 {
+      background-color: transparent !important;
+      color: #ecf0f1 !important;
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      text-align: center !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      font-size: 0.9rem !important;
+      letter-spacing: 0.5px !important;
+      line-height: 1.4 !important;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+  }
+
+  /* EVENT BUTTON */
+  .button2 .event-button:hover {
+      background-color: rgba(100, 181, 246, 0.4) !important; 
+  }
+  /* ITEM BUTTON */
+  .button2 .item-button:hover {
+      background-color: rgba(255, 183, 77, 0.4) !important; 
+  }
+  /* INSERT BUTTON */
+  .button2 .insert-button:hover {
+      background-color: rgba(149, 117, 205, 0.4) !important; 
+  }
+
+  .button2.primary {
+      background-color: #3498db !important;
+  }
+
+  .button2.primary:hover {
+      background-color: #2980b9 !important;
+  }
+
+  .button2.warning {
+      background-color: #e74c3c !important;
+  }
+
+  .button2.warning:hover {
+      background-color: #c0392b !important;
+  }
+
+  .button2.addEvent-button:hover {
+    background-color: rgba(100, 181, 246, 0.4) !important;
+    border-color: rgba(100, 181, 246, 0.6) !important;
+}
+
+.button2.addItem-button:hover {
+    background-color: rgba(255, 183, 77, 0.4) !important;
+    border-color: rgba(255, 183, 77, 0.6) !important;
+}
+
+.button2.addInsert-button:hover {
+    background-color: rgba(149, 117, 205, 0.4) !important;
+    border-color: rgba(149, 117, 205, 0.6) !important;
+}
+
+.button2:not(.addEvent-button):not(.addItem-button):not(.addInsert-button):hover {
+    background-color: rgba(255,255,255,0.1) !important;
+    border-color: rgba(255,255,255,0.2);
+}
+
+  /* ---------------------------------------------------------*/
+
+  .editable-cell:not(.production-title),
+  .editable-text:not(.production-title),
+  div[contenteditable='true']:not(.production-title) {
+    display: block;
+    width: 100%;
+    position: relative;
+    user-select: text; 
+    background-color: rgba(244, 244, 244, 0.3) !important;
+    outline: 0px !important;
+  }
+
+  .editable-cell span {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+  }
+
+  .editable-cell span::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 3px;
+    width: 100%;
+    height: 1px;
+    background-color: black;
+    outline: 1px solid blue;
+  }
+
+  .cut-line {
+    position: relative;
+  }
+  
+  .cut-line::after {
+    content: '';
+    position: absolute;
+    left: -350px !important; 
+    right: 0; 
+    bottom: -5px;
+    height: 2px;
+    background-color: black;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .shot-type-flex-container {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+  }
+  
+  .shot-type-text {
+      flex-grow: 1;
+      margin-left: 8px;
+  }
+  
+  .shot-type-dropdown {
+      flex-shrink: 0;
+      margin-right: 6px; 
+      background-color: #f8f8f8 !important;
+      color: rgb(16, 16, 16) !important;
+  }
+
+  .shotSubject {
+      flex: 1; 
+      min-width: 0; 
+      color: rgb(16, 16, 16) !important;
+  }
+
+  /* CUSTOM SHOT TYPE */
+  .custom-shot-type {
+    width: 100%;
+    border: 0.5px solid rgb(155, 180, 203);
+    border-radius: 8px;
+    background-color: inherit !important;
+    color: rgb(16, 16, 16) !important;
+    padding: 2px 6px;
+    display: none;
+}
+
+  /* PLACEHOLDER TEXT */
+  .shotSubject::placeholder, 
+  .cameraType::placeholder,
+  .extraInfo::placeholder {
+      color: rgb(16, 16, 16) !important;
+  }
+
+  .shotSubject::-moz-placeholder,
+  .cameraType::-moz-placeholder,
+  .extraInfo::-moz-placeholder {
+      color: rgb(16, 16, 16) !important;
+  }
+
+  .modal-dialog {
+    margin-top: 15%;
+    text-align: center;
+  }
+  .modal-footer {
+    justify-content: center !important;
+    text-align: center;
+    gap: 15px;
+  }
+
+  /* USER INPUT DURATION */
+  .insert-duration-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      margin: 0 auto;
+      text-align: center;
+      padding-left: 35px;
+      background-color: inherit !important;
+      color: rgb(16, 16, 16) !important;
+  }
+
+  /* TIME INPUT */
+  input[type="time"] {
+      background-color: inherit !important;
+      border: none;
+      color: rgb(16, 16, 16) !important;
+  }
+
+  tr.insert_highlighted input[type="time"] {
+      background-color: inherit !important;
+  }
+
+  tr.insert_highlighted:hover input[type="time"] {
+      background-color: rgba(248, 248, 248, 0.9) !important;
+      transition: background-color 0.2s ease;
+  }
+
+  .insertDuration {
+      text-align: right;
+      margin: 0;
+      padding: 0;
+  }
+  /* --------- VIEW MODE ---------- */
+  .view-mode .insert-duration-container {
+      display: flex;
+      justify-content: center;
+      text-align: center;
+  }
+
+  .view-mode .insertDuration {
+      padding-right: 4px;
+  }
+
+  /* ----------- TITLE ---------- */
+  .production-title-container {
+      text-align: left;
+      padding: 10px 0;
+      margin-top: 30px;
+      margin-bottom: -80px;
+      margin-left: 165px;
+  }
+
+  .production-title {
+      font-size: 24px;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 4px;
+      display: inline-block;
+      background-color: #f8f8f8 !important;
+      outline: none !important;
+      border: none !important;
+      color: rgb(16, 16, 16) !important;
+  }
+
+  /* ------------ ACTION BUTTONS -------------- */
+  .row-actions {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      align-items: center;
+      opacity: 0.6;
+      transition: opacity 0.2s ease;
+      height: 100%; 
+      padding: 8px 0;
+  }
+
+  .row-actions:hover {
+      opacity: 1;
+  }
+
+  td:last-child {
+      vertical-align: middle !important; 
+      position: relative; 
+  }
+
+  .row-button {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      background: transparent;
+      color: #2c3e50; 
+  }
+
+  .row-button.drag {
+      color: #ffffff;
+      background-color: #0c0c0c; 
+  }
+
+  .row-button.drag:hover {
+      background-color: #34ca0b; 
+  }
+
+  .row-button.remove {
+      color: #ffffff;
+      background-color: #0c0c0c;   
+  }
+
+  .row-button.remove:hover {
+      background-color: #ed0606; 
+  }
+
+  /* -------------- DRAGGING ------------- */
+  tr.dragging {
+      opacity: 0.5;
+      background-color: #e3e3e3;
+  }
+  
+  tbody tr {
+      cursor: default;  
+  }
+
+  .row-button.drag {
+      cursor: move;  
+  }
+
+    /* Change styling of last header column in running order */
+    #runningOrder-table thead tr th:last-child {
+    /* better contrast for accessibility */
+    background-color: #2c3e50 !important;
+    color: #ffffff !important;
+    border-radius: 12px 12px 0 0;
+
+    /* Text styling for better readability */
+    text-align: center !important;
+    vertical-align: middle !important;
+    height: 56px !important;
+    line-height: 1.6 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 1rem !important;
+    letter-spacing: 0.7px !important;
+    border-bottom: 3px solid #34495e !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+    padding: 12px 16px !important;
+    }
+
+    #event-table, #runningOrder-table {
+    width: 1140px !important;
+    margin: 0 auto;
+    table-layout: fixed;
+    }
+
+    #event-table th, #event-table td,
+    #runningOrder-table th {
+    border: 1px solid black;
+    padding: 8px;
+    }
+
+    .view-mode #event-table {
+    margin-top: 100px !important;
+    }
