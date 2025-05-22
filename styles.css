@@ -375,27 +375,10 @@
     outline: 1px solid blue;
   }
 
-  .cut-line {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .cut-line::after {
-    content: '';
-    position: absolute;
-    left: -350px;  
-    width: 350px;
-    height: 2px;
-    background-color: black;
-    bottom: 50%;
-    transform: translateY(50%);
-  }
-
   .shot-type-flex-container {
       display: flex;
       align-items: center;
       gap: 2px; 
-      background-color: #f8f8f8 !important;
   }
   
   .shot-type-text {
@@ -455,17 +438,20 @@
       align-items: center;
       text-align: center;
       margin: 0 auto;
+      background-color: inherit !important;
   }
 
   .insert-duration-container > * {
       display: inline-block;
       vertical-align: middle;
       margin: 0;
+      background-color: inherit !important;
   }
 
   .insertDuration {
       padding-right: 4px !important;
       text-align: right !important;
+      background-color: black !important;
   }
 
   /* --------- VIEW MODE ---------- */
@@ -605,24 +591,25 @@
     }
 
     td:nth-child(3) {
-        vertical-align: top !important;
-        padding-top: 8px !important;
-      }
+      vertical-align: top !important;
+      padding-top: 8px !important;
+    }
+    
+    .view-mode td:nth-child(3) {
+      vertical-align: top !important;
+      padding-top: 8px !important;
+    }
       
-      .view-mode td:nth-child(3) {
-        vertical-align: top !important;
-        padding-top: 8px !important;
-      }
-       
-      .view-mode td {
-        vertical-align: top !important;
-        padding-top: 8px !important;
-      }
-      
-      .view-mode td > div {
-        text-align: left;
-        margin-top: 0;
-        padding-top: 0;
-      }
+    .view-mode td {
+      vertical-align: top !important;
+      padding-top: 8px !important;
+    }
+    
+    .view-mode td > div {
+      text-align: left;
+      margin-top: 0;
+      padding-top: 0;
+    }
+    
   
   
