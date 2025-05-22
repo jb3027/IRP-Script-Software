@@ -8,7 +8,7 @@
 
 /* --------------- MAIN CONTENT ------------------ */
   body {
-    padding-top: 60px;
+    padding-top: 20px;
     /* Remove !important from font-family */
     font-family: Arial, 'OpenDyslexic', sans-serif;
     /*Off-white background colour and dark blue text colour for accessibility */
@@ -189,11 +189,10 @@
   /* EDITABLE CELL STYLING */
   .editable-cell,
   .editable-text,
-  div[contenteditable='true'] {
-      border: 0.5px solid rgb(155, 180, 203);
-      border-radius: 8px;
-      background-color: inherit !important;
-      color: rgb(16, 16, 16) !important;
+  div[contenteditable] {
+      outline: none !important;
+      border: none !important;
+      min-height: 24px;
       vertical-align: top !important;
       height: auto;
       min-height: 24px;
@@ -208,32 +207,27 @@
 
   tr.event_highlighted .editable-cell,
   tr.event_highlighted .editable-text,
-  tr.event_highlighted div[contenteditable='true'] {
+  tr.event_highlighted div[contenteditable] {
       background-color: inherit !important;
   }
 
   /* EDITABLE INSERT CELLS */
   tr.insert_highlighted .editable-cell,
   tr.insert_highlighted .editable-text,
-  tr.insert_highlighted div[contenteditable='true'] {
+  tr.insert_highlighted div[contenteditable] {
       background-color: inherit !important;
       border: 0px solid rgb(255, 214, 235);
   }
 
   /* SHOT TYPE USER INPUT */
-  .table .shot-type-select {
+  .shot-type-select {
       width: fit-content;
       text-align: left;
-      border: 0px solid rgb(214, 235, 255);
-      outline: 0.2px solid rgba(61, 113, 255, 0.5);
-      background-color: inherit !important;
+      border: none;
+      outline: none;
+      background-color: none !important;
   }
 
-  .shot-type-select {
-      background-color: inherit !important;
-  }
-
-  /* DROP DOWN DEFAULT */
   .shot-type-select option {
     background-color: white !important;
     color: rgb(16, 16, 16) !important;
@@ -355,7 +349,7 @@
 
   .editable-cell:not(.production-title),
   .editable-text:not(.production-title),
-  div[contenteditable='true']:not(.production-title) {
+  div[contenteditable]:not(.production-title) {
     display: block;
     width: 100%;
     position: relative;
@@ -383,24 +377,25 @@
 
   .cut-line {
     position: relative;
+    display: inline-block;
   }
   
   .cut-line::after {
     content: '';
     position: absolute;
-    left: -350px !important; 
-    right: 0; 
-    bottom: -5px;
+    left: -350px;  
+    width: 350px;
     height: 2px;
     background-color: black;
-    z-index: 1;
-    pointer-events: none;
+    bottom: 50%;
+    transform: translateY(50%);
   }
 
   .shot-type-flex-container {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 2px; 
+      background-color: #f8f8f8 !important;
   }
   
   .shot-type-text {
@@ -410,9 +405,7 @@
   
   .shot-type-dropdown {
       flex-shrink: 0;
-      margin-right: 6px; 
-      background-color: #f8f8f8 !important;
-      color: rgb(16, 16, 16) !important;
+      margin-right: 4px;
   }
 
   .shotSubject {
@@ -460,35 +453,21 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 5px;
-      margin: 0 auto;
       text-align: center;
-      padding-left: 35px;
-      background-color: inherit !important;
-      color: rgb(16, 16, 16) !important;
+      margin: 0 auto;
   }
 
-  /* TIME INPUT */
-  input[type="time"] {
-      background-color: inherit !important;
-      border: none;
-      color: rgb(16, 16, 16) !important;
-  }
-
-  tr.insert_highlighted input[type="time"] {
-      background-color: inherit !important;
-  }
-
-  tr.insert_highlighted:hover input[type="time"] {
-      background-color: rgba(248, 248, 248, 0.9) !important;
-      transition: background-color 0.2s ease;
+  .insert-duration-container > * {
+      display: inline-block;
+      vertical-align: middle;
+      margin: 0;
   }
 
   .insertDuration {
-      text-align: right;
-      margin: 0;
-      padding: 0;
+      padding-right: 4px !important;
+      text-align: right !important;
   }
+
   /* --------- VIEW MODE ---------- */
   .view-mode .insert-duration-container {
       display: flex;
@@ -624,3 +603,26 @@
     .view-mode #event-table {
     margin-top: 100px !important;
     }
+
+    td:nth-child(3) {
+        vertical-align: top !important;
+        padding-top: 8px !important;
+      }
+      
+      .view-mode td:nth-child(3) {
+        vertical-align: top !important;
+        padding-top: 8px !important;
+      }
+       
+      .view-mode td {
+        vertical-align: top !important;
+        padding-top: 8px !important;
+      }
+      
+      .view-mode td > div {
+        text-align: left;
+        margin-top: 0;
+        padding-top: 0;
+      }
+  
+  
