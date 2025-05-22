@@ -617,9 +617,9 @@
                         const scriptCell = row.querySelector('td:nth-child(3)');
                         const scriptContent = scriptCell ? scriptCell.textContent : '';
                         
-                        const characterCount = scriptContent.replace(/\s/g, '').length; 
+                        const characterCount = scriptContent.length; 
 
-                        const charactersPerLine = 75; //Characters per line
+                        const charactersPerLine = 70; //Characters per line
                         const lineHeight = 22; //Pixels per line
 
                         //How many lines to move the shot cell down by
