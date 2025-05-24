@@ -438,14 +438,14 @@
       align-items: center;
       text-align: center;
       margin: 0 auto;
-      background-color: inherit !important;
+      background-color: inherit !important; 
   }
 
   .insert-duration-container > * {
       display: inline-block;
       vertical-align: middle;
       margin: 0;
-      background-color: inherit !important;
+      background-color: inherit !important; 
   }
 
   .insertDuration {
