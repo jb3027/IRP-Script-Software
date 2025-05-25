@@ -1273,11 +1273,13 @@
       const itemTitle = [];
       let accumulatedCalc = 0;
 
-      function wordCalulation(content) {
-        const wordCount = content.trim().split(' ').length;
+      //Calculate how long it would take for dialogue to be spoken
+      function wordCalulation(content) { //Passes in the dialogue in the event
+        const wordCount = content.trim().split(' ').length; //Get word count
         const wordsPerSecond = 2.5; //Average words per second
-        const totalSeconds = wordCount * wordsPerSecond;
-        return timeConvert(totalSeconds);
+        const totalSeconds = wordCount * wordsPerSecond; 
+        //Call the function to convert this to a time format
+        return timeConvert(totalSeconds); 
       }
 
       function secondCalc(time) {
@@ -1289,10 +1291,12 @@
         return totalSeconds;
       }
 
+      //Convert time in seconds to '00:00' format for running order
       function timeConvert(time) {
-        const totalSeconds = Math.round(time);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
+        const totalSeconds = Math.round(time); //Round total seconds
+        const minutes = Math.floor(totalSeconds / 60); //Convert seconds to minutes
+        const seconds = totalSeconds % 60; //Get the remainder seconds
+        //Return this in a '00:00' format
         return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       }
 
