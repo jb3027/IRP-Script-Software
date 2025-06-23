@@ -176,8 +176,17 @@
         <div class="toolbar-group right">
             <button class="btn button2 primary" title="Save"><i class="fas fa-save"></i> Save</button> 
             <button class="btn button2 view-button" title="View"><i class="fas fa-eye"></i> View</button>
+
+            <!-- Each drop down has camList listed and takes you to a camera card for that camera-->
+            <div class="dropdown">
+                <input class="text-box" type="text" placeholder="CAMERA CARDS" readonly>
+                <div class="options">
+                  <div onclick="show('HTML')">CAMERA 1</div>
+                  <div onclick="show('CSS')">CAMERA 2</div>
+                </div>
+            </div>
+            
             <button class="btn button2 runningOrder-button" title="Running Order"> Running Order</button>
-            <button class="btn button2 camCard-button" title="Camera Cards"> Camera Cards</button>
         </div>
     </nav>
 
@@ -431,6 +440,7 @@
 
     //START
     $(document).ready(function() {
+        
         var highlight = true;
         var cutLine = true;
 
@@ -1156,8 +1166,21 @@
         });
 
         //~
+        //Nav bar
+
+        function show(value) {
+            document.querySelector(".text-box").value = value;
+        }
+        
+        let dropdown = document.querySelector(".dropdown")
+        dropdown.onclick = function() {
+            dropdown.classList.toggle("active")
+        }
+  
+
         //CAMERA CARDS
         $('.camCard-button').on('click', function() {
+
             //Find all event rows 
             //Split camera numbers and positions
             //List of all Camera Numbers
@@ -1206,37 +1229,24 @@
                 }
             }
 
+            console.log(camList);
+            let currentCamera;
+
             for(let i = 0; i < camList.length; i++) {
-                
+                //Filter all events to those with the corresponding camera number
+                currentCamera = camCards.filter(camCards => camCards.cameraNumber === camList[i]);
             }
-            
-            
-        
-            //Create new window and display all camera cards
-            const viewWindow = window.open('', '_blank');
-            viewWindow.document.write(`
+
+            //New window has drop down to show different cameras
+
+            //Create new window and display camera card for each camera
+            const camCardWindow = window.open('', '_blank');
+            camCardWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
                     <head>
                         <title>Camera Cards</title>
                         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-                        <style>
-                            body { 
-                                padding-top: 20px;
-                                color: rgb(16, 16, 16) !important;
-                            }
-                            table {
-                                width: 794px !important;
-                                table-layout: fixed;
-                                margin: 0 auto;
-                                border-collapse: separate !important;
-                                border-spacing: 0 10px;
-                            }
-                            td, th{
-                                border: 0.5px;
-                                outline: 0.5px;
-                            }
-                        </style>
                     </head>
                     <body>
                         
@@ -1247,16 +1257,19 @@
                                     <th scope="col" style="border: 1px solid black; width:100px; text-align: center;">Shot</th>
                                     <th scope="col" style="border: 1px solid black; width:350px; text-align: center;">Position</th>
                                     <th scope="col" style="border: 1px solid black; width:450px; text-align: center;">Description</th>
-                                    <th scope="col" style="border: 1px solid black; width:150px; text-align: center;">Notes</th>                                </tr>
+                                    <th scope="col" style="border: 1px solid black; width:150px; text-align: center;">Notes</th>   
+                                </tr>
                             </thead>
                             <tbody>
-
+                                <tr>
+                                    <td ${currentCamera} /td>
+                                </tr>
                             </tbody>
                         </table>
                         </div>
                     </body>
                 </html>
-            `);
+            `);           
         });
 
       //ADD INSERT
