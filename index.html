@@ -45,7 +45,7 @@
         pointer-events: none;
     }
 
-    /* Fix shot type dropdown styling */
+    /* shot type dropdown styling */
     .shot-type-select {
         background-color: transparent !important;
         border: none;
@@ -86,7 +86,7 @@
         position: relative;
     }
 
-    /* Update shot type cell layout */
+    /* shot type cell layout */
     .shot-type-flex-container {
         display: flex;
         flex-direction: column;
@@ -176,12 +176,13 @@
         <div class="toolbar-group right">
             <button class="btn button2 primary" title="Save"><i class="fas fa-save"></i> Save</button> 
             <button class="btn button2 view-button" title="View"><i class="fas fa-eye"></i> View</button>
-            <button class="btn button2 runningOrder-button" title="Running Order"><i class="fas fa-list-ol"></i> Running Order</button>
+            <button class="btn button2 runningOrder-button" title="Running Order"> Running Order</button>
+            <button class="btn button2 camCard-button" title="Camera Cards"> Camera Cards</button>
         </div>
     </nav>
 
     <div class="production-title-container">
-        <div class="production-title" contenteditable="true"></div>
+        <div style="margin-top:100px;" class="production-title" contenteditable="true"></div>
     </div>
 
     <div class="square"></div>
@@ -251,7 +252,8 @@
       //Use setTimeout to get the updated content after the current event cycle
       setTimeout(() => {
         const shotSubject = row.querySelector('.shotSubject');
-        const cameraType = row.querySelector('.cameraType');
+        const cameraNum = row.querySelector('.cameraNum');
+        const cameraPos = row.querySelector('.cameraPos');
         const extraInfo = row.querySelector('.extraInfo');
 
         //Check if any of the cells are empty
@@ -266,9 +268,20 @@
           selection.addRange(range);     
         }
 
-        if (cameraType.textContent.length === 0) {
+        if (cameraNum.textContent.length === 0) {
           //Restore the previous content
-          cameraType.textContent = '\u00A0';
+          cameraNum.textContent = '\u00A0';
+          const range = document.createRange();
+          const selection = window.getSelection();
+          range.selectNodeContents(shotSubject);
+          range.collapse(false); //false means collapse to end
+          selection.removeAllRanges();
+          selection.addRange(range);     
+        }
+
+        if (cameraPos.textContent.length === 0) {
+          //Restore the previous content
+          cameraPos.textContent = '\u00A0';
           const range = document.createRange();
           const selection = window.getSelection();
           range.selectNodeContents(shotSubject);
@@ -418,7 +431,6 @@
 
     //START
     $(document).ready(function() {
-        
         var highlight = true;
         var cutLine = true;
 
@@ -442,19 +454,17 @@
                     <input class="editable-text shotSubject" placeholder="Shot Subject (E.g., HOST)">
                 </div>`;
 
-            var placeHolderText1 = firstTime ? 'Camera Number/Position' : '\u00A0';
-            var placeHolderText3 = firstTime ? 'Additional Info (E.g., TRACK OUT)' : '\u00A0';
-
             return '<div>' +
-                '<input type="text" class="editable-cell cameraType event_highlighted" placeholder="Camera Number/Position">' + 
+                '<div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">' +
+                    '<input type="text" class="editable-cell cameraNum event_highlighted" placeholder="Camera Number">' + 
+                    '<input type="text" class="editable-cell cameraPos event_highlighted" placeholder="Camera Position">' + 
+                '</div>' +
                 '<div class="shot-type-flex-container event_highlighted">' +
                     selectHTML +
                 '</div>' +
                 '<input type="text" class="editable-cell extraInfo event_highlighted" placeholder="Additional Info (E.g., TRACK OUT)">' +
             '</div>';
         }
-
-
 
         //CREATE INSERT CELL
         function createInsertCell() {
@@ -813,7 +823,8 @@
                 const row = $(this);
                 const shotCell = row.find('td:nth-child(2)');
                 const scriptCell = row.find('td:nth-child(3)');
-                const cameraType = shotCell.find('.cameraType').val() || 'Camera Number/Position';
+                const cameraNum = shotCell.find('.cameraNum').val() || 'Camera Number';
+                const cameraPos = shotCell.find('.cameraPos').val() || 'Camera Position';
                 const shotTypeSelect = shotCell.find('.shot-type-select');
                 const customInput = shotCell.find('.custom-shot-type');
                 
@@ -841,7 +852,7 @@
                 // Structure the content in three distinct lines
                 const newContent = `
                     <div style="position: relative; top: ${originalTop}; display: flex; flex-direction: column; gap: 4px;">
-                        <div style="margin-bottom: 4px;">${cameraType}</div>
+                        <div style="margin-bottom: 4px;">${cameraNum}${cameraPos}</div>
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                             <span style="white-space: nowrap;">${shotType}</span>
                             <span style="margin-left: 8px;">${shotSubject}</span>
@@ -1144,6 +1155,52 @@
             viewWindow.document.close();
         });
 
+        //~
+        //CAMERA CARDS
+        $('.camCard-button').on('click', function() {
+            //Find all event rows 
+            //Split camera numbers and positions
+            //List of all Camera Numbers
+            //List of all corresponding camera positions
+            //List of shot types for each event
+            //Shot Subject for each event
+            //Addition info for each event
+            //Write table for each camera
+
+            const camCardObject = [];
+
+            $('#event-table').find('tr.event_highlighted').each(function() {
+                const row = $(this);
+                
+                const eventNum = row.find('td:first-child').text() || '';
+                const shotCell = row.find('td:nth-child(2)');
+
+                const cameraNum = shotCell.find('.cameraNum').val() || '';
+                const cameraPos = shotCell.find('.cameraPos').val() || '';
+                const shotType = shotCell.find('.shot-type-select').val() || '';
+                const shotSubject = shotCell.find('.shotSubject').val() || '';
+                const info = shotCell.find('.extraInfo').val() || '';
+
+                camCardObject.push({
+                    eventNumber: eventNum,
+                    cameraNumber: cameraNum,
+                    cameraPosition: cameraPos,
+                    shotType: shotType,
+                    shotSubject: shotSubject,
+                    extraInfo: info
+                });  
+            });
+
+        
+            //Create new window and display all camera cards
+            const viewWindow = window.open('', '_blank');
+            viewWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                </html>
+            `);
+        });
+
       //ADD INSERT
       $('.addInsert-button').on('click', function() {
             var selection = window.getSelection();
@@ -1254,7 +1311,7 @@
           insertInputs: $('.insertTitle, .insertIn, .insertOut').map(function() {
               return $(this).val() || $(this).text();
           }).get(),
-          eventInputs: $('.cameraType, .shotSubject, .extraInfo, .shot-type-select').map(function() {
+          eventInputs: $('.cameraNum, .cameraPos, .shotSubject, .extraInfo, .shot-type-select').map(function() {
               return $(this).val() || $(this).text();
           }).get(),
           timeInputs: $('input[type="time"]').map(function() {
@@ -1469,7 +1526,7 @@
           });
 
           //Restore event values
-          $('.cameraType, .shotSubject, .extraInfo, .shot-type-select').each(function(index) {
+          $('.cameraNum, .cameraPos, .shotSubject, .extraInfo, .shot-type-select').each(function(index) {
               if (storedInputs.eventInputs[index]) {
                   $(this).val(storedInputs.eventInputs[index]);
               }
@@ -1619,7 +1676,7 @@
               const box = sibling.getBoundingClientRect();
               return e.clientY < box.top + box.height / 2;
           });
-          //CURRENT
+          
           if (nextSibling) {
               tbody.insertBefore(draggingRow, nextSibling);
               var draggedEventNum = draggingRow.querySelector('td:first-child').textContent;
