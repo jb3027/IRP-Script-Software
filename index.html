@@ -633,29 +633,72 @@
                     //Move down the shot type cell to align with cut line
                     if (shotCell) {
                         //Get the script cell's content
-                        const scriptCell = row.querySelector('td:nth-child(3)');
-                        const scriptContent = scriptCell ? scriptCell.textContent : '';
+                        let scriptCell = row.querySelector('td:nth-child(3)');
                         
-                        const characterCount = scriptContent.length; 
-
-                        const charactersPerLine = 100; //Characters per line
-                        const lineHeight = 22; //Pixels per line
-
-                        let offset; 
-
-                        if(characterCount < 100) {
-                            //Don't move shot cell if only one line present
-                            offset = 0;
+                        // Create a temporary element to measure just the text height
+                        const tempDiv = document.createElement('div');
+                        const computedStyle = window.getComputedStyle(scriptCell);
+                        tempDiv.style.cssText = `
+                            position: absolute;
+                            visibility: hidden;
+                            white-space: ${computedStyle.whiteSpace};
+                            word-wrap: ${computedStyle.wordWrap};
+                            word-break: ${computedStyle.wordBreak};
+                            font-family: ${computedStyle.fontFamily};
+                            font-size: ${computedStyle.fontSize};
+                            line-height: ${computedStyle.lineHeight};
+                            width: ${scriptCell.offsetWidth}px;
+                            padding: ${computedStyle.padding};
+                            margin: ${computedStyle.margin};
+                            border: ${computedStyle.border};
+                            box-sizing: ${computedStyle.boxSizing};
+                        `;
+                        tempDiv.textContent = scriptCell.textContent;
+                        document.body.appendChild(tempDiv);
+                        
+                        // Get the height of just the text content
+                        const textHeight = tempDiv.scrollHeight;
+                        document.body.removeChild(tempDiv);
+                        
+                        // Calculate offset based on cut line position
+                        let offset = 0;
+                        
+                        // Get the cut line element
+                        const cutLine = scriptCell.querySelector('.cut-line');
+                        if (cutLine) {
+                            // Get the position of the cut line relative to the script cell
+                            const cutLineRect = cutLine.getBoundingClientRect();
+                            const scriptCellRect = scriptCell.getBoundingClientRect();
+                            
+                            // Calculate how far down the cut line is from the top of the script cell
+                            const cutLineOffset = cutLineRect.top - scriptCellRect.top;
+                            
+                            // The shot elements should be positioned so that:
+                            // - Camera num/pos are above the cut line
+                            // - Shot type/subject/info are below the cut line
+                            
+                            // Camera num/pos elements should be at the cut line position
+                            // Shot type elements should be below the cut line
+                            offset = cutLineOffset;
                         } else {
-                            //How many lines to move the shot cell down by
-                            offset = lineHeight * Math.ceil(characterCount / charactersPerLine);   
+                            // If no cut line, use text height to estimate
+                            const lineHeight = 24;
+                            const textLines = Math.floor(textHeight / lineHeight);
+                            offset = lineHeight * textLines;
                         }
 
                         //Apply offset to shot cell elements
                         const allElements = shotCell.querySelectorAll('.editable-cell, .shot-type-flex-container');
                         allElements.forEach(element => {
                             element.style.position = 'relative';
-                            element.style.top = `${offset}px`;
+                            
+                            // Camera num/pos elements should be above the cut line
+                            if (element.classList.contains('cameraNum') || element.classList.contains('cameraPos')) {
+                                element.style.top = `${offset - 30}px`; // Position above cut line
+                            } else {
+                                // Shot type elements should be below the cut line
+                                element.style.top = `${offset - 30}px`; // Position below cut line
+                            }
                         });
                         
                         //Adjust row height to accommodate the offset
@@ -663,7 +706,7 @@
                         cells.forEach(cell => {
                             //Adjust the minimum height on both the cell and its contents
                             cell.style.cssText = `
-                                min-height: ${offset + 120}px !important;
+                                min-height: ${offset + 80}px !important;
                                 height: auto !important;
                                 vertical-align: top !important;
                             `;
@@ -672,14 +715,14 @@
                             const containerDiv = cell.querySelector('div');
                             if (containerDiv) {
                                 containerDiv.style.cssText = `
-                                    min-height: ${offset + 120}px !important;
+                                    min-height: ${offset + 80}px !important;
                                     height: auto !important;
                                 `;
                             }
                         });
                         
                         row.style.cssText = `
-                            min-height: ${offset + 120}px !important;
+                            min-height: ${offset + 80}px !important;
                             height: auto !important;
                         `;
                     }
@@ -1573,10 +1616,10 @@
                       text-align: center !important;
                       vertical-align: middle !important;
                       height: 56px !important;
-                      line-height: 1.6 !important;
+                      line-height: 150% !important;
                       font-weight: 700 !important;
                       text-transform: uppercase !important;
-                      font-size: 1rem !important;
+                      font-size: 16px !important;
                       letter-spacing: 0.7px !important;
                       border-bottom: 3px solid #34495e !important;
                       box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
