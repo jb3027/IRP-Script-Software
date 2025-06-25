@@ -298,17 +298,36 @@
       transition: all 0.2s ease;
   }
 
+  .button3 .createCamCard-button {
+      position: absolute;
+      top: 70px;
+      width: 100%;
+      overflow: hidden;
+      display: none;
+      color: default;
+      background-color: #fff;
+      padding: 12px 20px;
+      cursor: pointer;
+  }
+
+  .button3.createCamCard-button:hover {
+    background: #62baea;
+    color: #fff;
+  }
+
   .dropdown {
     position: relative;
     width: 175px;
     height: 50px;
+    top: 9px;
+    margin-right: -45px;
   }
 
   .dropdown::before {
       content: "";
       background-color: inherit !important;
       position: absolute;
-      top: 20px;
+      top: 14px;
       z-index: 1000;
       width: 8px;
       height: 8px;
@@ -321,7 +340,7 @@
   }
 
   .dropdown.active::before {
-      top: 15px;
+      top: 1px;
       transform: rotate(-225deg);
   }
 

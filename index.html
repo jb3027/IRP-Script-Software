@@ -177,12 +177,11 @@
             <button class="btn button2 primary" title="Save"><i class="fas fa-save"></i> Save</button> 
             <button class="btn button2 view-button" title="View"><i class="fas fa-eye"></i> View</button>
 
-            <!-- Each drop down has camList listed and takes you to a camera card for that camera-->
+            
             <div class="dropdown">
-                <input class="text-box" type="text" placeholder="CAMERA CARDS" readonly>
-                <div class="options">
-                  <div onclick="show('HTML')">CAMERA 1</div>
-                  <div onclick="show('CSS')">CAMERA 2</div>
+                <button class="btn button2 camCard-button" title="camCards"> CAMERA CARDS </button>
+                <div class="options" id="camera-options">
+                    <!-- Dropdown options change when user adds more cameras to events -->
                 </div>
             </div>
             
@@ -639,12 +638,19 @@
                         
                         const characterCount = scriptContent.length; 
 
-                        const charactersPerLine = 70; //Characters per line
+                        const charactersPerLine = 100; //Characters per line
                         const lineHeight = 22; //Pixels per line
 
-                        //How many lines to move the shot cell down by
-                        const offset = lineHeight * Math.ceil(characterCount / charactersPerLine);   
-                        
+                        let offset; 
+
+                        if(characterCount < 100) {
+                            //Don't move shot cell if only one line present
+                            offset = 0;
+                        } else {
+                            //How many lines to move the shot cell down by
+                            offset = lineHeight * Math.ceil(characterCount / charactersPerLine);   
+                        }
+
                         //Apply offset to shot cell elements
                         const allElements = shotCell.querySelectorAll('.editable-cell, .shot-type-flex-container');
                         allElements.forEach(element => {
@@ -657,7 +663,7 @@
                         cells.forEach(cell => {
                             //Adjust the minimum height on both the cell and its contents
                             cell.style.cssText = `
-                                min-height: ${offset + 150}px !important;
+                                min-height: ${offset + 120}px !important;
                                 height: auto !important;
                                 vertical-align: top !important;
                             `;
@@ -666,14 +672,14 @@
                             const containerDiv = cell.querySelector('div');
                             if (containerDiv) {
                                 containerDiv.style.cssText = `
-                                    min-height: ${offset + 150}px !important;
+                                    min-height: ${offset + 120}px !important;
                                     height: auto !important;
                                 `;
                             }
                         });
                         
                         row.style.cssText = `
-                            min-height: ${offset + 150}px !important;
+                            min-height: ${offset + 120}px !important;
                             height: auto !important;
                         `;
                     }
@@ -833,8 +839,8 @@
                 const row = $(this);
                 const shotCell = row.find('td:nth-child(2)');
                 const scriptCell = row.find('td:nth-child(3)');
-                const cameraNum = shotCell.find('.cameraNum').val() || 'Camera Number';
-                const cameraPos = shotCell.find('.cameraPos').val() || 'Camera Position';
+                const cameraNum = shotCell.find('.cameraNum').val() || '';
+                const cameraPos = shotCell.find('.cameraPos').val() || '';
                 const shotTypeSelect = shotCell.find('.shot-type-select');
                 const customInput = shotCell.find('.custom-shot-type');
                 
@@ -853,8 +859,8 @@
                     });
                 }
                 
-                const shotSubject = shotCell.find('.shotSubject').val() || 'Shot Subject (E.g., HOST)';
-                const extraInfo = shotCell.find('.extraInfo').val() || 'Additional Info (E.g., TRACK OUT)';
+                const shotSubject = shotCell.find('.shotSubject').val() || '';
+                const extraInfo = shotCell.find('.extraInfo').val() || '';
 
                 // Get the original top position from the style attribute
                 const originalTop = shotCell.find('.shot-type-flex-container').css('top') || '0px';
@@ -1166,8 +1172,7 @@
         });
 
         //~
-        //Nav bar
-
+        //dropdown menu closes when user clicks elsewhere
         function show(value) {
             document.querySelector(".text-box").value = value;
         }
@@ -1176,21 +1181,11 @@
         dropdown.onclick = function() {
             dropdown.classList.toggle("active")
         }
-  
 
-        //CAMERA CARDS
+        //CAMERA CARD DROPDOWN
         $('.camCard-button').on('click', function() {
-
-            //Find all event rows 
-            //Split camera numbers and positions
-            //List of all Camera Numbers
-            //List of all corresponding camera positions
-            //List of shot types for each event
-            //Shot Subject for each event
-            //Addition info for each event
-            //Write table for each camera
-
-            const camCards = [];
+            let camList = []; //stores list of unique cameras
+            let camCards = []; //Stores all info for events
 
             $('#event-table').find('tr.event_highlighted').each(function() {
                 const row = $(this);
@@ -1216,61 +1211,115 @@
                 camCards.push(event);
             });
             
-            let camList = [];
-            
-            
             //Get a list of cameras, ignoring duplicate mentions
             for(let i = 0; i < camCards.length; i++) {
                 let alreadyAdded = false;
                 let tempCamNum = camCards[i].cameraNumber; //Store current cam number
 
-                if(!(camList.includes(tempCamNum))) {
+                if(tempCamNum && !(camList.includes(tempCamNum))) {
                     camList.push(tempCamNum);
                 }
             }
-
-            console.log(camList);
-            let currentCamera;
-
-            for(let i = 0; i < camList.length; i++) {
-                //Filter all events to those with the corresponding camera number
-                currentCamera = camCards.filter(camCards => camCards.cameraNumber === camList[i]);
+            
+            //Populates the dropdown menu with the available camera options
+            const dropdown = $('#camera-options');
+            dropdown.empty(); //Clear existing options
+            
+            if (camList.length === 0) {
+                dropdown.append('<div>No cameras found</div>');
+            } else {
+                camList.forEach((camera) => {
+                    const cameraOption = $(`<div><button class="btn button3 createCamCard-button" id="${camera}" title="camOption"> CAMERA ${camera}</button></div>`);
+                    dropdown.append(cameraOption);
+                });
             }
+        
+        });
 
-            //New window has drop down to show different cameras
+    
+        //CREATE CAMERA CARD
+        $(document).on('click', '.createCamCard-button', function() {
+            let cameraNumber = (this.id);
+            let camCards = [];
 
-            //Create new window and display camera card for each camera
+            $('#event-table').find('tr.event_highlighted').each(function() {
+                const row = $(this);
+                
+                const eventNum = row.find('td:first-child').text() || '';
+                const shotCell = row.find('td:nth-child(2)');
+                
+
+                const cameraNum = shotCell.find('.cameraNum').val() || '';
+                const cameraPos = shotCell.find('.cameraPos').val() || '';
+                let shotType = shotCell.find('.shot-type-select').val() || '';
+                const shotSubject = shotCell.find('.shotSubject').val() || '';
+                const info = shotCell.find('.extraInfo').val() || '';
+
+                if(shotType === "SHOT TYPE") {
+                    shotType = '';
+                }
+                //Adds events to the camera array as objects
+                let event = {
+                    eventNumber: eventNum,
+                    cameraNumber: cameraNum,
+                    cameraPosition: cameraPos,
+                    shotType: shotType,
+                    shotSubject: shotSubject,
+                    extraInfo: info
+                };  
+                camCards.push(event);
+            });
+
+            
+
+            //Filter events for the selected camera
+            const currentCameraEvents = camCards.filter(event => event.cameraNumber === cameraNumber);
+
+            //Create new window and display camera card for the selected camera
             const camCardWindow = window.open('', '_blank');
             camCardWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
                     <head>
-                        <title>Camera Cards</title>
+                        <title>Camera Card: Camera ${cameraNumber}</title>
                         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+                        <style>
+                            body { padding: 20px; }
+                            table { width: 794px; margin: 0 auto; }
+                            th, td { padding: 8px; text-align: left; border: 1px solid #ddd; }
+                            th { background-color: #f2f2f2; }
+                        </style>
                     </head>
                     <body>
-                        
+                        <h2 style="margin-left: 420px;">Camera ${cameraNumber}</h2>
                         <div class="container">
-                        <table style="margin-top:100px;" id="camCard-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col" style="border: 1px solid black; width:100px; text-align: center;">Shot</th>
-                                    <th scope="col" style="border: 1px solid black; width:350px; text-align: center;">Position</th>
-                                    <th scope="col" style="border: 1px solid black; width:450px; text-align: center;">Description</th>
-                                    <th scope="col" style="border: 1px solid black; width:150px; text-align: center;">Notes</th>   
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td ${currentCamera} /td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            <table id="camCard-table" style="align: center;">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" style="width:15%; text-align: center;">Shot</th>
+                                        <th scope="col" style="width:15%; text-align: center;">Position</th>
+                                        <th scope="col" style="width:50%; text-align: center;">Description</th>
+                                        <th scope="col" style="width:20%; text-align: center;">Notes</th>   
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${currentCameraEvents.map(event => `
+                                        <tr>
+                                            <td style="text-align: center;">${event.eventNumber}</td>
+                                            <td style="text-align: center;">${event.cameraPosition}</td>
+                                            <td style="text-align: left;">${event.shotType} ${event.shotSubject}</td>
+                                            <td contenteditable="true">${event.extraInfo}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
                         </div>
                     </body>
                 </html>
-            `);           
+            `);
+            camCardWindow.document.close();
         });
+
 
       //ADD INSERT
       $('.addInsert-button').on('click', function() {
@@ -1769,6 +1818,13 @@
   //Make rows remain draggable when order is rearranged
   $(document).on('click', '.row-button.drag, .addEvent-button, .addInsert-button, .addItem-button', function() {
       setTimeout(initDraggable, 0);
+  });
+
+  //Close dropdown when clicking outside
+  $(document).on('click', function(e) {
+      if (!$(e.target).closest('.dropdown').length) {
+          $('.dropdown').removeClass('active');
+      }
   });
 
   //Initialise item row

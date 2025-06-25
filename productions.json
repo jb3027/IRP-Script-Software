@@ -2,7 +2,7 @@
     "productions": [
         {
             "name": "prod1",
-            "users": ["user"]
+            "users": ["abc"]
         }
     ]
 }
