@@ -398,6 +398,19 @@
       color: #fff;
   }
 
+  .addSubject-button,
+  .submitSubject-button,
+  .btn-success {
+    background: #62baea;
+    color: #fff;
+  }
+
+  .addSubject-button:hover,
+  .submitSubject-button:hover,
+  .btn-success:hover {
+    background: #fff;
+    color: #0e0e0e;
+  }
 
   /* EVENT BUTTON */
   .button2 .event-button:hover {

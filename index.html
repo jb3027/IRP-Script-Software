@@ -231,6 +231,40 @@
     </div>
   </div>
 
+  <!-- FLOOR PLAN POP UP -->
+  <div id="fpCheckBox-form" title="Create Floor Plan">
+    <form>
+      <fieldset>
+        <ul id="fpSubjects"></ul>
+        <!-- Allow form submission with keyboard without duplicating the dialog button -->
+        <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+      </fieldset>
+    </form>
+  </div>
+
+  <!-- Add subjects to floor plan -->
+  <!-- Removed - using inline editable checkboxes instead -->
+
+  <!-- Subject Selection Modal -->
+  <div id="subjectModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Floor Plan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Select which subjects should appear in the floor plan:</p>
+          <div id="subjectCheckboxes"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn button submitSubject-button" id="submitSubjects">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   
@@ -1251,6 +1285,7 @@
             let eventInfo = [];
             let camList = [];
             let subjectList = [];
+            let subjectInitials = [];
 
             $('#event-table').find('tr.event_highlighted').each(function() {
                 const row = $(this);
@@ -1276,21 +1311,104 @@
                     camList.push(tempCamNum);
                 }
                 if(tempSubject && !(subjectList.includes(tempSubject))) {
-
                     subjectList.push(tempSubject);
                 }
             }
 
-            
-            
+            //If no subjects found, open floor plan directly
+            if (subjectList.length === 0) {
+                openFloorPlan(productionTitle, camList, []);
+                return;
+            }
+
+            //UNIQUE INITIAL FEATURE 
+            // //Generate unique initials for subjects
+            // subjectInitials = generateUniqueInitials(subjectList);
+            // console.log('Subject initials:', subjectInitials);
+
+            // //Function to generate unique initials
+            // function generateUniqueInitials(subjects) {
+            //     if (subjects.length === 0) return [];
+            //     if (subjects.length === 1) return [subjects[0].charAt(0)];
+
+            //     const initials = [];
+                
+            //     for (let i = 0; i < subjects.length; i++) {
+            //         const currentSubject = subjects[i];
+            //         let minLength = 1;
+                    
+            //         //Check against all other subjects to find minimum unique length
+            //         for (let j = 0; j < subjects.length; j++) {
+            //             if (i === j) continue; // Skip comparing with itself
+                        
+            //             const otherSubject = subjects[j];
+            //             const maxLength = Math.min(currentSubject.length, otherSubject.length);
+                        
+            //             //Find where the two subjects differ
+            //             for (let k = 0; k <= maxLength; k++) {
+            //                 if (k === maxLength || currentSubject.charAt(k) !== otherSubject.charAt(k)) {
+            //                     minLength = Math.max(minLength, k + 1);
+            //                     break;
+            //                 }
+            //             }
+            //         }
+            //         //Add the unique initial (minimum length needed)
+            //         //If more than 2 letters are needed, display the full subject name
+            //         if (minLength > 2) {
+            //             initials.push(currentSubject);
+            //         } else {
+            //             initials.push(currentSubject.substring(0, minLength));
+            //         }
+            //     }
+                
+            //     return initials;
+            // }
+
+            // Populate the modal with checkboxes
+            const subjectCheckboxes = document.getElementById('subjectCheckboxes');
+            const checkboxHTML = subjectList.map(subject => `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="subject_${subject}" value="${subject}" checked>
+                    <label class="form-check-label" for="subject_${subject}">
+                        ${subject}
+                    </label>
+                </div>
+            `).join('');
+            subjectCheckboxes.innerHTML = checkboxHTML;
+
+            // Show the modal
+            const subjectModal = new bootstrap.Modal(document.getElementById('subjectModal'));
+            subjectModal.show();
+
+            //Handle submit button click
+            $('#submitSubjects').on('click', function() {
+                const selectedSubjects = [];
+                subjectList.forEach(subject => {
+                    const checkbox = document.getElementById(`subject_${subject}`);
+                    if (checkbox && checkbox.checked) {
+                        selectedSubjects.push(subject);
+                    }
+                });
+                
+                // Close modal and open floor plan
+                subjectModal.hide();
+                openFloorPlan(productionTitle, camList, selectedSubjects, subjectInitials);
+            });
+        });
+
+        // Function to open the floor plan window
+        function openFloorPlan(productionTitle, camList, selectedSubjects, subjectInitials) {
             const floorPlanWindow = window.open('', '_blank');
             floorPlanWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
                 <head>  
                     <title>${productionTitle} Floor Plan</title>
-                    <link rel="stylesheet" href="/style.css">
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+                    
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+                        integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+                        crossorigin="anonymous" referrerpolicy="no-referrer"/>
+                    <script src="https://kit.fontawesome.com/c353d71a36.js" crossorigin="anonymous"><\/script>
 
                     <style>
                         body {
@@ -1412,7 +1530,8 @@
                             background: #6c757d;
                         }
 
-                        .buttons .save-img {
+                        .buttons .save-img,
+                        .addSubject-button {
                             background: white;
                             color: black;
                             border: 1px solid #6c757d;
@@ -1507,20 +1626,15 @@
                                     <button class="clear-canvas">Clear Canvas</button>
                                     <button class="save-img">Save Image</button>
                                 </div>
+                                <div class="row">
+                                    <label class="title"><strong>Script Items</strong></label>
+                                    <ul id="scriptItems"></ul>
+                                    <button class="addSubject-button"> Add Subject </button>   
+                                </div>
                             </section>
                             <section class="drawing-board">
                                 <canvas></canvas>
                             </section>
-
-                            <section class="script-icons">
-                                <div class="row">
-                                <div class="col-md-6">
-                                    <label class="title"><strong>Script Items</strong></label>
-                                    <ul id="scriptItems"></ul>
-                                </div>
-                                </div>
-                            </section>
-
                     </div>
                 </body>
                 </html>
@@ -1538,9 +1652,8 @@
                 const clearCanvas = floorPlanWindow.document.querySelector(".clear-canvas");
                 const saveImage = floorPlanWindow.document.querySelector(".save-img");
                 const ctx = canvas.getContext("2d");
-
-                // Create camera list
                 const scriptItems = floorPlanWindow.document.getElementById('scriptItems');
+                const addSubject = floorPlanWindow.document.querySelector('.addSubject-button');
                 
                 if (camList.length > 0) {
                     const li = camList.map(cam => `<li class="option tool" id="camera-${cam}">
@@ -1552,17 +1665,16 @@
                     scriptItems.innerHTML = '';
                 }
 
-                if (subjectList.length > 0) {
-                    const li = subjectList.map(subject => `<li class="option tool" id="${subject}">
+                //Add selected subjects to the script items
+                if (selectedSubjects.length > 0) {
+                    const subjectLi = selectedSubjects.map(subject => `<li class="option tool" id="${subject}">
                         <i class="fa-solid fa-user"></i>
                         <span>${subject}</span>
                     </li>`).join('');
-                    scriptItems.innerHTML = li;
-                } else {
-                    scriptItems.innerHTML = '';
+                    scriptItems.innerHTML += subjectLi;
                 }
 
-                // Global variables with default values
+                //Global variables with default values
                 let prevMouseX, prevMouseY, snapshot,
                     isDrawing = false,
                     selectedTool = "brush",
@@ -1666,22 +1778,6 @@
                     ctx.fill();
                 }
 
-                const startDraw = (e) => {
-                    isDrawing = true;
-                    prevMouseX = e.offsetX; 
-                    prevMouseY = e.offsetY;
-                    ctx.beginPath();
-                    ctx.lineWidth = brushWidth;
-                    ctx.strokeStyle = selectedColor;
-                    ctx.fillStyle = selectedColor;
-                    snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                }
-
-                const drawPencil = (e) => {
-                    ctx.lineTo(e.offsetX, e.offsetY);
-                    ctx.stroke();
-                }
-
                 const drawCamera = (e) => {
                     ctx.beginPath();
                     let radius = Math.sqrt(Math.pow((prevMouseX - e.offsetX), 2) + Math.pow((prevMouseY - e.offsetY), 2));
@@ -1703,14 +1799,33 @@
                     ctx.arc(prevMouseX, prevMouseY, radius, 0, 2 * Math.PI);
                     fillColor.checked ? ctx.fill() : ctx.stroke();
                     
-                    //Add host initial into circle
+                    //Add unique subject initials into circle
                     const subjectName = selectedTool;
+                    //For optional unique intial feature
+                    // const subjectIndex = selectedSubjects.indexOf(subjectName);
+                    // const displayText = subjectIndex >= 0 && subjectInitials[subjectIndex] ? subjectInitials[subjectIndex] : subjectName.charAt(0);
+                    
                     ctx.fillStyle = selectedColor;
                     ctx.font = `${Math.max(12, radius/3)}px Arial`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    //Only display first letter of subject
-                    ctx.fillText(subjectName.charAt(0), prevMouseX, prevMouseY);
+                    ctx.fillText(subjectName, prevMouseX, prevMouseY);
+                }
+
+                const startDraw = (e) => {
+                    isDrawing = true;
+                    prevMouseX = e.offsetX; 
+                    prevMouseY = e.offsetY;
+                    ctx.beginPath();
+                    ctx.lineWidth = brushWidth;
+                    ctx.strokeStyle = selectedColor;
+                    ctx.fillStyle = selectedColor;
+                    snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                }
+
+                const drawPencil = (e) => {
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
                 }
 
                 const drawing = (e) => {
@@ -1752,7 +1867,7 @@
                     });
                 });
 
-                // Add event delegation for dynamically added camera buttons
+                //Add event delegation for dynamically added camera buttons
                 floorPlanWindow.document.addEventListener("click", (e) => {
                     if (e.target.closest('.tool')) {
                         const clickedTool = e.target.closest('.tool');
@@ -1790,11 +1905,25 @@
                     link.click();
                 });
 
+                addSubject.addEventListener("click", () => {
+                    const newSubjectName = prompt('Enter new subject name:');
+                    if (newSubjectName && newSubjectName.trim()) {
+                        const trimmedName = newSubjectName.trim();
+                        
+                        // Add to script items
+                        const newSubjectLi = `<li class="option tool" id="${trimmedName}">
+                            <i class="fa-solid fa-user"></i>
+                            <span>${trimmedName}</span>
+                        </li>`;
+                        scriptItems.innerHTML += newSubjectLi;
+                    }
+                });
+
                 canvas.addEventListener("mousedown", startDraw);
                 canvas.addEventListener("mousemove", drawing);
                 canvas.addEventListener("mouseup", () => isDrawing = false);
             };
-        });
+        }
 
       //ADD INSERT
       $('.addInsert-button').on('click', function() {
@@ -2146,7 +2275,6 @@
       //Add the show script button
       $('.toolbar-group.right').append(showScriptButton);
   });
-      
 
 
   //Pop up question modal
@@ -2194,6 +2322,7 @@
     
     modal.show();
   }
+
 
   function formatTime(event) {
       //Allow only numbers, backspace, delete, tab, arrows, and colon
