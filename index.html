@@ -176,8 +176,9 @@
         <div class="toolbar-group right">
             <button class="btn button2 primary" title="Save"><i class="fas fa-save"></i> Save</button> 
             <button class="btn button2 view-button" title="View"><i class="fas fa-eye"></i> View</button>
+            <button class="btn button2 runningOrder-button" title="Running Order"> Running Order</button>
+            <button class="btn button2 floorPlan-button" title="Floor Plan"> Floor Plan</button>
 
-            
             <div class="dropdown">
                 <button class="btn button2 camCard-button" title="camCards"> CAMERA CARDS </button>
                 <div class="options" id="camera-options">
@@ -185,7 +186,7 @@
                 </div>
             </div>
             
-            <button class="btn button2 runningOrder-button" title="Running Order"> Running Order</button>
+            
         </div>
     </nav>
 
@@ -460,7 +461,7 @@
                         `).join('')}
                     </select>
                     <input type="text" class="custom-shot-type" style="display:none">
-                    <input class="editable-text shotSubject" placeholder="Shot Subject (E.g., HOST)">
+                    <input class="editable-text shotSubject" placeholder="Shot Subject">
                 </div>`;
 
             return '<div>' +
@@ -561,10 +562,10 @@
 
             //If no selection, create new row at the end
             var newRow = '<tr class="event_highlighted">' +
-                '<td contenteditable="false"; style="text-align:center";></td>' +
-                '<td contenteditable="true";>' + createShotTypeCell("SHOT TYPE", false) + '</td>' +
+                '<td contenteditable="false" style="text-align:center"></td>' +
+                '<td contenteditable="true">' + createShotTypeCell("SHOT TYPE", false) + '</td>' +
                 '<td contenteditable="true"></td>' +
-                '<td contenteditable="true"; style="text-align:center";></td>' +
+                '<td contenteditable="true" style="text-align:center"></td>' +
                 '<td style="border:none; width:90px">' + createRowButtons() + '</td>' +
             '</tr>';
             $('#event-table tbody').append(newRow);
@@ -607,128 +608,6 @@
         //ADD CUT ON CLICK
         $('.addCut-button').on('click', function() {
             const selection = window.getSelection();
-            let lineCount = 0; //Default to 1
-
-            if (selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                const rects = range.getClientRects();
-                
-                //Get all unique y-coordinates of the rectangles
-                const uniqueYPositions = new Set();
-                for (const rect of rects) {
-                    uniqueYPositions.add(Math.round(rect.top)); //Round to handle minor pixel differences
-                }
-                
-                lineCount = uniqueYPositions.size;
-
-                //Get the cell containing the selection
-                const cell = range.commonAncestorContainer.nodeType === 1 
-                    ? range.commonAncestorContainer.closest('td')
-                    : range.commonAncestorContainer.parentElement.closest('td');
-
-                if (cell) {
-                    const row = cell.closest('tr');
-                    const shotCell = row.querySelector('td:nth-child(2)');
-                    
-                    //Move down the shot type cell to align with cut line
-                    if (shotCell) {
-                        //Get the script cell's content
-                        let scriptCell = row.querySelector('td:nth-child(3)');
-                        
-                        // Create a temporary element to measure just the text height
-                        const tempDiv = document.createElement('div');
-                        const computedStyle = window.getComputedStyle(scriptCell);
-                        tempDiv.style.cssText = `
-                            position: absolute;
-                            visibility: hidden;
-                            white-space: ${computedStyle.whiteSpace};
-                            word-wrap: ${computedStyle.wordWrap};
-                            word-break: ${computedStyle.wordBreak};
-                            font-family: ${computedStyle.fontFamily};
-                            font-size: ${computedStyle.fontSize};
-                            line-height: ${computedStyle.lineHeight};
-                            width: ${scriptCell.offsetWidth}px;
-                            padding: ${computedStyle.padding};
-                            margin: ${computedStyle.margin};
-                            border: ${computedStyle.border};
-                            box-sizing: ${computedStyle.boxSizing};
-                        `;
-                        tempDiv.textContent = scriptCell.textContent;
-                        document.body.appendChild(tempDiv);
-                        
-                        // Get the height of just the text content
-                        const textHeight = tempDiv.scrollHeight;
-                        document.body.removeChild(tempDiv);
-                        
-                        // Calculate offset based on cut line position
-                        let offset = 0;
-                        
-                        // Get the cut line element
-                        const cutLine = scriptCell.querySelector('.cut-line');
-                        if (cutLine) {
-                            // Get the position of the cut line relative to the script cell
-                            const cutLineRect = cutLine.getBoundingClientRect();
-                            const scriptCellRect = scriptCell.getBoundingClientRect();
-                            
-                            // Calculate how far down the cut line is from the top of the script cell
-                            const cutLineOffset = cutLineRect.top - scriptCellRect.top;
-                            
-                            // The shot elements should be positioned so that:
-                            // - Camera num/pos are above the cut line
-                            // - Shot type/subject/info are below the cut line
-                            
-                            // Camera num/pos elements should be at the cut line position
-                            // Shot type elements should be below the cut line
-                            offset = cutLineOffset;
-                        } else {
-                            // If no cut line, use text height to estimate
-                            const lineHeight = 24;
-                            const textLines = Math.floor(textHeight / lineHeight);
-                            offset = lineHeight * textLines;
-                        }
-
-                        //Apply offset to shot cell elements
-                        const allElements = shotCell.querySelectorAll('.editable-cell, .shot-type-flex-container');
-                        allElements.forEach(element => {
-                            element.style.position = 'relative';
-                            
-                            // Camera num/pos elements should be above the cut line
-                            if (element.classList.contains('cameraNum') || element.classList.contains('cameraPos')) {
-                                element.style.top = `${offset - 30}px`; // Position above cut line
-                            } else {
-                                // Shot type elements should be below the cut line
-                                element.style.top = `${offset - 30}px`; // Position below cut line
-                            }
-                        });
-                        
-                        //Adjust row height to accommodate the offset
-                        const cells = row.querySelectorAll('td');
-                        cells.forEach(cell => {
-                            //Adjust the minimum height on both the cell and its contents
-                            cell.style.cssText = `
-                                min-height: ${offset + 80}px !important;
-                                height: auto !important;
-                                vertical-align: top !important;
-                            `;
-                            
-                            //Also set the height on the cell's container div 
-                            const containerDiv = cell.querySelector('div');
-                            if (containerDiv) {
-                                containerDiv.style.cssText = `
-                                    min-height: ${offset + 80}px !important;
-                                    height: auto !important;
-                                `;
-                            }
-                        });
-                        
-                        row.style.cssText = `
-                            min-height: ${offset + 80}px !important;
-                            height: auto !important;
-                        `;
-                    }
-                }
-            }
-
             if (!selection.rangeCount) return;
 
             const range = selection.getRangeAt(0);
@@ -976,6 +855,9 @@
                 $(this).replaceWith($('<span>').text(`${minutes}'${seconds}"`));
             });
             }
+            
+            // Call setDuration function
+            setDuration();
 
             //Replace 'New Item' with what the user has inputted
             tableClone.find('td:nth-child(3) .item-content').each(function() {
@@ -1214,7 +1096,6 @@
             viewWindow.document.close();
         });
 
-        //~
         //dropdown menu closes when user clicks elsewhere
         function show(value) {
             document.querySelector(".text-box").value = value;
@@ -1363,6 +1244,557 @@
             camCardWindow.document.close();
         });
 
+        //FLOORPLAN
+        $('.floorPlan-button').on('click', function () {
+            var productionTitle = $('.production-title').text();
+            let cameraNumber = (this.id);
+            let eventInfo = [];
+            let camList = [];
+            let subjectList = [];
+
+            $('#event-table').find('tr.event_highlighted').each(function() {
+                const row = $(this);
+                const shotCell = row.find('td:nth-child(2)');
+        
+                const cameraNum = shotCell.find('.cameraNum').val() || '';
+                const shotSubject = shotCell.find('.shotSubject').val() || '';
+            
+                //Adds events to the camera array as objects
+                let event = {
+                    cameraNumber: cameraNum,
+                    shotSubject: shotSubject,
+                };  
+                eventInfo.push(event);
+            });
+
+            for(let i = 0; i < eventInfo.length; i++) {
+                let alreadyAdded = false;
+                let tempCamNum = eventInfo[i].cameraNumber; //Store current cam number
+                let tempSubject = eventInfo[i].shotSubject;
+
+                if(tempCamNum && !(camList.includes(tempCamNum))) {
+                    camList.push(tempCamNum);
+                }
+                if(tempSubject && !(subjectList.includes(tempSubject))) {
+
+                    subjectList.push(tempSubject);
+                }
+            }
+
+            
+            
+            const floorPlanWindow = window.open('', '_blank');
+            floorPlanWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>  
+                    <title>${productionTitle} Floor Plan</title>
+                    <link rel="stylesheet" href="/style.css">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+                    <style>
+                        body {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            min-height: 100vh;
+                            background-color: #e3dede;
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                            font-family: Arial;
+                        }
+
+                        .container {
+                            display: flex;
+                            gap: 10px;
+                            height: 540px;
+                            max-width: 1050px;
+                            width: 100%;
+                            border-radius: 20px;
+                        }
+
+                        .tools-board {
+                            width: 210px;
+                            height: 590px;
+                            border-radius: 20px;
+                            background-color: #f8f7f6;
+                            padding: 15px 22px 0;
+                        }
+
+                        .tools-board .row {
+                            margin-bottom: 20px;
+                        }
+
+                        .row .options {
+                            list-style: none;
+                            margin: 10px 0 0 5px;
+                        }
+
+                        .row .options .option {
+                            display: flex;
+                            cursor: pointer;
+                            align-items: center;
+                            margin-bottom: 10px;
+                        }
+
+                        .option:is(:hover, .active) img {
+                            filter: grayscale(20%);
+                        }
+
+                        .option :where(span, label) {
+                            color: black;
+                            cursor: pointer;
+                            padding-left: 10px;
+                        }
+
+                        .option:is(:hover, .active) :where(span, label) {
+                            color: #f4130b;
+                        }
+
+                        .option #fill-color {
+                            height: 14px;
+                            cursor: pointer;
+                            width: 14px;
+                        }
+
+                        #fill-color:checked~label {
+                            color: #e93e2b;
+                        }
+
+                        .option #size-slider {
+                            width: 100%;
+                            height: 5px;
+                            margin-top: 10px;
+                        }
+
+                        .colors .options {
+                            display: flex;
+                            justify-content: space-between;
+                        }
+
+                        .colors .option {
+                            height: 20px;
+                            width: 20px;
+                            border-radius: 30%;
+                            margin-top: 3px;
+                            position: relative;
+                        }
+
+                        .option #color-picker {
+                            opacity: 0;
+                            cursor: pointer;
+                        }
+
+                        .buttons button {
+                            width: 80%;
+                            color: #fff;
+                            border: none;
+                            outline: none;
+                            font-size: 0.9rem;
+                            padding: 3px 0;
+                            margin-bottom: 13px;
+                            background: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        }
+
+                        .buttons .clear-canvas {
+                            color: black;
+                            border: 1px solid #9fc39f;
+                            transition: all 0.2s ease;
+                            border: 2px solid black;
+                            font-size: 13px;
+                        }
+
+                        .clear-canvas:hover {
+                            color: #fff;
+                            background: #6c757d;
+                        }
+
+                        .buttons .save-img {
+                            background: white;
+                            color: black;
+                            border: 1px solid #6c757d;
+                        }
+
+                        .drawing-board {
+                            flex: 1;
+                        }
+
+                        .drawing-board canvas {
+                            width: 100%;
+                            height: 590px;
+                            border-radius: 10px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <section class="tool-board">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="title"><strong>Tools</strong></label>
+                                    <ul class="options">
+                                        <li class="option tool" id="pencil">
+                                            <i class="fas fa-pencil" id="icon"></i>
+                                            <span>Pencil</span>
+                                        </li>
+                                        <li class="option active tool" id="brush">
+                                            <i class="fas fa-brush" id="icon"></i>
+                                            <span>Brush</span>
+                                        </li>
+                                        <li class="option tool" id="eraser">
+                                            <i class="fas fa-eraser" id="icon"></i>
+                                            <span>Eraser</span>
+                                        </li>
+                                        <li class="option">
+                                            <input type="range" id="size-slider" min="1" max="30" value="5">
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="row colours">
+                                    <label for="" class="title">Colours</label>
+                                    <ul class="options">
+                                        <li class="option">
+                                            <input type="color" value="#00FF00" name="" id="color-picker">
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="row">
+                                    <label for="" class="title"><strong>Shapes</strong></label>
+                                    <ul class="options">
+                                        <li class="option tool" id="rectangle">
+                                            <i class="fa-solid fa-dice-one"></i>
+                                            <span>Rectangle</span>
+                                        </li>
+                                        <li class="option tool" id="circle">
+                                            <i class="fa-solid fa-circle"></i>
+                                            <span>Circle</span>
+                                        </li>
+                                        <li class="option tool" id="triangle">
+                                            <i class="fa-solid fa-mountain"></i>
+                                            <span>Triangle</span>
+                                        </li>
+                                        <li class="option tool" id="line">
+                                            <i class="fa-solid fa-grip-lines"></i>
+                                            <span>Line</span>
+                                        </li>
+                                        <li class="option tool" id="arrow">
+                                            <i class="fa-solid fa-arrow-up"></i>
+                                            <span>Arrow</span>
+                                        </li>
+                                        <li class="option tool" id="square">
+                                            <i class="far fa-square"></i>
+                                            <span>Square</span>
+                                        </li>
+                                        <li class="option tool" id="hexagon">
+                                            <i class="fa-solid fa-cube"></i>
+                                            <span>Hexagon</span>
+                                        </li>
+                                        <li class="option tool" id="pentagon">
+                                            <i class="fa-solid fa-dice-d6"></i>
+                                            <span>Pentagon</span>
+                                        </li>
+                                        <li class="option">
+                                            <input type="checkbox" id="fill-color">
+                                            <label for="fill-color">Fill Color</label>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="row buttons">
+                                    <button class="clear-canvas">Clear Canvas</button>
+                                    <button class="save-img">Save Image</button>
+                                </div>
+                            </section>
+                            <section class="drawing-board">
+                                <canvas></canvas>
+                            </section>
+
+                            <section class="script-icons">
+                                <div class="row">
+                                <div class="col-md-6">
+                                    <label class="title"><strong>Script Items</strong></label>
+                                    <ul id="scriptItems"></ul>
+                                </div>
+                                </div>
+                            </section>
+
+                    </div>
+                </body>
+                </html>
+            `);
+            floorPlanWindow.document.close();
+            
+            // Wait for the window to load, then initialize canvas
+            floorPlanWindow.onload = function() {
+                const canvas = floorPlanWindow.document.querySelector("canvas");
+                const toolBtns = floorPlanWindow.document.querySelectorAll(".tool");
+                const fillColor = floorPlanWindow.document.querySelector("#fill-color");
+                const sizeSlider = floorPlanWindow.document.querySelector("#size-slider");
+                const colorBtns = floorPlanWindow.document.querySelectorAll(".colors .option");
+                const colorPicker = floorPlanWindow.document.querySelector("#color-picker");
+                const clearCanvas = floorPlanWindow.document.querySelector(".clear-canvas");
+                const saveImage = floorPlanWindow.document.querySelector(".save-img");
+                const ctx = canvas.getContext("2d");
+
+                // Create camera list
+                const scriptItems = floorPlanWindow.document.getElementById('scriptItems');
+                
+                if (camList.length > 0) {
+                    const li = camList.map(cam => `<li class="option tool" id="camera-${cam}">
+                        <i class="fa-solid fa-camera"></i>
+                        <span>Camera ${cam}</span>
+                    </li>`).join('');
+                    scriptItems.innerHTML = li;
+                } else {
+                    scriptItems.innerHTML = '';
+                }
+
+                if (subjectList.length > 0) {
+                    const li = subjectList.map(subject => `<li class="option tool" id="${subject}">
+                        <i class="fa-solid fa-user"></i>
+                        <span>${subject}</span>
+                    </li>`).join('');
+                    scriptItems.innerHTML = li;
+                } else {
+                    scriptItems.innerHTML = '';
+                }
+
+                // Global variables with default values
+                let prevMouseX, prevMouseY, snapshot,
+                    isDrawing = false,
+                    selectedTool = "brush",
+                    brushWidth = 5,
+                    selectedColor = "#000";
+
+                const setCanvasBackground = () => {
+                    ctx.fillStyle = "#fff";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = selectedColor;
+                }
+
+                // Setting canvas width/height
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                setCanvasBackground();
+
+                const drawRect = (e) => {
+                    if (!fillColor.checked) {
+                        const width = prevMouseX - e.offsetX;
+                        const height = prevMouseY - e.offsetY;
+                        return ctx.strokeRect(e.offsetX, e.offsetY, width, height);
+                    }
+                    const width = prevMouseX - e.offsetX;
+                    const height = prevMouseY - e.offsetY;
+                    ctx.fillRect(e.offsetX, e.offsetY, width, height);
+                }
+
+                const drawCircle = (e) => {
+                    ctx.beginPath();
+                    let radius = Math.sqrt(Math.pow((prevMouseX - e.offsetX), 2) + Math.pow((prevMouseY - e.offsetY), 2));
+                    ctx.arc(prevMouseX, prevMouseY, radius, 0, 2 * Math.PI);
+                    fillColor.checked ? ctx.fill() : ctx.stroke();
+                }
+
+                const drawTriangle = (e) => {
+                    ctx.beginPath(); 
+                    ctx.moveTo(prevMouseX, prevMouseY);
+                    ctx.lineTo(e.offsetX, e.offsetY); 
+                    ctx.lineTo(prevMouseX * 2 - e.offsetX, e.offsetY); 
+                    ctx.closePath(); 
+                    fillColor.checked ? ctx.fill() : ctx.stroke();
+                }
+
+                const drawSquare = (e) => {
+                    const sideLength = Math.abs(prevMouseX - e.offsetX);
+                    ctx.beginPath();
+                    ctx.rect(e.offsetX, e.offsetY, sideLength, sideLength);
+                    fillColor.checked ? ctx.fill() : ctx.stroke();
+                }
+
+                const drawHexagon = (e) => {
+                    const sideLength = Math.abs(prevMouseX - e.offsetX);
+                    ctx.beginPath();
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (2 * Math.PI / 6) * i;
+                        const x = e.offsetX + sideLength * Math.cos(angle);
+                        const y = e.offsetY + sideLength * Math.sin(angle);
+                        ctx.lineTo(x, y);
+                    }
+                    ctx.closePath();
+                    fillColor.checked ? ctx.fill() : ctx.stroke();
+                }
+
+                const drawPentagon = (e) => {
+                    const sideLength = Math.abs(prevMouseX - e.offsetX);
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        const angle = (2 * Math.PI / 5) * i - Math.PI / 2;
+                        const x = e.offsetX + sideLength * Math.cos(angle);
+                        const y = e.offsetY + sideLength * Math.sin(angle);
+                        ctx.lineTo(x, y);
+                    }
+                    ctx.closePath();
+                    fillColor.checked ? ctx.fill() : ctx.stroke();
+                }
+
+                const drawLine = (e) => {
+                    ctx.beginPath();
+                    ctx.moveTo(prevMouseX, prevMouseY);
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+                }
+
+                const drawArrow = (e) => {
+                    const headLength = 10;
+                    const angle = Math.atan2(e.offsetY - prevMouseY, e.offsetX - prevMouseX);
+                    ctx.beginPath();
+                    ctx.moveTo(prevMouseX, prevMouseY);
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+
+                    // Draw arrowhead
+                    ctx.beginPath();
+                    ctx.moveTo(e.offsetX - headLength * Math.cos(angle - Math.PI / 6), 
+                        e.offsetY - headLength * Math.sin(angle - Math.PI / 6));
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.lineTo(e.offsetX - headLength * Math.cos(angle + Math.PI / 6),
+                        e.offsetY - headLength * Math.sin(angle + Math.PI / 6));
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                const startDraw = (e) => {
+                    isDrawing = true;
+                    prevMouseX = e.offsetX; 
+                    prevMouseY = e.offsetY;
+                    ctx.beginPath();
+                    ctx.lineWidth = brushWidth;
+                    ctx.strokeStyle = selectedColor;
+                    ctx.fillStyle = selectedColor;
+                    snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                }
+
+                const drawPencil = (e) => {
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+                }
+
+                const drawCamera = (e) => {
+                    ctx.beginPath();
+                    let radius = Math.sqrt(Math.pow((prevMouseX - e.offsetX), 2) + Math.pow((prevMouseY - e.offsetY), 2));
+                    ctx.arc(prevMouseX, prevMouseY, radius, 0, 2 * Math.PI);
+                    fillColor.checked ? ctx.fill() : ctx.stroke();
+                    
+                    //Add camera number text inside the circle representing a cam
+                    const cameraNumber = selectedTool.replace('camera-', '');
+                    ctx.fillStyle = selectedColor;
+                    ctx.font = `${Math.max(12, radius/3)}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(cameraNumber, prevMouseX, prevMouseY);
+                }
+
+                const drawSubject = (e) => {
+                    ctx.beginPath();
+                    let radius = Math.sqrt(Math.pow((prevMouseX - e.offsetX), 2) + Math.pow((prevMouseY - e.offsetY), 2));
+                    ctx.arc(prevMouseX, prevMouseY, radius, 0, 2 * Math.PI);
+                    fillColor.checked ? ctx.fill() : ctx.stroke();
+                    
+                    //Add host initial into circle
+                    const subjectName = selectedTool;
+                    ctx.fillStyle = selectedColor;
+                    ctx.font = `${Math.max(12, radius/3)}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    //Only display first letter of subject
+                    ctx.fillText(subjectName.charAt(0), prevMouseX, prevMouseY);
+                }
+
+                const drawing = (e) => {
+                    if (!isDrawing) return;
+                    ctx.putImageData(snapshot, 0, 0);
+
+                    if (selectedTool === "brush" || selectedTool === "pencil" || selectedTool === "eraser") {
+                        ctx.strokeStyle = selectedTool === "eraser" ? "#fff" : selectedColor;
+                        ctx.lineTo(e.offsetX, e.offsetY);
+                        ctx.stroke();
+                    } else if (selectedTool === "rectangle") {
+                        drawRect(e);
+                    } else if (selectedTool === "circle") {
+                        drawCircle(e);
+                    } else if (selectedTool === "triangle") {
+                        drawTriangle(e);
+                    } else if (selectedTool === "square") {
+                        drawSquare(e);
+                    } else if (selectedTool === "hexagon") {
+                        drawHexagon(e);
+                    } else if (selectedTool === "pentagon") {
+                        drawPentagon(e);
+                    } else if (selectedTool === "line") {
+                        drawLine(e);
+                    } else if (selectedTool === "arrow") {
+                        drawArrow(e);
+                    } else if (selectedTool.startsWith("camera-")) {
+                        drawCamera(e);
+                    } else {
+                        drawSubject(e);
+                    } 
+                }
+
+                toolBtns.forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        floorPlanWindow.document.querySelector(".options .active").classList.remove("active");
+                        btn.classList.add("active");
+                        selectedTool = btn.id;
+                    });
+                });
+
+                // Add event delegation for dynamically added camera buttons
+                floorPlanWindow.document.addEventListener("click", (e) => {
+                    if (e.target.closest('.tool')) {
+                        const clickedTool = e.target.closest('.tool');
+                        floorPlanWindow.document.querySelector(".options .active")?.classList.remove("active");
+                        clickedTool.classList.add("active");
+                        selectedTool = clickedTool.id;
+                        console.log("Selected tool:", selectedTool);
+                    }
+                });
+
+                sizeSlider.addEventListener("change", () => brushWidth = sizeSlider.value);
+
+                colorBtns.forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        floorPlanWindow.document.querySelector(".options .selected").classList.remove("selected");
+                        btn.classList.add("selected"); 
+                        selectedColor = floorPlanWindow.getComputedStyle(btn).getPropertyValue("background-color");
+                    });
+                });
+
+                colorPicker.addEventListener("change", () => {
+                    colorPicker.parentElement.style.background = colorPicker.value;
+                    colorPicker.parentElement.click();
+                });
+
+                clearCanvas.addEventListener("click", () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    setCanvasBackground();
+                });
+
+                saveImage.addEventListener("click", () => {
+                    const link = floorPlanWindow.document.createElement("a");
+                    link.download = `${Date.now()}.jpg`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                });
+
+                canvas.addEventListener("mousedown", startDraw);
+                canvas.addEventListener("mousemove", drawing);
+                canvas.addEventListener("mouseup", () => isDrawing = false);
+            };
+        });
 
       //ADD INSERT
       $('.addInsert-button').on('click', function() {
@@ -1394,10 +1826,10 @@
 
             //If no selection, create new row at the end
             var newRow = '<tr class="insert_highlighted">' +
-                '<td contenteditable="false"; style="text-align:center";></td>' +
-                '<td contenteditable="true"; style="text-align:center";></td>' +
+                '<td contenteditable="false" style="text-align:center"></td>' +
+                '<td contenteditable="true" style="text-align:center"></td>' +
                 '<td contenteditable="true">' + createInsertCell() + '</td>' +
-                '<td contenteditable="true"; style="text-align:center";></td>' +
+                '<td contenteditable="true" style="text-align:center"></td>' +
                 '<td style="border:none; width:90px">' + createRowButtons() + '</td>' +
             '</tr>';
             $('#event-table tbody').append(newRow);
@@ -1405,6 +1837,15 @@
             
             //Initialize draggable on the newly added row
             initDraggable();
+
+            //OLD CAMERA ADDING BUTTON
+            // let scriptItems = document.getElementByID('scriptItems');
+
+            // let li = `<li>${camList.map(camList =>
+            //     `<li${camList}</li>`).join('')}
+            //     </li>`;
+
+            // scriptItems.innerHTML = li;
         });
 
 

@@ -306,7 +306,7 @@
       display: none;
       color: default;
       background-color: #fff;
-      padding: 12px 20px;
+      padding: 10px 20px;
       cursor: pointer;
   }
 
@@ -340,7 +340,7 @@
   }
 
   .dropdown.active::before {
-      top: 1px;
+      top: 12px;
       transform: rotate(-225deg);
   }
 
@@ -377,7 +377,8 @@
 
   .dropdown .options {
       position: absolute;
-      top: 70px;
+      right: 18px;
+      top: 53px;
       width: 100%;
       overflow: hidden;
       display: none;
