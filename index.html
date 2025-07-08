@@ -1531,7 +1531,7 @@
                         }
 
                         .buttons .save-img,
-                        .addSubject-button {
+                        .addSubject {
                             background: white;
                             color: black;
                             border: 1px solid #6c757d;
@@ -1626,15 +1626,37 @@
                                     <button class="clear-canvas">Clear Canvas</button>
                                     <button class="save-img">Save Image</button>
                                 </div>
-                                <div class="row">
-                                    <label class="title"><strong>Script Items</strong></label>
-                                    <ul id="scriptItems"></ul>
-                                    <button class="addSubject-button"> Add Subject </button>   
-                                </div>
+                                
                             </section>
                             <section class="drawing-board">
                                 <canvas></canvas>
                             </section>
+                            <section class="tool-board">
+                                <div class="row buttons">
+                                    <label class="title"><strong>Script Items</strong></label>
+                                    <ul id="scriptItems"></ul> 
+                                    <button class="addSubject"> Add Subject </button>  
+                                </div>
+                            </section>
+                    </div>
+
+                    <!-- Modal for adding new subject -->
+                    <div id="newSubjectModal" class="modal fade" tabindex="-1" role="dialog">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Add New Subject</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="text" id="newSubjectInput" class="form-control" placeholder="Enter New Subject">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="addNewSubjectBtn">Add</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </body>
                 </html>
@@ -1653,7 +1675,7 @@
                 const saveImage = floorPlanWindow.document.querySelector(".save-img");
                 const ctx = canvas.getContext("2d");
                 const scriptItems = floorPlanWindow.document.getElementById('scriptItems');
-                const addSubject = floorPlanWindow.document.querySelector('.addSubject-button');
+                const addSubject = floorPlanWindow.document.querySelector('.addSubject');
                 
                 if (camList.length > 0) {
                     const li = camList.map(cam => `<li class="option tool" id="camera-${cam}">
@@ -1906,16 +1928,27 @@
                 });
 
                 addSubject.addEventListener("click", () => {
-                    const newSubjectName = prompt('Enter new subject name:');
-                    if (newSubjectName && newSubjectName.trim()) {
-                        const trimmedName = newSubjectName.trim();
-                        
+                    const newSubjectModal = new bootstrap.Modal(floorPlanWindow.document.getElementById('newSubjectModal'));
+                    newSubjectModal.show();
+                });
+
+                // Handle adding new subject
+                floorPlanWindow.document.getElementById('addNewSubjectBtn').addEventListener("click", () => {
+                    const newSubjectInput = floorPlanWindow.document.getElementById('newSubjectInput');
+                    const newSubjectName = newSubjectInput.value.trim();
+                    
+                    if (newSubjectName) {
                         // Add to script items
-                        const newSubjectLi = `<li class="option tool" id="${trimmedName}">
+                        const newSubjectLi = `<li class="option tool" id="${newSubjectName}">
                             <i class="fa-solid fa-user"></i>
-                            <span>${trimmedName}</span>
+                            <span>${newSubjectName}</span>
                         </li>`;
                         scriptItems.innerHTML += newSubjectLi;
+                        
+                        // Clear input and close modal
+                        newSubjectInput.value = '';
+                        const modal = bootstrap.Modal.getInstance(floorPlanWindow.document.getElementById('newSubjectModal'));
+                        modal.hide();
                     }
                 });
 
