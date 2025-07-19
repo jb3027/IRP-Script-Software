@@ -139,15 +139,15 @@
   <!-- Login Form -->
   <div id="login-form" style="text-align:center;">
     <h2>Login</h2>
-    <input idtype="text" id="username" placeholder="Username"><br><br>
-    <input type="password" id="password" placeholder="Password"><br><br>
+    <input type="text" id="username" name="username" autocomplete="username" placeholder="Username"><br><br>
+    <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Password"><br><br>
     <button id="loginButton">Login</button>
   </div>
 
   <!-- Project Login Form -->
   <div id="project-login" style="text-align:center;">
     <h2>Project Name:</h2>
-    <input type="text" id="projectName" placeholder="Enter Project Name"><br><br>
+    <input type="text" id="projectName" name="projectName" autocomplete="off" placeholder="Enter Project Name"><br><br>
     <button id="projectLogBtn">Select</button>
   </div>
 
@@ -491,33 +491,33 @@
                             <option value="${option}" ${(option === shotType) ? 'selected' : ''}>${option}</option>
                         `).join('')}
                     </select>
-                    <input type="text" class="custom-shot-type" style="display:none">
-                    <input class="editable-text shotSubject" placeholder="Shot Subject">
+                    <input type="text" class="custom-shot-type" name="customShotType" autocomplete="off" style="display:none">
+                    <input type="text" class="editable-text shotSubject" name="shotSubject" autocomplete="off" placeholder="Shot Subject">
                 </div>`;
 
             return '<div>' +
                 '<div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">' +
-                    '<input type="text" class="editable-cell cameraNum event_highlighted" placeholder="Camera Number">' + 
-                    '<input type="text" class="editable-cell cameraPos event_highlighted" placeholder="Camera Position">' + 
+                    '<input type="text" class="editable-cell cameraNum event_highlighted" name="cameraNum" autocomplete="off" placeholder="Camera Number">' + 
+                    '<input type="text" class="editable-cell cameraPos event_highlighted" name="cameraPos" autocomplete="off" placeholder="Camera Position">' + 
                 '</div>' +
                 '<div class="shot-type-flex-container event_highlighted">' +
                     selectHTML +
                 '</div>' +
-                '<input type="text" class="editable-cell extraInfo event_highlighted" placeholder="Additional Info (E.g., TRACK OUT)">' +
+                '<input type="text" class="editable-cell extraInfo event_highlighted" name="extraInfo" autocomplete="off" placeholder="Additional Info (E.g., TRACK OUT)">' +
             '</div>';
         }
 
         //CREATE INSERT CELL
         function createInsertCell() {
           return '<div style="text-align: left; width: 60%; margin: 0 auto;" class="insert-content">' +
-            '<u><input type="text" class="editable-cell insertTitle" style="text-align: left; width: 60%; margin: 0 auto; outline: none; color: rgb(16, 16, 16);" placeholder="Ven: Title"></u>' +
-            '<input type="text" class="editable-text insertIn" style="text-align: left; width: 60%; margin: 0 auto; outline: none; color: rgb(16, 16, 16);" placeholder="In: Music">' +
+            '<u><input type="text" class="editable-cell insertTitle" name="insertTitle" autocomplete="off" style="text-align: left; width: 60%; margin: 0 auto; outline: none; color: rgb(16, 16, 16);" placeholder="Ven: Title"></u>' +
+            '<input type="text" class="editable-text insertIn" name="insertIn" autocomplete="off" style="text-align: left; width: 60%; margin: 0 auto; outline: none; color: rgb(16, 16, 16);" placeholder="In: Music">' +
             '<div class="insert-duration-container" style="text-align: left; width: 60%; margin: 0 auto; margin-left: 18px; outline: none; color: rgb(16, 16, 16);">' +
                 '<span style="white-space: nowrap; color: rgb(16, 16, 16);">Dur: ' +
-                '<input type="time" id="durationVT" name="durationVT" value="00:00" style="border: none; width: auto; margin: 0 auto; color: rgb(16, 16, 16);">' +
+                '<input type="time" id="durationVT" name="durationVT" autocomplete="off" value="00:00" style="border: none; width: auto; margin: 0 auto; color: rgb(16, 16, 16);">' +
                 '</span>' +
             '</div>' +
-            '<input type="text" class="editable-cell insertOut" style="text-align: left; width: 60%; margin: 0 auto; outline: none; color: rgb(16, 16, 16);" placeholder="Out: Music">' +
+            '<input type="text" class="editable-cell insertOut" name="insertOut" autocomplete="off" style="text-align: left; width: 60%; margin: 0 auto; outline: none; color: rgb(16, 16, 16);" placeholder="Out: Music">' +
           '</div>';
         }
 
@@ -1466,6 +1466,11 @@
                             color: #f4130b;
                         }
 
+                        .option.active {
+                            background-color: #e0e0e0;
+                            border-radius: 5px;
+                        }
+
                         .option #fill-color {
                             height: 14px;
                             cursor: pointer;
@@ -1540,6 +1545,33 @@
                             background: white;
                             color: black;
                             border: 1px solid #6c757d;
+                        }
+
+                        .mode-buttons {
+                            margin-top: 10px;
+                        }
+
+                        .mode-btn {
+                            width: 80%;
+                            color: #fff;
+                            border: none;
+                            outline: none;
+                            font-size: 0.9rem;
+                            padding: 8px 0;
+                            margin-bottom: 8px;
+                            background: #6c757d;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                        }
+
+                        .mode-btn.active {
+                            background: #28a745;
+                            color: white;
+                        }
+
+                        .mode-btn:hover {
+                            opacity: 0.8;
                         }
 
                         .drawing-board {
@@ -1631,6 +1663,10 @@
                                     <button class="clear-canvas">Clear Canvas</button>
                                     <button class="save-img">Save Image</button>
                                 </div>
+                                <div class="row mode-buttons">
+                                    <button class="mode-btn draw-mode active" id="draw-mode">Draw Mode</button>
+                                    <button class="mode-btn select-mode" id="select-mode">Select Mode</button>
+                                </div>
                             </section>
                             <section class="drawing-board">
                                 <canvas id="canvas" width="600" height="590" style="border:1px solid #000000;"></canvas>
@@ -1639,7 +1675,7 @@
                                 <div class="row">
                                     <label class="title"><strong>Script Items</strong></label>
                                     <ul id="scriptItems"></ul>
-                                    <input type="text" id="newSub" onfocus="this.value=''" placeholder="Enter new subject"">
+                                    <input type="text" id="newSub" name="newSubject" autocomplete="off" onfocus="this.value=''" placeholder="Enter new subject">
                                     <button class="addSub">Add Subject</button>
                                 </div>
                             </section>
@@ -1686,7 +1722,8 @@
                         canvas = new floorPlanWindow.fabric.Canvas('canvas', {
                             backgroundColor: '#ffffff',
                             width: 600,
-                            height: 590
+                            height: 590,
+                            isDrawingMode: false
                         });
                         
                         console.log('Fabric.js canvas initialized successfully');
@@ -1694,8 +1731,18 @@
                         // Store canvas reference
                         floorPlanWindow.canvas = canvas;
                         
-                        // Set up all event handlers and UI
-                        setupFloorPlanUI(canvas);
+                                        // Set up all event handlers and UI
+                setupFloorPlanUI(canvas);
+                
+                // Configure canvas selection behavior - start in draw mode
+                canvas.selection = false;
+                canvas.forEachObject(function(obj) {
+                    obj.selectable = false;
+                });
+                
+                // Disable canvas default behaviors for drawing
+                canvas.defaultCursor = 'crosshair';
+                canvas.hoverCursor = 'crosshair';
                         
                     } catch (error) {
                         console.error('Error initializing Fabric.js canvas:', error);
@@ -1729,14 +1776,33 @@
                 const saveImage = floorPlanWindow.document.querySelector(".save-img");
                 const addSubject = floorPlanWindow.document.querySelector(".addSub");
                 const scriptItems = floorPlanWindow.document.getElementById('scriptItems');
+                const drawModeBtn = floorPlanWindow.document.querySelector("#draw-mode");
+                const selectModeBtn = floorPlanWindow.document.querySelector("#select-mode");
 
                 // Global variables
                 let selectedTool = "pencil";
                 let brushWidth = 5;
                 let selectedColor = "#000";
                 let isDrawing = false;
-                let path;
-                let canvas = null; // Initialize canvas variable to null
+                let path = null;
+                let lastPoint = null;
+                let drawMode = true; // Start in draw mode
+                let currentLine = null; // For interactive line/arrow drawing
+                
+                // Initialize free drawing brushes
+                canvasInstance.freeDrawingBrush = new floorPlanWindow.fabric.PencilBrush(canvasInstance);
+                canvasInstance.freeDrawingBrush.width = brushWidth;
+                canvasInstance.freeDrawingBrush.color = selectedColor;
+                
+                // Set pencil as default active tool
+                const defaultTool = floorPlanWindow.document.querySelector('#pencil');
+                if (defaultTool) {
+                    defaultTool.classList.add('active');
+                    defaultTool.style.backgroundColor = '#e0e0e0';
+                }
+                
+                // Setup initial free drawing
+                setupFreeDrawing();
 
                 // Populate script items
                 if (camList.length > 0) {
@@ -1758,8 +1824,120 @@
                     scriptItems.innerHTML += subjectLi;
                 }
 
-                // Mouse event handlers
+                // Mouse event handlers using direct DOM events for better control
+                const canvasElement = canvasInstance.lowerCanvasEl;
+                
+                // Handle free drawing tools (pencil and eraser)
+                function setupFreeDrawing() {
+                    if (selectedTool === "pencil") {
+                        canvasInstance.isDrawingMode = true;
+                        canvasInstance.freeDrawingBrush = new floorPlanWindow.fabric.PencilBrush(canvasInstance);
+                        canvasInstance.freeDrawingBrush.width = brushWidth;
+                        canvasInstance.freeDrawingBrush.color = selectedColor;
+                    } else if (selectedTool === "eraser") {
+                        canvasInstance.isDrawingMode = true;
+                        canvasInstance.freeDrawingBrush = new floorPlanWindow.fabric.PencilBrush(canvasInstance);
+                        canvasInstance.freeDrawingBrush.width = brushWidth;
+                        canvasInstance.freeDrawingBrush.color = "#ffffff"; // White for eraser
+                    } else {
+                        canvasInstance.isDrawingMode = false;
+                    }
+                }
+                
+                // Keep Fabric.js events for other tools
+                canvasInstance.on('mouse:move', function(opt) {
+                    if (!isDrawing || !drawMode) return;
+                    
+                    const pointer = canvasInstance.getPointer(opt.e);
+                    
+                    // Update interactive line drawing
+                    if (selectedTool === "line" && currentLine) {
+                        currentLine.set({
+                            x2: pointer.x,
+                            y2: pointer.y
+                        });
+                        canvasInstance.renderAll();
+                    }
+                    
+                    // Update interactive arrow drawing
+                    if (selectedTool === "arrow" && currentLine) {
+                        console.log("Updating arrow...");
+                        currentLine.set({
+                            x2: pointer.x,
+                            y2: pointer.y
+                        });
+                        canvasInstance.renderAll();
+                    }
+                });
+                
+                canvasInstance.on('mouse:up', function(opt) {
+                    if (!isDrawing || !drawMode) return;
+                    
+                    // Finalize interactive line and arrow drawing
+                    if ((selectedTool === "line" || selectedTool === "arrow") && currentLine) {
+                        if (selectedTool === "arrow") {
+                            // Add arrowhead to the line
+                            const x1 = currentLine.x1;
+                            const y1 = currentLine.y1;
+                            const x2 = currentLine.x2;
+                            const y2 = currentLine.y2;
+                            
+                            // Calculate arrowhead
+                            const arrowLength = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                            const arrowAngle = Math.atan2(y2 - y1, x2 - x1);
+                            const arrowheadLength = Math.min(20, arrowLength * 0.2);
+                            const arrowheadAngle = Math.PI / 4; // 45 degrees - wider angle
+                            
+                            // Create arrowhead lines - start them slightly back from the end point
+                            const arrowheadStartDistance = 5; // Start arrowhead 5 pixels back from the end
+                            const startX = x2 - arrowheadStartDistance * Math.cos(arrowAngle);
+                            const startY = y2 - arrowheadStartDistance * Math.sin(arrowAngle);
+                            
+                            const head1X = startX - arrowheadLength * Math.cos(arrowAngle - arrowheadAngle);
+                            const head1Y = startY - arrowheadLength * Math.sin(arrowAngle - arrowheadAngle);
+                            const head2X = startX - arrowheadLength * Math.cos(arrowAngle + arrowheadAngle);
+                            const head2Y = startY - arrowheadLength * Math.sin(arrowAngle + arrowheadAngle);
+                            
+                            const head1 = new floorPlanWindow.fabric.Line([startX, startY, head1X, head1Y], {
+                                stroke: selectedColor,
+                                strokeWidth: brushWidth,
+                                selectable: false,
+                                evented: false
+                            });
+                            
+                            const head2 = new floorPlanWindow.fabric.Line([startX, startY, head2X, head2Y], {
+                                stroke: selectedColor,
+                                strokeWidth: brushWidth,
+                                selectable: false,
+                                evented: false
+                            });
+                            
+                            // Add arrowhead lines to canvas
+                            canvasInstance.add(head1);
+                            canvasInstance.add(head2);
+                        }
+                        
+                        // Make the line/arrow selectable and editable
+                        currentLine.set({
+                            selectable: true,
+                            evented: true,
+                            hasControls: true,
+                            hasBorders: true,
+                            lockRotation: false,
+                            lockScalingX: false,
+                            lockScalingY: false
+                        });
+                        
+                        canvasInstance.setActiveObject(currentLine);
+                        currentLine = null;
+                        isDrawing = false;
+                        lastPoint = null;
+                    }
+                });
+                
                 canvasInstance.on('mouse:down', function(opt) {
+                    if (!drawMode) return;
+                    
                     const pointer = canvasInstance.getPointer(opt.e);
                     
                     if (selectedTool === "text") {
@@ -1779,43 +1957,45 @@
                         return;
                     }
                     
-                    if (selectedTool === "pencil" || selectedTool === "eraser") {
+                    // Handle interactive line and arrow drawing
+                    if (selectedTool === "line" || selectedTool === "arrow") {
+                        console.log("Starting to draw:", selectedTool);
                         isDrawing = true;
-                        path = new floorPlanWindow.fabric.Path('M ' + pointer.x + ' ' + pointer.y, {
-                            stroke: selectedTool === "eraser" ? "#ffffff" : selectedColor,
-                            strokeWidth: brushWidth,
-                            fill: '',
-                            selectable: false
-                        });
-                        canvasInstance.add(path);
+                        lastPoint = pointer;
+                        
+                        if (selectedTool === "line") {
+                            currentLine = new floorPlanWindow.fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+                                stroke: selectedColor,
+                                strokeWidth: brushWidth,
+                                selectable: false,
+                                evented: false
+                            });
+                        } else if (selectedTool === "arrow") {
+                            // Just create a simple line like the line tool
+                            currentLine = new floorPlanWindow.fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+                                stroke: selectedColor,
+                                strokeWidth: brushWidth,
+                                selectable: false,
+                                evented: false
+                            });
+                        }
+                        
+                        canvasInstance.add(currentLine);
+                        return;
                     }
                     
-                    // Handle shape drawing
+                    // Handle shape drawing and other tools
                     if (selectedTool === "rectangle" || selectedTool === "circle" || selectedTool === "triangle" || 
-                        selectedTool === "line" || selectedTool === "arrow" || selectedTool === "square" || 
-                        selectedTool === "hexagon" || selectedTool === "pentagon" || 
+                        selectedTool === "square" || selectedTool === "hexagon" || selectedTool === "pentagon" || 
                         selectedTool.startsWith("camera-") || 
                         (selectedTool !== 'pencil' && selectedTool !== 'eraser' && selectedTool !== 'text')) {
                         drawShape(selectedTool, pointer);
                     }
                 });
 
-                canvasInstance.on('mouse:move', function(opt) {
-                    if (!isDrawing) return;
-                    const pointer = canvasInstance.getPointer(opt.e);
-                    
-                    if (selectedTool === "pencil" || selectedTool === "eraser") {
-                        path.path.push(['L', pointer.x, pointer.y]);
-                        canvasInstance.renderAll();
-                    }
-                });
-
-                canvasInstance.on('mouse:up', function() {
-                    isDrawing = false;
-                });
-
                 // Shape drawing functions
                 const drawShape = function(shapeType, pointer) {
+                    console.log("Drawing shape:", shapeType, "at", pointer);
                     let shape;
                     
                     switch(shapeType) {
@@ -1854,23 +2034,7 @@
                                 selectable: true
                             });
                             break;
-                        case 'line':
-                            shape = new floorPlanWindow.fabric.Line([pointer.x, pointer.y, pointer.x + 100, pointer.y + 100], {
-                                stroke: selectedColor,
-                                strokeWidth: brushWidth,
-                                selectable: true
-                            });
-                            break;
-                        case 'arrow':
-                            // Create arrow using path
-                            const arrowPath = `M ${pointer.x} ${pointer.y} L ${pointer.x + 100} ${pointer.y + 100} M ${pointer.x + 100} ${pointer.y + 100} L ${pointer.x + 85} ${pointer.y + 85} M ${pointer.x + 100} ${pointer.y + 100} L ${pointer.x + 85} ${pointer.y + 115}`;
-                            shape = new floorPlanWindow.fabric.Path(arrowPath, {
-                                stroke: selectedColor,
-                                strokeWidth: brushWidth,
-                                fill: '',
-                                selectable: true
-                            });
-                            break;
+
                         case 'square':
                             shape = new floorPlanWindow.fabric.Rect({
                                 left: pointer.x,
@@ -1914,30 +2078,34 @@
                             });
                             break;
                         case 'camera':
-                            const cameraNumber = selectedTool.replace('camera-', '');
-                            const cameraCircle = new floorPlanWindow.fabric.Circle({
-                                left: pointer.x,
-                                top: pointer.y,
-                                radius: 30,
-                                fill: fillColor.checked ? selectedColor : 'transparent',
-                                stroke: selectedColor,
-                                strokeWidth: brushWidth,
-                                selectable: true
-                            });
-                            
-                            const cameraText = new floorPlanWindow.fabric.Text(cameraNumber, {
-                                left: pointer.x,
-                                top: pointer.y,
-                                fontSize: 16,
-                                fill: selectedColor,
-                                originX: 'center',
-                                originY: 'center',
-                                selectable: false
-                            });
-                            
-                            canvasInstance.add(cameraCircle);
-                            canvasInstance.add(cameraText);
-                            return;
+                            // Handle camera tools (camera-1, camera-2, etc.)
+                            if (selectedTool.startsWith('camera-')) {
+                                const cameraNumber = selectedTool.replace('camera-', '');
+                                const cameraCircle = new floorPlanWindow.fabric.Circle({
+                                    left: pointer.x,
+                                    top: pointer.y,
+                                    radius: 30,
+                                    fill: fillColor.checked ? selectedColor : 'transparent',
+                                    stroke: selectedColor,
+                                    strokeWidth: 2,
+                                    selectable: true
+                                });
+                                
+                                const cameraText = new floorPlanWindow.fabric.Text(cameraNumber, {
+                                    left: pointer.x,
+                                    top: pointer.y,
+                                    fontSize: 16,
+                                    fill: selectedColor,
+                                    originX: 'center',
+                                    originY: 'center',
+                                    selectable: false
+                                });
+                                
+                                canvasInstance.add(cameraCircle);
+                                canvasInstance.add(cameraText);
+                                return;
+                            }
+                            break;
                         default:
                             // Subject or other tool
                             if (selectedTool !== 'pencil' && selectedTool !== 'eraser' && selectedTool !== 'text') {
@@ -1974,26 +2142,45 @@
                     }
                 };
 
+                // Tool selection logic
                 toolBtns.forEach(btn => {
                     btn.addEventListener("click", () => {
-                        floorPlanWindow.document.querySelector(".options .active").classList.remove("active");
-                        btn.classList.add("active");
-                        selectedTool = btn.id;
+                        selectTool(btn);
                     });
                 });
 
-                //Add event delegation for dynamically added camera buttons
+                // Function to handle tool selection
+                function selectTool(toolElement) {
+                    // Remove active class from all tools
+                    floorPlanWindow.document.querySelectorAll(".tool").forEach(tool => {
+                        tool.classList.remove("active");
+                        tool.style.backgroundColor = '';
+                    });
+                    toolElement.classList.add("active");
+                    toolElement.style.backgroundColor = '#e0e0e0';
+                    selectedTool = toolElement.id;
+                    console.log("Selected tool:", selectedTool);
+                    
+                    // Setup free drawing for pencil/eraser
+                    if (drawMode) {
+                        setupFreeDrawing();
+                    }
+                }
+                
+                // Add event delegation only for dynamically added tools (cameras and subjects)
                 floorPlanWindow.document.addEventListener("click", (e) => {
-                    if (e.target.closest('.tool')) {
-                        const clickedTool = e.target.closest('.tool');
-                        floorPlanWindow.document.querySelector(".options .active")?.classList.remove("active");
-                        clickedTool.classList.add("active");
-                        selectedTool = clickedTool.id;
-                        console.log("Selected tool:", selectedTool);
+                    const clickedTool = e.target.closest('.tool');
+                    if (clickedTool && (clickedTool.id.startsWith('camera-') || !Array.from(toolBtns).includes(clickedTool))) {
+                        selectTool(clickedTool);
                     }
                 });
 
-                sizeSlider.addEventListener("change", () => brushWidth = parseInt(sizeSlider.value));
+                sizeSlider.addEventListener("change", () => {
+                    brushWidth = parseInt(sizeSlider.value);
+                    if (canvasInstance.freeDrawingBrush) {
+                        canvasInstance.freeDrawingBrush.width = brushWidth;
+                    }
+                });
 
                 colorBtns.forEach(btn => {
                     btn.addEventListener("click", () => {
@@ -2005,6 +2192,9 @@
 
                 colorPicker.addEventListener("change", () => {
                     selectedColor = colorPicker.value;
+                    if (canvasInstance.freeDrawingBrush && selectedTool === "pencil") {
+                        canvasInstance.freeDrawingBrush.color = selectedColor;
+                    }
                 });
 
                 clearCanvas.addEventListener("click", () => {
@@ -2035,15 +2225,55 @@
                     </li>`;
                     }
                 });
+
+                // Mode button event handlers
+                drawModeBtn.addEventListener("click", () => {
+                    drawMode = true;
+                    drawModeBtn.classList.add("active");
+                    selectModeBtn.classList.remove("active");
+                    console.log("Switched to Draw Mode");
+                    
+                    // Disable selection in draw mode
+                    canvasInstance.selection = false;
+                    canvasInstance.forEachObject(function(obj) {
+                        obj.selectable = false;
+                    });
+                    
+                    // Set drawing cursor
+                    canvasInstance.defaultCursor = 'crosshair';
+                    canvasInstance.hoverCursor = 'crosshair';
+                    
+                    // Setup free drawing for current tool
+                    setupFreeDrawing();
+                });
+
+                selectModeBtn.addEventListener("click", () => {
+                    drawMode = false;
+                    selectModeBtn.classList.add("active");
+                    drawModeBtn.classList.remove("active");
+                    console.log("Switched to Select Mode");
+                    
+                    // Enable selection in select mode
+                    canvasInstance.selection = true;
+                    canvasInstance.forEachObject(function(obj) {
+                        obj.selectable = true;
+                    });
+                    
+                    // Set selection cursor
+                    canvasInstance.defaultCursor = 'default';
+                    canvasInstance.hoverCursor = 'move';
+                    
+                    // Disable free drawing
+                    canvasInstance.isDrawingMode = false;
+                });
                 
-                console.log('Floor plan canvas setup complete');
             }
             
-            // Start initialization after document is ready
+            //Initialization after document is ready
             if (floorPlanWindow.document.readyState === 'loading') {
                 floorPlanWindow.document.addEventListener('DOMContentLoaded', initializeFloorPlan);
             } else {
-                // Add a small delay to ensure DOM is fully ready
+                //Delay to ensure DOM is fully ready
                 setTimeout(initializeFloorPlan, 100);
             }
         }
@@ -2104,7 +2334,7 @@
             <td contenteditable="false">
                 <div class="item-cell-container">
                     <span contenteditable="false" style="text-decoration: underline;"><b>ITEM ${$('#event-table tbody tr.item_highlighted').length + 1}: &nbsp</b></span>
-                    <input type="text" class="item-content" placeholder="New Item" style="background-color: black; margin-left: -15px;">
+                    <input type="text" class="item-content" name="itemContent" autocomplete="off" placeholder="New Item" style="background-color: black; margin-left: -15px;">
                 </div>
             </td>
             <td contenteditable="true" style="text-align:center"></td>
