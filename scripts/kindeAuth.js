@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('createKindeClient is available:', typeof createKindeClient);
         
         kinde = await createKindeClient({
-            client_id: "3cb1915462fb44b68c52a8737952806f",
+            client_id: "b6a6ec27637d4aa09c4e0e59992426da",
             domain: "https://jbtest001.kinde.com",
             redirect_uri: window.location.origin,
             // Callback function to handle redirects
