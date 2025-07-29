@@ -3,25 +3,20 @@ let kinde;
 
 // Initialize the Kinde client after DOM loads
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('DOM loaded, initializing Kinde client...');
     try {
         // Check if createKindeClient is available (UMD version)
         if (typeof createKindeClient === 'undefined') {
             console.error('Kinde SDK not loaded. Please check the CDN link.');
-            console.log('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('kinde')));
             renderLoggedOutView();
             return;
         }
         
-        console.log('createKindeClient is available:', typeof createKindeClient);
-        
         kinde = await createKindeClient({
-            client_id: "b6a6ec27637d4aa09c4e0e59992426da",
+            client_id: "3cb1915462fb44b68c52a8737952806f",
             domain: "https://jbtest001.kinde.com",
             redirect_uri: window.location.origin,
             // Callback function to handle redirects
             on_redirect_callback: (user, appState) => {
-                console.log('Redirect callback called', { user, appState });
                 if (user) {
                     handleAuthentication(user);
                 } else {
@@ -30,14 +25,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
         
-        console.log('Kinde client initialized successfully');
+        // Check if user is already authenticated using multiple methods
+        let isAuthenticated = false;
+        let user = null;
         
-        // Check if user is already authenticated
-        const isAuthenticated = await kinde.isAuthenticated();
-        if (isAuthenticated) {
-            const user = await kinde.getUser();
+        try {
+            isAuthenticated = await kinde.isAuthenticated();
+            if (isAuthenticated) {
+                user = await kinde.getUser();
+            }
+        } catch (error) {
+            console.warn('Kinde authentication check failed:', error);
+            isAuthenticated = false;
+        }
+        
+        // Fallback: Check sessionStorage for existing authentication
+        const storedAuthState = sessionStorage.getItem('isKindeLoggedIn');
+        const storedUser = sessionStorage.getItem('kindeUser');
+        
+        if (isAuthenticated && user) {
+            // Primary path: Kinde says we're authenticated
             handleAuthentication(user);
+        } else if (storedAuthState === 'true' && storedUser) {
+            // Fallback path: Use stored authentication state
+            try {
+                const parsedUser = JSON.parse(storedUser);
+                renderLoggedInView(parsedUser);
+            } catch (error) {
+                console.error('Failed to parse stored user data:', error);
+                renderLoggedOutView();
+            }
         } else {
+            // No authentication found
             renderLoggedOutView();
         }
         
@@ -51,24 +70,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function setupEventListeners() {
-    console.log('Setting up event listeners...');
     const loginBtn = document.getElementById('login');
     const registerBtn = document.getElementById('register');
     
-    console.log('Login button found:', !!loginBtn);
-    console.log('Register button found:', !!registerBtn);
-    console.log('Kinde client available:', !!kinde);
-    
     if (loginBtn) {
         loginBtn.addEventListener('click', async (e) => {
-            console.log('Login button clicked!');
             e.preventDefault();
             try {
                 if (!kinde) {
                     console.error('Kinde client not initialized');
                     return;
                 }
-                console.log('Calling kinde.login()...');
                 await kinde.login();
             } catch (error) {
                 console.error('Login error:', error);
@@ -78,14 +90,12 @@ function setupEventListeners() {
     
     if (registerBtn) {
         registerBtn.addEventListener('click', async (e) => {
-            console.log('Register button clicked!');
             e.preventDefault();
             try {
                 if (!kinde) {
                     console.error('Kinde client not initialized');
                     return;
                 }
-                console.log('Calling kinde.register()...');
                 await kinde.register();
             } catch (error) {
                 console.error('Register error:', error);
@@ -95,46 +105,26 @@ function setupEventListeners() {
 }
 
 function handleAuthentication(user) {
-    console.log('=== HANDLE AUTHENTICATION ===');
-    console.log('User authenticated:', user);
-    console.log('Setting session storage...');
-    
     // Store authentication state
     sessionStorage.setItem('isKindeLoggedIn', 'true');
     sessionStorage.setItem('kindeUser', JSON.stringify(user));
-    
-    console.log('Session storage set. isKindeLoggedIn:', sessionStorage.getItem('isKindeLoggedIn'));
-    console.log('Calling renderLoggedInView...');
     
     renderLoggedInView(user);
 }
 
 function renderLoggedInView(user) {
-    console.log('=== RENDER LOGGED IN VIEW ===');
-    console.log('User object:', user);
-    
+   
     const loggedOutView = document.getElementById('logged_out_view');
     const loggedInView = document.getElementById('logged_in_view');
     const projectLogin = document.getElementById('project-login');
     const mainContent = document.querySelector('.main-content');
     
-    console.log('Elements found:');
-    console.log('- loggedOutView:', !!loggedOutView, loggedOutView);
-    console.log('- loggedInView:', !!loggedInView, loggedInView);
-    console.log('- projectLogin:', !!projectLogin, projectLogin);
-    console.log('- mainContent:', !!mainContent, mainContent);
-    
     // Hide the auth container (logged_out_view IS the auth-container)
     if (loggedOutView) {
-        console.log('Before hiding loggedOutView - display:', loggedOutView.style.display);
-        console.log('Before hiding loggedOutView - computed display:', window.getComputedStyle(loggedOutView).display);
         loggedOutView.style.display = 'none';
-        console.log('After hiding loggedOutView - display:', loggedOutView.style.display);
-        console.log('After hiding loggedOutView - computed display:', window.getComputedStyle(loggedOutView).display);
     }
     
     if (loggedInView) {
-        console.log('Showing logged in view...');
         loggedInView.style.display = 'block';
         // Add logout button to the main navigation
         addLogoutButton();
@@ -142,7 +132,6 @@ function renderLoggedInView(user) {
     
     // Check if user already has a project selected
     const existingProjectName = sessionStorage.getItem('projectName');
-    console.log('Existing project name in sessionStorage:', existingProjectName);
     
     if (existingProjectName) {
         // User already has a project selected, show main content directly
@@ -163,16 +152,7 @@ function renderLoggedInView(user) {
         if (mainContent) mainContent.style.display = 'none';
         
         // Show project selection with extensive debugging and force visibility
-        if (projectLogin) {
-            console.log('Before showing projectLogin:');
-            console.log('- current display:', projectLogin.style.display);
-            console.log('- computed display:', window.getComputedStyle(projectLogin).display);
-            console.log('- computed visibility:', window.getComputedStyle(projectLogin).visibility);
-            console.log('- computed opacity:', window.getComputedStyle(projectLogin).opacity);
-            console.log('- offsetWidth:', projectLogin.offsetWidth);
-            console.log('- offsetHeight:', projectLogin.offsetHeight);
-            console.log('- getBoundingClientRect:', projectLogin.getBoundingClientRect());
-            
+        if (projectLogin) {            
             // Force all possible visibility styles - override CSS !important
             projectLogin.style.setProperty('display', 'flex', 'important');
             projectLogin.style.visibility = 'visible';
@@ -180,15 +160,6 @@ function renderLoggedInView(user) {
             projectLogin.style.position = 'fixed';
             projectLogin.style.zIndex = '9999';
             projectLogin.classList.remove('hidden');
-            
-            console.log('After showing projectLogin:');
-            console.log('- current display:', projectLogin.style.display);
-            console.log('- computed display:', window.getComputedStyle(projectLogin).display);
-            console.log('- computed visibility:', window.getComputedStyle(projectLogin).visibility);
-            console.log('- computed opacity:', window.getComputedStyle(projectLogin).opacity);
-            console.log('- offsetWidth:', projectLogin.offsetWidth);
-            console.log('- offsetHeight:', projectLogin.offsetHeight);
-            console.log('- getBoundingClientRect:', projectLogin.getBoundingClientRect());
             
             // Reset body styles for main content
             document.body.style.background = '#f8f8f8';
@@ -199,30 +170,28 @@ function renderLoggedInView(user) {
     }
     
     // Additional debugging after a short delay to see final state
-    setTimeout(() => {
-        console.log('=== FINAL STATE CHECK (after 500ms) ===');
-        if (loggedOutView) {
-            console.log('loggedOutView final state:');
-            console.log('- display:', loggedOutView.style.display);
-            console.log('- computed display:', window.getComputedStyle(loggedOutView).display);
-            console.log('- visible:', loggedOutView.offsetWidth > 0 && loggedOutView.offsetHeight > 0);
-        }
-        if (projectLogin) {
-            console.log('projectLogin final state:');
-            console.log('- display:', projectLogin.style.display);
-            console.log('- computed display:', window.getComputedStyle(projectLogin).display);
-            console.log('- visible:', projectLogin.offsetWidth > 0 && projectLogin.offsetHeight > 0);
-            console.log('- getBoundingClientRect:', projectLogin.getBoundingClientRect());
-        }
-        if (mainContent) {
-            console.log('mainContent final state:');
-            console.log('- display:', mainContent.style.display);
-            console.log('- computed display:', window.getComputedStyle(mainContent).display);
-            console.log('- visible:', mainContent.offsetWidth > 0 && mainContent.offsetHeight > 0);
-        }
-    }, 500);
+    // setTimeout(() => {
+    //     if (loggedOutView) {
+    //         console.log('loggedOutView final state:');
+    //         console.log('- display:', loggedOutView.style.display);
+    //         console.log('- computed display:', window.getComputedStyle(loggedOutView).display);
+    //         console.log('- visible:', loggedOutView.offsetWidth > 0 && loggedOutView.offsetHeight > 0);
+    //     }
+    //     if (projectLogin) {
+    //         console.log('projectLogin final state:');
+    //         console.log('- display:', projectLogin.style.display);
+    //         console.log('- computed display:', window.getComputedStyle(projectLogin).display);
+    //         console.log('- visible:', projectLogin.offsetWidth > 0 && projectLogin.offsetHeight > 0);
+    //         console.log('- getBoundingClientRect:', projectLogin.getBoundingClientRect());
+    //     }
+    //     if (mainContent) {
+    //         console.log('mainContent final state:');
+    //         console.log('- display:', mainContent.style.display);
+    //         console.log('- computed display:', window.getComputedStyle(mainContent).display);
+    //         console.log('- visible:', mainContent.offsetWidth > 0 && mainContent.offsetHeight > 0);
+    //     }
+    // }, 500);
     
-    console.log('=== RENDER LOGGED IN VIEW COMPLETE ===');
 }
 
 function renderLoggedOutView() {
@@ -265,6 +234,8 @@ function addLogoutButton() {
     logoutBtn.addEventListener('click', async () => {
         try {
             await kinde.logout();
+            // Always clear session state after logout, whether it succeeds or fails
+            renderLoggedOutView(true);
         } catch (error) {
             console.error('Logout error:', error);
             // Fallback logout - pass true to indicate this is an actual logout
