@@ -1,0 +1,19 @@
+# Add kinde logon
+this code base currently hosts a javascript based web app. The current setup for users to log in and be authenticated is via a username and password input box which is then compared to a static local json file userPass.json.
+We need to complete the following tasks:
+- Replace the existing insecure, unscalable logon method with the kinde framework using their SDK: https://docs.kinde.com/developer-tools/sdks/frontend/javascript-sdk/
+- As per the kinde documentation link above, implement the necessary config, logon, logout and register functionality
+- the config you will need is as follows and neither value is considered a secret:
+  - domain: https://jbtest001.kinde.com
+  - client_id: 3cb1915462fb44b68c52a8737952806f
+  - redirect_uri: http://127.0.0.1:8080
+- The new kinde functionality should be added to the code base as follows:
+  - Any html code added to the main index.html file
+  - Any javascript should be addded to a separate dedicated .js file in a scripts sub directory and loaded from there in the index.html file
+- The user experience should be as follows:
+  - When visiting the site as an unauthenticated user, they should be presented with a landing page inviting them to either login or register using clear and prominent buttons
+  - Once authenticated, there should be a logout button added to the main menu bar
+  - Once logged out, the user should be taken back to the initial logon view
+- In order to not disrupt other developers working on this framework, we need changes to the index.html file to be minimal and where necessary follow a similar style. This is important as the other developers are junior and we need to make sure they can maintain our changes going forward. Use comments as appropriate to assist in this goal.
+If you're unsure about any of the above, then just ask.
+

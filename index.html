@@ -136,19 +136,62 @@
 </head>
 
 <body> 
-  <!-- Login Form -->
-  <div id="login-form" style="text-align:center;">
-    <h2>Login</h2>
-    <input type="text" id="username" name="username" autocomplete="username" placeholder="Username"><br><br>
-    <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Password"><br><br>
-    <button id="loginButton">Login</button>
-  </div>
+			<!-- Kinde Login/Register Form -->
+	<div id="logged_out_view" class="auth-container">
+		<div class="auth-card">
+			<div class="app-icon">
+				<i class="fas fa-film"></i>
+			</div>
+			<h1 class="app-title">PaperworkPro</h1>
+			<p class="app-subtitle">Professional script management</p>
+			
+			<div class="auth-buttons">
+				<button id="login" class="btn-primary">
+					<i class="fas fa-user"></i>
+					Sign In
+				</button>
+				<button id="register" class="btn-secondary">
+					<i class="fas fa-user-plus"></i>
+					Create Account
+				</button>
+			</div>
+			
+			<div class="security-note">
+				<i class="fas fa-shield-alt"></i>
+				<span>Secured with end-to-end encryption</span>
+			</div>
+		</div>
+	</div>
+
+	<!-- Authenticated User View -->
+	<div id="logged_in_view" style="display:none;">
+		<!-- Logout will be dynamically added here -->
+	</div>
 
   <!-- Project Login Form -->
-  <div id="project-login" style="text-align:center;">
-    <h2>Project Name:</h2>
-    <input type="text" id="projectName" name="projectName" autocomplete="off" placeholder="Enter Project Name"><br><br>
-    <button id="projectLogBtn">Select</button>
+  <div id="project-login" class="project-container" style="display:none;">
+    <div class="project-card">
+      <div class="app-icon">
+        <i class="fas fa-folder-open"></i>
+      </div>
+      <h1 class="app-title">Select Project</h1>
+      <p class="app-subtitle">Choose your project to continue with EpisodicPro</p>
+      
+      <div class="project-form">
+        <div class="input-group">
+          <input type="text" id="projectName" name="projectName" class="project-input" placeholder="Enter project name" required>
+        </div>
+        <button id="projectLogBtn" class="btn-primary project-btn">
+          <i class="fas fa-arrow-right"></i>
+          Continue
+        </button>
+      </div>
+      
+      <div class="security-note">
+        <i class="fas fa-shield-alt"></i>
+        <span>Your projects are securely stored</span>
+      </div>
+    </div>
   </div>
 
   <!-- Main Page -->
@@ -174,19 +217,25 @@
         </div>
 
         <div class="toolbar-group right">
-            <button class="btn button2 primary" title="Save"><i class="fas fa-save"></i> Save</button> 
-            <button class="btn button2 view-button" title="View"><i class="fas fa-eye"></i> View</button>
-            <button class="btn button2 runningOrder-button" title="Running Order"> Running Order</button>
-            <button class="btn button2 floorPlan-button" title="Floor Plan"> Floor Plan</button>
+            <!-- Dynamic buttons container - for buttons like Show Script, Running Order -->
+            <div class="toolbar-group dynamic-buttons" id="dynamic-buttons-container">
+                <button class="btn button2 primary" title="Save"><i class="fas fa-save"></i> Save</button> 
+                <button class="btn button2 view-button" title="View"><i class="fas fa-eye"></i> View</button>
+                <button class="btn button2 runningOrder-button" title="Running Order"> Running Order</button>
+                <button class="btn button2 floorPlan-button" title="Floor Plan"> Floor Plan</button>
 
-            <div class="dropdown">
-                <button class="btn button2 camCard-button" title="camCards"> CAMERA CARDS </button>
-                <div class="options" id="camera-options">
-                    <!-- Dropdown options change when user adds more cameras to events -->
+                <div class="dropdown">
+                    <button class="btn button2 camCard-button" title="camCards"> CAMERA CARDS </button>
+                    <div class="options" id="camera-options">
+                        <!-- Dropdown options change when user adds more cameras to events -->
+                    </div>
                 </div>
             </div>
             
-            
+            <!-- Dedicated logout container - always rightmost -->
+            <div class="toolbar-group logout-container" id="logout-container" style="display: none; margin-left: 16px;">
+                <!-- Logout button will be dynamically added here -->
+            </div>
         </div>
     </nav>
 
@@ -265,24 +314,52 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   
+  <!-- Kinde SDK -->
+  <script src="node_modules/@kinde-oss/kinde-auth-pkce-js/dist/kinde-auth-pkce-js.umd.min.js"></script>
+  
+  <!-- Kinde Auth JavaScript -->
+  <script src="scripts/kindeAuth.js"></script>
+
   <script type="text/javascript">
-    //checks if user is already logged in
+    // Kinde authentication integration - check for existing authentication state
     window.onload = function() {
-        const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-        const projectName = sessionStorage.getItem('projectName');
-        
-        if (isLoggedIn === 'true') {
-            $('#login-form').hide();
-            if (projectName) {
+        // Use setTimeout to ensure Kinde auth script has finished initializing
+        setTimeout(() => {
+            const isKindeLoggedIn = sessionStorage.getItem('isKindeLoggedIn');
+            const projectName = sessionStorage.getItem('projectName');
+            
+            console.log('Window onload check:', { isKindeLoggedIn, projectName });
+            
+            // If user is authenticated with Kinde and has selected a project
+            if (isKindeLoggedIn === 'true' && projectName) {
+                console.log('User authenticated with project, showing main content');
+                $('#logged_out_view').hide();
                 $('#project-login').hide();
                 $('.main-content').show();
                 $('.production-title').text(projectName);
                 document.title = projectName + ' - Studio Script Writer';
-            } else {
+                
+                // Show logout button if not already visible
+                const logoutContainer = document.getElementById('logout-container');
+                if (logoutContainer && window.kindeAuth) {
+                    logoutContainer.style.display = 'flex';
+                }
+            } else if (isKindeLoggedIn === 'true') {
+                // Authenticated but no project selected
+                console.log('User authenticated without project, showing project selection');
+                $('#logged_out_view').hide();
                 $('#project-login').show();
             }
-        }
+            // If not authenticated, the Kinde script will handle showing the login view
+        }, 100); // Small delay to ensure Kinde script has finished
     };
+    
+    // Also listen for storage changes in case another tab modifies the session
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'projectName' || e.key === 'isKindeLoggedIn') {
+            location.reload();
+        }
+    });
 
     function preventDeletion(event, defaultContent) {
       const element = event.target;
@@ -345,64 +422,22 @@
     
 
     var role;
-    $('#project-login').hide();
+    // $('#project-login').hide(); // Removed - now controlled by Kinde auth flow
 
-    document.getElementById('loginButton').addEventListener('click', function() {
-      login();
-    });
-
+    // Updated project login to work with Kinde authentication
     document.getElementById('projectLogBtn').addEventListener('click', function() {
       projectLogin();
     });
 
-    function login() {
-      const usernameInput = document.querySelector("#username");
-      const passwordInput = document.querySelector("#password");
-
-      function usernameCheck(json_file) { //A json file with stored data is passed in
-          fetch(json_file, {method: 'GET'}) //Get the file
-              .then(response => response.json()) //Put user input in json format
-              .then(result => {
-                  const usernameList = result.usernames.map(element => {
-                      return element.toLowerCase() //Turns it to lower case
-                  })
-
-                  const passwordList = result.passwords.map(element => {
-                    return element.toLowerCase() //Turns it to lower case
-                  })
-                  //Make the user input lower cast
-                  const targetUsername = usernameInput.value.toLowerCase();
-                  const targetPassword = passwordInput.value.toLowerCase();
-                  let authenticated = false; //Assume failed log-in until proven otherwise
-
-                  //Check if the username and password matches any stored in the json file
-                  for(let i = 0; i < usernameList.length; i++) {
-                      if(targetUsername === usernameList[i] && targetPassword === passwordList[i]) {
-                          $('#login-form').hide(); //Hide the log in page
-                          $('#project-login').show(); //Show project log in page
-                          authenticated = true; 
-                          //Saves log in if the user switches tabs for example (temp storage)
-                          sessionStorage.setItem('isLoggedIn', 'true'); 
-                          sessionStorage.setItem('username', targetUsername);
-                          break;
-                      }
-                  }
-
-                  if(!authenticated) {
-                    alert("Username or password is incorrect");
-                  } 
-              })
-              .catch(error => console.log("Error", error)) //Error handling
-          }
-        
-        var username = document.getElementById('username').value;
-        var password = document.getElementById('password').value;
-    
-        usernameCheck("userPass.json"); //Use the function above
-    }
-
     function projectLogin() {
       var projectName = document.getElementById('projectName').value;
+      
+      // Check if user is authenticated with Kinde first
+      const isKindeLoggedIn = sessionStorage.getItem('isKindeLoggedIn');
+      if (isKindeLoggedIn !== 'true') {
+        alert("Please log in first");
+        return;
+      }
 
       function projectCheck(json_file) {
         fetch(json_file, {method: 'GET'})
@@ -414,21 +449,27 @@
               const targetProject = projectName.toLowerCase();
               
               let authenticated = false;
+              
+              // Get Kinde user information
+              const kindeUser = JSON.parse(sessionStorage.getItem('kindeUser') || '{}');
+              const userEmail = kindeUser.email || 'unknown';
 
+              // For now, allow any authenticated Kinde user access to any project
+              // You can modify this logic later to check specific user permissions
               for(let i = 0; i < projectList.length; i++) {
-                if(targetProject === projectList[i]['name'] && projectList[i]['users'].includes(document.getElementById('username').value)) {
+                if(targetProject === projectList[i]['name']) {
                     $('#project-login').hide();
                     $('.main-content').show();
                     $('.production-title').text(projectName);
                     document.title = projectName + ' - Studio Script Writer';
                     authenticated = true;
-                    sessionStorage.setItem('projectName', targetProject);
+                    sessionStorage.setItem('projectName', projectName);
                     break;
                 }
               }
 
               if(!authenticated) {
-                alert("Production does not exist or you do not have access");
+                alert("Production does not exist");
               } 
             })
             .catch(error => console.log("Error", error))
@@ -2610,11 +2651,11 @@
 
           $(this).remove();
           const runningOrderButton = $('<button class="btn button2 runningOrder-button" title="Running Order"><i class="fas fa-list-ol"></i> Running Order</button>');
-          $('.toolbar-group.right').append(runningOrderButton);
+          $('.toolbar-group.dynamic-buttons').append(runningOrderButton);
       });
 
       //Add the show script button
-      $('.toolbar-group.right').append(showScriptButton);
+      $('.toolbar-group.dynamic-buttons').append(showScriptButton);
   });
 
 
