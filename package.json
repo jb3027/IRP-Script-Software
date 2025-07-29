@@ -1,0 +1,27 @@
+{
+  "name": "irp-script-software",
+  "version": "1.0.0",
+  "description": "Proof of Concept app to help studio workers manage scripts.",
+  "main": "sketch.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jb3027/IRP-Script-Software.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jb3027/IRP-Script-Software/issues"
+  },
+  "homepage": "https://github.com/jb3027/IRP-Script-Software#readme",
+  "dependencies": {
+    "@kinde-oss/kinde-auth-pkce-js": "^4.3.0"
+  }
+}
