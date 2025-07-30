@@ -1,3 +1,7 @@
+  <div id="loader" class="loader-container" style="display: none;">
+    <div class="loader"></div>
+  </div>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -128,6 +132,33 @@
         flex-direction: column;
         gap: 2px;
     }
+    /* Loader styles */
+    .loader-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -174,18 +205,24 @@
       <div class="app-icon">
         <i class="fas fa-folder-open"></i>
       </div>
-      <h1 class="app-title">Select Project</h1>
-      <p class="app-subtitle">Choose your project to continue with EpisodicPro</p>
+      <h1 class="app-title">Select Production</h1>
+      <p class="app-subtitle">Choose your Production to continue with PaperworkPro</p>
       
       <div class="project-form">
-        <div class="input-group">
-          <input type="text" id="projectName" name="projectName" class="project-input" placeholder="Enter project name" required>
-        </div>
-        <button id="projectLogBtn" class="btn-primary project-btn">
-          <i class="fas fa-arrow-right"></i>
-          Continue
+        <!-- Option 1: Create New Production -->
+        <button id="createNewBtn" class="btn-primary project-btn">
+          <i class="fas fa-plus"></i>
+          Create New Production
+        </button>
+        
+        <!-- Option 2: Load Existing Production -->
+        <button id="loadExistingBtn" class="btn-secondary project-btn" style="margin-top: 12px;">
+          <i class="fas fa-folder-open"></i>
+          Load Existing Production
         </button>
       </div>
+
+      <input type="file" id="file-loader" accept=".pwpro" style="display: none;">
       
       <div class="security-note">
         <i class="fas fa-shield-alt"></i>
@@ -198,6 +235,8 @@
   <div class="main-content">
     <nav class="nav-toolbar">
         <div class="toolbar-group left">
+            <button class="btn button2 home-button" title="Home - Return to Project Selection"><i class="fas fa-home"></i></button>
+            <div class="divider"></div>
             <button class="btn button2 undo-button" title="Undo"><i class="fas fa-undo"></i></button>
             <button class="btn button2 redo-button" title="Redo"><i class="fas fa-redo"></i></button>
             <div class="divider"></div>
@@ -219,10 +258,9 @@
         <div class="toolbar-group right">
             <!-- Dynamic buttons container - for buttons like Show Script, Running Order -->
             <div class="toolbar-group dynamic-buttons" id="dynamic-buttons-container">
-                <button class="btn button2 primary" title="Save"><i class="fas fa-save"></i> Save</button> 
                 <button class="btn button2 view-button" title="View"><i class="fas fa-eye"></i> View</button>
-                <button class="btn button2 runningOrder-button" title="Running Order"> Running Order</button>
-                <button class="btn button2 floorPlan-button" title="Floor Plan"> Floor Plan</button>
+                <button class="btn button2 runningOrder-button" title="Running Order">Running Order</button>
+                <button class="btn button2 floorPlan-button" title="Floor Plan">Floor Plan</button>
 
                 <div class="dropdown">
                     <button class="btn button2 camCard-button" title="camCards"> CAMERA CARDS </button>
@@ -232,9 +270,17 @@
                 </div>
             </div>
             
-            <!-- Dedicated logout container - always rightmost -->
-            <div class="toolbar-group logout-container" id="logout-container" style="display: none; margin-left: 16px;">
-                <!-- Logout button will be dynamically added here -->
+            <!-- Right-aligned buttons container -->
+            <div class="toolbar-group right-buttons" style="display: flex; margin-left: 16px;">
+                <!-- Dedicated save container -->
+                <div class="toolbar-group save-container" id="save-container">
+                    <button class="btn button2 primary save-button" title="Save"><i class="fas fa-save"></i> Save</button>
+                </div>
+                
+                <!-- Dedicated logout container -->
+                <div class="toolbar-group logout-container" id="logout-container" style="display: none; margin-left: 8px;">
+                    <!-- Logout button will be dynamically added here -->
+                </div>
             </div>
         </div>
     </nav>
@@ -319,10 +365,22 @@
   
   <!-- Kinde Auth JavaScript -->
   <script src="scripts/kindeAuth.js"></script>
+  
+  <!-- State Management JavaScript -->
+  <script src="scripts/stateManagement.js"></script>
+
+  <!-- Helper Functions JavaScript -->
+  <script src="scripts/helperFunctions.js"></script>
 
   <script type="text/javascript">
     // Kinde authentication integration - check for existing authentication state
     window.onload = function() {
+        // Show the loader and hide other views
+        $('#loader').show();
+        $('#logged_out_view').hide();
+        $('#project-login').hide();
+        $('.main-content').hide();
+
         // Use setTimeout to ensure Kinde auth script has finished initializing
         setTimeout(() => {
             const isKindeLoggedIn = sessionStorage.getItem('isKindeLoggedIn');
@@ -339,6 +397,14 @@
                 $('.production-title').text(projectName);
                 document.title = projectName + ' - Studio Script Writer';
                 
+                // Ensure we start in Script view, not Running Order view
+                resetToScriptView();
+                
+                // Initialize the production state for this project on page load
+                setTimeout(() => {
+                    initializeProductionState(projectName);
+                }, 200); // Additional delay to ensure DOM is fully ready
+                
                 // Show logout button if not already visible
                 const logoutContainer = document.getElementById('logout-container');
                 if (logoutContainer && window.kindeAuth) {
@@ -349,8 +415,13 @@
                 console.log('User authenticated without project, showing project selection');
                 $('#logged_out_view').hide();
                 $('#project-login').show();
+            } else {
+                // Not authenticated
+                $('#logged_out_view').show();
             }
-            // If not authenticated, the Kinde script will handle showing the login view
+            
+            // Hide the loader
+            $('#loader').hide();
         }, 100); // Small delay to ensure Kinde script has finished
     };
     
@@ -424,62 +495,137 @@
     var role;
     // $('#project-login').hide(); // Removed - now controlled by Kinde auth flow
 
-    // Updated project login to work with Kinde authentication
-    document.getElementById('projectLogBtn').addEventListener('click', function() {
-      projectLogin();
+    // Handler for Create New Production button
+    document.getElementById('createNewBtn').addEventListener('click', function() {
+      createNewProduction();
+    });
+    
+    // Handler for Load Existing Production button (to be implemented)
+    document.getElementById('loadExistingBtn').addEventListener('click', function() {
+      loadExistingProduction();
     });
 
-    function projectLogin() {
-      var projectName = document.getElementById('projectName').value;
+    // Function to ensure the main script view is shown (not Running Order)
+    function resetToScriptView() {
+      // Check if we're currently in Running Order view
+      const isRunningOrderView = $('#runningOrder-table').length > 0;
       
+      if (isRunningOrderView) {
+        // Restore the main script table structure
+        $('.container').html(`
+          <table style="margin-top:100px;" id="event-table" class="draggable-table">
+              <thead>
+                  <tr>
+                      <th scope="col" style="border: 1px solid black; width:100px; text-align: center;">Event number</th>
+                      <th scope="col" style="border: 1px solid black; width:350px; text-align: center;">Shot</th>
+                      <th scope="col" style="border: 1px solid black; width:450px; text-align: center;">Script</th>
+                      <th scope="col" style="border: 1px solid black; width:150px; text-align: center;">Details</th>
+                      <th scope="col" style="border: none; width:90px; text-align: center;"></th>
+                  </tr>
+              </thead>
+              <tbody>
+              </tbody>
+          </table>
+        `);
+        
+        // Remove any Show Script button if it exists
+        $('.showScript-button').remove();
+        
+        // Restore the Running Order button if it doesn't exist
+        if ($('.runningOrder-button').length === 0) {
+          const runningOrderButton = $('<button class="btn button2 runningOrder-button" title="Running Order">Running Order</button>');
+          $('.toolbar-group.dynamic-buttons').append(runningOrderButton);
+        }
+      }
+    }
+
+    function createNewProduction() {
       // Check if user is authenticated with Kinde first
       const isKindeLoggedIn = sessionStorage.getItem('isKindeLoggedIn');
       if (isKindeLoggedIn !== 'true') {
         alert("Please log in first");
         return;
       }
+      
+      const projectName = "New Production";
+      sessionStorage.setItem('projectName', projectName);
+      
+      // Hide project login and show main content
+      $('#project-login').hide();
+      $('.main-content').show();
+      $('.production-title').text(projectName);
+      document.title = projectName + ' - Studio Script Writer';
+      
+      // Ensure we start in Script view, not Running Order view
+      resetToScriptView();
+      
+      // Initialize the production state for this new project
+      setTimeout(() => {
+        initializeProductionState(projectName);
+        
+        // Auto-select the production title for easy editing
+        selectProductionTitle();
+      }, 100);
+    }
 
-      function projectCheck(json_file) {
-        fetch(json_file, {method: 'GET'})
-            .then(response => response.json())
-            .then(result => {
-              const projectList = result.productions.map(element => {
-                  return element 
-              })
-              const targetProject = projectName.toLowerCase();
-              
-              let authenticated = false;
-              
-              // Get Kinde user information
-              const kindeUser = JSON.parse(sessionStorage.getItem('kindeUser') || '{}');
-              const userEmail = kindeUser.email || 'unknown';
-
-              // For now, allow any authenticated Kinde user access to any project
-              // You can modify this logic later to check specific user permissions
-              for(let i = 0; i < projectList.length; i++) {
-                if(targetProject === projectList[i]['name']) {
-                    $('#project-login').hide();
-                    $('.main-content').show();
-                    $('.production-title').text(projectName);
-                    document.title = projectName + ' - Studio Script Writer';
-                    authenticated = true;
-                    sessionStorage.setItem('projectName', projectName);
-                    break;
-                }
-              }
-
-              if(!authenticated) {
-                alert("Production does not exist");
-              } 
-            })
-            .catch(error => console.log("Error", error))
-        }
-
-        projectCheck("productions.json");
+    function loadExistingProduction() {
+      document.getElementById('file-loader').click();
     }
     
+    // Function to automatically select the production title text for easy editing
+    function selectProductionTitle() {
+      const productionTitleElement = document.querySelector('.production-title');
+      if (productionTitleElement) {
+        // Focus on the element first
+        productionTitleElement.focus();
+        
+        // Select all the text inside the element
+        const range = document.createRange();
+        range.selectNodeContents(productionTitleElement);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        console.log('Production title selected for editing');
+      }
+    }
+    
+    // Make resetToScriptView globally available
+    window.resetToScriptView = function() {
+      // Check if we're currently in Running Order view
+      const isRunningOrderView = $('#runningOrder-table').length > 0;
+      
+      if (isRunningOrderView) {
+        // Restore the main script table structure
+        $('.container').html(`
+          <table style="margin-top:100px;" id="event-table" class="draggable-table">
+              <thead>
+                  <tr>
+                      <th scope="col" style="border: 1px solid black; width:100px; text-align: center;">Event number</th>
+                      <th scope="col" style="border: 1px solid black; width:350px; text-align: center;">Shot</th>
+                      <th scope="col" style="border: 1px solid black; width:450px; text-align: center;">Script</th>
+                      <th scope="col" style="border: 1px solid black; width:150px; text-align: center;">Details</th>
+                      <th scope="col" style="border: none; width:90px; text-align: center;"></th>
+                  </tr>
+              </thead>
+              <tbody>
+              </tbody>
+          </table>
+        `);
+        
+        // Remove any Show Script button if it exists
+        $('.showScript-button').remove();
+        
+        // Restore the Running Order button if it doesn't exist
+        if ($('.runningOrder-button').length === 0) {
+          const runningOrderButton = $('<button class="btn button2 runningOrder-button" title="Running Order">Running Order</button>');
+          $('.toolbar-group.dynamic-buttons').append(runningOrderButton);
+        }
+      }
+    };
+
     //Made this a global function so that initdraggable() can call it
-    function updateEventNumbers() {
+    window.updateEventNumbers = function() {
         let eventNumber = 1;
         $('#event-table tbody tr').each(function() {
             //Check if there is an event in the row (If Shot column or Insert has content)
@@ -494,7 +640,7 @@
         });
     }
     //UPDATE ITEM NUMBERS
-    function updateItemNumbers() {
+    window.updateItemNumbers = function() {
         let itemNumber = 1;
         $('#event-table tbody tr').each(function() {
             //Checks if there is an item 
@@ -600,6 +746,13 @@
                 updateEventNumbers(); //Reorder event numbers
                 updateItemNumbers(); //Reorder item numbers for the running order
                 initDraggable(); //Reinitialize draggable after removing a row
+                
+                // Sync state after removing row
+                setTimeout(function() {
+                    if (typeof syncStateFromTable === 'function') {
+                        syncStateFromTable();
+                    }
+                }, 150);
             }
         });
 
@@ -628,6 +781,12 @@
                     $(newRow).insertAfter(targetRow);
                     updateEventNumbers();
                     initDraggable(); //Make it draggable
+                    // Sync state after adding new event row
+                    setTimeout(function() {
+                        if (typeof syncStateFromTable === 'function') {
+                            syncStateFromTable();
+                        }
+                    }, 150);
                     return;
                 }
             }
@@ -645,11 +804,72 @@
             
             //Initialize draggable on the newly added row
             initDraggable();
+            
+            // Sync state after adding new event row
+            setTimeout(function() {
+                if (typeof syncStateFromTable === 'function') {
+                    syncStateFromTable();
+                }
+            }, 150);
         });
 
         //UNDERLINE
         $('.underline-button').on('click', function() {
           document.execCommand('underline', false, null);
+        });
+
+        //HOME BUTTON - Return to project selection
+        $('.home-button').on('click', function() {
+            console.log('Home button clicked');
+            
+            // Show confirmation dialog before proceeding
+            showQuestionModal(
+                "Are you sure you want to close this project? Any unsaved changes will be lost.",
+                "Cancel",
+                "Close Project",
+                // Cancel callback - do nothing
+                function() {
+                    console.log('Home button action cancelled by user');
+                },
+                // Close Project callback - proceed with original functionality
+                function() {
+                    console.log('User confirmed closing project');
+                    
+                    // Clear production state
+                    if (typeof clearProductionState === 'function') {
+                        clearProductionState();
+                    }
+                    
+                    // Clear project name from session storage
+                    sessionStorage.removeItem('projectName');
+                    
+                    // Hide main content and show project selection
+                    console.log('Hiding main content and showing project selection');
+                    $('.main-content').hide();
+                    $('#logged_out_view').hide();
+                    
+                    // Force show project selection with explicit CSS
+                    const projectLogin = $('#project-login');
+                    projectLogin.show();
+                    
+                    // Override the CSS !important rule by setting style attribute directly
+                    projectLogin[0].style.setProperty('display', 'flex', 'important');
+                    projectLogin[0].style.setProperty('visibility', 'visible', 'important');
+                    projectLogin[0].style.setProperty('opacity', '1', 'important');
+                    
+                    console.log('Project login visibility:', projectLogin.is(':visible'));
+                    console.log('Project login display:', projectLogin.css('display'));
+                    console.log('Project login element:', projectLogin.length);
+                    
+                    // Clear the project input field
+                    $('#projectName').val('');
+                    
+                    // Reset the page title
+                    document.title = 'PaperworkPro';
+                    
+                    console.log('Home button transition complete');
+                }
+            );
         });
 
         //BOLD
@@ -2343,6 +2563,12 @@
                     $(newRow).insertAfter(targetRow);
                     updateEventNumbers();
                     initDraggable(); //Make it draggable
+                    // Sync state after adding new insert row
+                    setTimeout(function() {
+                        if (typeof syncStateFromTable === 'function') {
+                            syncStateFromTable();
+                        }
+                    }, 150);
                     return;
                 }
             }
@@ -2360,6 +2586,13 @@
             
             //Initialize draggable on the newly added row
             initDraggable();
+            
+            // Sync state after adding new insert row
+            setTimeout(function() {
+                if (typeof syncStateFromTable === 'function') {
+                    syncStateFromTable();
+                }
+            }, 150);
 
 
         });
@@ -2369,44 +2602,65 @@
       $('.addItem-button').on('click', function() {
         var selection = window.getSelection();
         
-        var newRow = $(`<tr class="item_highlighted">
-            <td contenteditable="false" style="text-align:center"></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="false">
-                <div class="item-cell-container">
-                    <span contenteditable="false" style="text-decoration: underline;"><b>ITEM ${$('#event-table tbody tr.item_highlighted').length + 1}: &nbsp</b></span>
-                    <input type="text" class="item-content" name="itemContent" autocomplete="off" placeholder="New Item" style="background-color: black; margin-left: -15px;">
-                </div>
-            </td>
-            <td contenteditable="true" style="text-align:center"></td>
-            <td style="border:none; width:90px">${createRowButtons()}</td>
-        </tr>`);
+        // Calculate item number upfront to avoid DOM timing issues
+        var itemCount = $('#event-table tbody tr.item_highlighted').length;
+        var newItemNumber = itemCount + 1;
         
-        //If there is a selection, add the item after the selected row
+        var newRow = $(`
+            <tr class="item_highlighted">
+                <td contenteditable="false" style="text-align:center"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="false">
+                    <div class="item-cell-container">
+                        <span contenteditable="false" style="text-decoration: underline;"><b>ITEM ${newItemNumber}: &nbsp;</b></span>
+                        <input type="text" class="item-content" autocomplete="off" placeholder="New Item" style="background-color: black; margin-left: -15px;">
+                    </div>
+                </td>
+                <td contenteditable="true" style="text-align:center"></td>
+                <td style="border:none; width:90px">${createRowButtons()}</td>
+            </tr>
+        `);
+        
+        // Check if there's a meaningful selection (not just cursor in input field)
+        var targetRow = null;
         if (selection.rangeCount > 0) {
             var range = selection.getRangeAt(0);
-            var cell = range.commonAncestorContainer.nodeType === 1 
-                ? range.commonAncestorContainer.closest('td')?.closest('tr')
-                : range.commonAncestorContainer.parentElement.closest('td')?.closest('tr');
+            var selectedText = selection.toString().trim();
             
-            if (cell) {
-                $(cell).after(newRow);
-                updateItemNumbers();
-                initDraggable();
-                return;
+            // Use selection-based insertion ONLY if there is actual selected text OR
+            // the selection is inside a contenteditable cell (and not an input field).
+            var isInsideEditable = range.commonAncestorContainer.nodeType === 1 && 
+                                 range.commonAncestorContainer.closest('[contenteditable="true"]');
+            var isInsideInput = $(range.commonAncestorContainer).closest('input, textarea').length > 0;
+
+            if (selectedText.length > 0 || (isInsideEditable && !isInsideInput)) {
+                var cell = range.commonAncestorContainer.nodeType === 1 
+                    ? range.commonAncestorContainer.closest('tr')
+                    : range.commonAncestorContainer.parentElement.closest('tr');
+                
+                if (cell && cell.closest('#event-table')) {
+                    targetRow = $(cell);
+                }
             }
         }
-        else {
-            //If no selection, append to end of table
-            $('#event-table tbody').append(newRow);
-            updateItemNumbers();
-            initDraggable();
-            return;
-        }   
-    
-        $('.addItem-button').trigger('click');
-       
         
+        if (targetRow) {
+            // Insert after the selected row
+            targetRow.after(newRow);
+        } else {
+            // Default: append to end of table
+            $('#event-table tbody').append(newRow);
+        }
+        
+        updateItemNumbers();
+        initDraggable();
+        
+        // Sync state after adding new item row
+        setTimeout(function() {
+            if (typeof syncStateFromTable === 'function') {
+                syncStateFromTable();
+            }
+        }, 150);
     });
 
 
@@ -2501,7 +2755,7 @@
               })
               .get(0)
               .trim();
-          itemTitle[currentItem.itemNumber - 1] = itemContent;
+          itemTitle.push(itemContent);
           itemNumbers.push(currentItem.itemNumber);
           
           //Initialize total time for item
@@ -2593,17 +2847,21 @@
                       </tr>
                   </thead>
                   <tbody>
-                      ${itemNumbers.map(num => `
+                      ${itemNumbers.map((num, index) => {
+                          const stateItem = productionState.events.find(event => event.type === 'item' && event.itemNumber == num);
+                          const actualTime = stateItem ? stateItem.actualTime : '';
+                          return `
                           <tr>
                               <td contenteditable="false">${num}</td>
-                              <td contenteditable="true">${sourceType[num-1]}</td>
-                              <td contenteditable="true" style="text-align:left; margin-left: 50px;">${itemTitle[num-1]}</td>
-                              <td contenteditable="true">${soundSource[num-1]}</td>
-                              <td contenteditable="false">${itemLength[num-1]}</td>
-                              <td contenteditable="false">${accumulatedTime[num-1]}</td>
-                              <td contenteditable="true"></td>
+                              <td contenteditable="true">${sourceType[index]}</td>
+                              <td contenteditable="true" style="text-align:left; margin-left: 50px;">${itemTitle[index]}</td>
+                              <td contenteditable="true">${soundSource[index]}</td>
+                              <td contenteditable="false">${itemLength[index]}</td>
+                              <td contenteditable="false">${accumulatedTime[index]}</td>
+                              <td contenteditable="true" class="actual-time-cell" data-item-number="${num}">${actualTime || ''}</td>
                           </tr>
-                      `).join('')}
+                          `
+                      }).join('')}
                   </tbody>
               </table>
           </body>
@@ -2617,45 +2875,50 @@
       
       //Attach click handler to show script button
       showScriptButton.on('click', function() {
-          $('.container').html(originalContent);
+          // Instead of restoring from stored inputs, rebuild the table from the current state
+          // This ensures that any actualTime changes made in Running Order view are preserved
+          $('.container').html(`
+              \u003ctable style="margin-top:100px;" id="event-table" class="draggable-table"\u003e
+                  \u003cthead\u003e
+                      \u003ctr\u003e
+                          \u003cth scope="col" style="border: 1px solid black; width:100px; text-align: center;"\u003eEvent number\u003c/th\u003e
+                          \u003cth scope="col" style="border: 1px solid black; width:350px; text-align: center;"\u003eShot\u003c/th\u003e
+                          \u003cth scope="col" style="border: 1px solid black; width:450px; text-align: center;"\u003eScript\u003c/th\u003e
+                          \u003cth scope="col" style="border: 1px solid black; width:150px; text-align: center;"\u003eDetails\u003c/th\u003e
+                          \u003cth scope="col" style="border: none; width:90px; text-align: center;"\u003e\u003c/th\u003e
+                      \u003c/tr\u003e
+                  \u003c/thead\u003e
+                  \u003ctbody\u003e
+                  \u003c/tbody\u003e
+              \u003c/table\u003e
+          `);
           
-          //Restore item content values using the stored inputs
-          $('.item-content').each(function(index) {
-              if (storedInputs.itemContents[index]) {
-                  $(this).val(storedInputs.itemContents[index]);
-              }
-          });
-
-          //Restore insert input values
-          $('.insertTitle, .insertIn, .insertOut').each(function(index) {
-              if (storedInputs.insertInputs[index]) {
-                  $(this).val(storedInputs.insertInputs[index]);
-              }
-          });
-
-          //Restore time input values
-          $('input[type="time"]').each(function(index) {
-              if (storedInputs.timeInputs[index]) {
-                  $(this).val(storedInputs.timeInputs[index]);
-              }
-          });
-
-          //Restore event values
-          $('.cameraNum, .cameraPos, .shotSubject, .extraInfo, .shot-type-select').each(function(index) {
-              if (storedInputs.eventInputs[index]) {
-                  $(this).val(storedInputs.eventInputs[index]);
-              }
-          });
-
-          initDraggable();
+          // Rebuild the table from the current production state
+          // This will include all the actualTime values and other changes
+          if (typeof rebuildTableFromState === 'function') {
+              rebuildTableFromState();
+          } else {
+              console.error('rebuildTableFromState function not available');
+          }
 
           $(this).remove();
-          const runningOrderButton = $('<button class="btn button2 runningOrder-button" title="Running Order"><i class="fas fa-list-ol"></i> Running Order</button>');
+          const runningOrderButton = $('\u003cbutton class="btn button2 runningOrder-button" title="Running Order"\u003e\u003ci class="fas fa-list-ol"\u003e\u003c/i\u003e Running Order\u003c/button\u003e');
           $('.toolbar-group.dynamic-buttons').append(runningOrderButton);
       });
 
       //Add the show script button
       $('.toolbar-group.dynamic-buttons').append(showScriptButton);
+
+      // Add event listener for the actual time cells
+        $(document).on('blur', '.actual-time-cell', function() {
+            const itemNumber = $(this).data('item-number');
+            const actualTime = $(this).text();
+            const itemInState = productionState.events.find(event => event.type === 'item' && event.itemNumber == itemNumber);
+            if (itemInState) {
+                itemInState.actualTime = actualTime;
+                sessionStorage.setItem('productionState', JSON.stringify(productionState));
+            }
+        });
   });
 
 
@@ -2758,7 +3021,7 @@
   });
 
   //DRAGGABLE FUNCTION
-  function initDraggable() {
+  window.initDraggable = function() {
       const tbody = document.querySelector('#event-table tbody');
       
       //Enable drag only on drag buttons
@@ -2777,6 +3040,13 @@
           button.addEventListener('dragend', () => {
               row.classList.remove('dragging');
               updateItemNumbers();
+              
+              // Sync state after drag operation
+              setTimeout(function() {
+                  if (typeof syncStateFromTable === 'function') {
+                      syncStateFromTable();
+                  }
+              }, 150);
           });
       });
       
@@ -2821,9 +3091,55 @@
           $('.dropdown').removeClass('active');
       }
   });
+  
+  // Event listener for production title changes
+  $(document).on('input blur', '.production-title', function() {
+      const newTitle = $(this).text().trim();
+      
+      // Only update if the title has actually changed and is not empty
+      if (newTitle && newTitle !== sessionStorage.getItem('projectName')) {
+          console.log('Production title changed to:', newTitle);
+          
+          // Update session storage
+          sessionStorage.setItem('projectName', newTitle);
+          
+          // Update the page title
+          document.title = newTitle + ' - Studio Script Writer';
+          
+          // Update the production state if the function exists
+          if (typeof updateProductionTitle === 'function') {
+              updateProductionTitle(newTitle);
+          }
+          
+          console.log('Production title updated in session and state');
+      }
+  });
 
   //Initialise item row
   $('.addItem-button').trigger('click');
+
+  // Add event listener for the file loader
+  $('#file-loader').on('change', function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+          const fileContent = e.target.result;
+          if (typeof loadProductionFromFile === 'function') {
+              const success = loadProductionFromFile(fileContent);
+              if (success) {
+                  $('#project-login').hide();
+                  $('.main-content').show();
+              }
+          } else {
+            alert('Error: state management script not loaded correctly.');
+          }
+          // Reset the input
+          event.target.value = '';
+      };
+      reader.readAsText(file);
+  });
   });
 </script>
 </body>
