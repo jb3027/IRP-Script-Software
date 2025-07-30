@@ -17,3 +17,30 @@ We need to complete the following tasks:
 - In order to not disrupt other developers working on this framework, we need changes to the index.html file to be minimal and where necessary follow a similar style. This is important as the other developers are junior and we need to make sure they can maintain our changes going forward. Use comments as appropriate to assist in this goal.
 If you're unsure about any of the above, then just ask.
 
+# State management
+The main functionality of this application, once the user is authenticated and has selected a named production, is to create a list of the following to help organise the production of unscripted televion shows:
+- Items
+- Events
+- Inserts
+This list represents the flow of the episode for the various technical people managing the filming. The application is designed to help the crew create, store and then follow the directions, but currently, once the list has been generated there ius no way to save the state so that it can be edited across sessions or collaboratively, saved for future use etc
+I would like to create a json representation of the current html table object, which is updated in parallel to the html objects, so that for example:
+- when a production is chosen, a new JSON state object is created with the name (and optional duration) values added as root level keys
+- When a new item is added, it is added to the json state object for the production under a "steps" key list in the root of the document
+- The same should apply for Events and Inserts
+- For Items, Events and Items any config values included in that table item in the html should be included in the json list item that represents the table row
+Can you first of all suggest an approach to achieve this? The implementation needs to be easy to follow so junior devs maintaining the code base can easily understand how it works. The ultimate goal is for users to be able to save the json document locally to their machines and then share or reload it at a later date. 
+
+can as much of this new functionaly be implemented in a separate .js file in the scripts directory to make maintenance easier?
+can you add a home icon to the left hand most side of the nav bar, that clears the production json state object and shows the user the production selection input form? 
+the next step is to be able to load the state. Currently if I refresh the page whilst editing a production, I lose the state, but the production name is remembered. Can we first of all use the productionState json object to recreate the html table if the page is refreshed?
+when the home button is clicked that clears the state and returns the user to the production selection form, which is the desired behaviour. 
+However, can we add a confirmation box for users with 2 buttons: Close and Cancel to ensure they're aware the current script will be lost unless saved?
+
+the application allows the user to download a json document that represents the script table view of a production.
+in addition, when the page is refreshed, if there is a production selected and the current session storage includes a matching production state json value, the script table is recreated.
+I now want to update the view where the user is prompted to select a production to work on, after they are successfully authenticated. 
+The changes I want to make are as follows:
+- Replaced the text input box with 2 options:
+- 1. a "Create New Production" button which will create a freshly initialised projected named "New Production"
+- 2. a "Load Existing Production" button which allows the user to select a file from their local machine using the browsers built in file dialog. If possible, the dialog should filter on files with the  *.pwpro file extension only. If a valid file is found, the file contents should be loaded into the session production state and the script table generated as per the page refresh functionality that already exists
+Make as little change as possible and ensure that any changes are simplified and/or commented sufficiently to allow junior developers to understand and maintain the new code. Start by implementing the first option for new projects only. Once that's confirmed by me as working, we'll move onto the load existing production option.
