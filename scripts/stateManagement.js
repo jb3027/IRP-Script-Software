@@ -1,3 +1,86 @@
+/**
+ * Saves the floor plan state to the production state
+ * @param {string|object} floorPlanData - The floor plan data (canvas JSON string or complete floor plan object)
+ * @param {array} customItems - Optional array of custom script items added by the user
+ */
+function saveFloorPlanState(floorPlanData, customItems = null) {
+    
+    if (!productionState) {
+        console.warn('No production state available to save floor plan');
+        return;
+    }
+    
+    if (!floorPlanData) {
+        console.warn('No floor plan data provided to save');
+        return;
+    }
+    
+    let floorPlanState;
+    
+    // Handle different input types
+    if (typeof floorPlanData === 'string') {
+        // Legacy support: just canvas JSON
+        try {
+            JSON.parse(floorPlanData); // Validate JSON
+            floorPlanState = {
+                canvasJSON: floorPlanData,
+                customItems: customItems || []
+            };
+        } catch (error) {
+            console.error('Invalid canvas JSON provided:', error);
+            return;
+        }
+    } else if (typeof floorPlanData === 'object') {
+        // New format: complete floor plan object
+        floorPlanState = floorPlanData;
+        if (customItems) {
+            floorPlanState.customItems = customItems;
+        }
+    } else {
+        console.error('Invalid floor plan data type provided:', typeof floorPlanData);
+        return;
+    }
+    
+    productionState.floorPlan = JSON.stringify(floorPlanState);
+    
+    // Update session storage
+    sessionStorage.setItem('productionState', JSON.stringify(productionState));
+    
+    console.log('Session storage updated with floorPlan data');
+}
+
+/**
+ * Retrieves the floor plan state from production state
+ * @returns {string|null} The floor plan canvas JSON or null if none exists
+ */
+function getFloorPlanState() {
+    return productionState && productionState.floorPlan ? productionState.floorPlan : null;
+}
+
+/**
+ * Restores the floor plan state from production state to localStorage
+ * This is needed when loading a production from file to make the floor plan data
+ * available to the floor plan UI which expects it in localStorage
+ */
+function restoreFloorPlanToLocalStorage() {
+    if (productionState && productionState.floorPlan) {
+        console.log('Restoring floor plan state to localStorage from production state');
+        localStorage.setItem('currentFloorPlanState', productionState.floorPlan);
+        localStorage.setItem('floorPlanStateChanged', Date.now().toString());
+        console.log('Floor plan state restored to localStorage');
+    } else {
+        console.log('No floor plan state in production to restore');
+        // Clear any stale floor plan data
+        localStorage.removeItem('currentFloorPlanState');
+        localStorage.removeItem('floorPlanStateChanged');
+    }
+}
+
+// Make these functions globally accessible
+window.saveFloorPlanState = saveFloorPlanState;
+window.getFloorPlanState = getFloorPlanState;
+window.restoreFloorPlanToLocalStorage = restoreFloorPlanToLocalStorage;
+
 
 // =================================================================================
 // Production State Management
@@ -20,7 +103,8 @@ function initializeProductionState(name) {
     productionState = {
         name: name,
         duration: "00:00:00", // Default duration, can be updated later
-        events: []
+        events: [],
+        floorPlan: "" // Will store fabric.js canvas JSON state
     };
     
     const stateRestored = reloadProductionStateIfPresent();
@@ -71,6 +155,10 @@ function clearProductionState() {
     
     // Reset the production state object
     productionState = {};
+    
+    // Clear floor plan temporary state from localStorage
+    localStorage.removeItem('currentFloorPlanState');
+    localStorage.removeItem('floorPlanStateChanged');
     
     // Clear the table content
     $('#event-table tbody').empty();
@@ -208,23 +296,19 @@ function syncStateFromTable() {
     
     const newEvents = [];
     const tableRows = $('#event-table tbody tr');
-    console.log('Found', tableRows.length, 'table rows to process');
     
     tableRows.each(function(index) {
         const eventData = extractRowData(this);
-        console.log('Row', index, 'extracted data:', eventData);
         newEvents.push(eventData);
     });
     
     productionState.events = newEvents;
     // Save to sessionStorage
     sessionStorage.setItem('productionState', JSON.stringify(productionState));
-    console.log("State synced with", newEvents.length, "events:", productionState);
 }
 
 
 function rebuildTableFromState() {
-    console.log('Rebuilding table from productionState with', productionState.events ? productionState.events.length : 0, 'events');
     $('#event-table tbody').empty();
 
     // Helper functions to create row elements
@@ -417,6 +501,9 @@ function loadProductionFromFile(fileContent) {
         sessionStorage.setItem('productionState', JSON.stringify(productionState));
         sessionStorage.setItem('projectName', productionState.name);
         
+        // Restore floor plan state to localStorage for UI access
+        restoreFloorPlanToLocalStorage();
+        
         // Update the UI
         $('.production-title').text(productionState.name);
         document.title = `${productionState.name} - Studio Script Writer`;
@@ -453,7 +540,6 @@ function saveStateToFile() {
     // In Running Order view, the state is already being updated via the blur event listeners
     const mainTable = $('#event-table');
     if (mainTable.is(':visible') && mainTable.find('tbody tr').length > 0) {
-        console.log('Main table is visible, syncing state from table before save');
         syncStateFromTable();
     } else {
         console.log('Main table not visible (probably in Running Order view), using existing state for save');
@@ -503,7 +589,6 @@ function showNotification(message, type = 'success') {
 $(document).ready(function() {
     // Listen for any change, click, or input on the table that should trigger a state sync.
     $('#event-table').on('input blur change', 'td, input, select', function() {
-        console.log('Table change detected, syncing state...', this);
         // Use a small timeout to let the DOM update before we sync.
         setTimeout(syncStateFromTable, 100);
     });
