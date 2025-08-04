@@ -67,7 +67,8 @@ $(document).ready(function() {
 
         // Find all item rows and their indices
         const itemRows = [];
-        $('#event-table').find('tr.event_highlighted').each(function(index) {
+        // $('#event-table').find('tr.event_highlighted').each(function(index) {
+        $('#event-table tbody tr').each(function(index) {
             if ($(this).hasClass('item_highlighted')) {
                 itemRows.push({
                     index: index,
@@ -78,7 +79,9 @@ $(document).ready(function() {
 
         // Process rows between each pair of items
         for (let i = 0; i < itemRows.length; i++) {
+            console.log('i', i);
             const currentItem = itemRows[i];
+            console.log('currentItem', currentItem);
             const nextItem = itemRows[i + 1];
             const startIndex = currentItem.index + 1;
             const endIndex = nextItem ? nextItem.index : $('#event-table tbody tr').length;

@@ -5,7 +5,7 @@ async function compareObfuscation() {
     console.log('🔍 Comparing Obfuscation Levels\n');
     
     const levels = ['minify', 'basic', 'advanced'];
-    const files = ['auth.js', 'auth-config.js', 'auth-ui.js'];
+    const files = ['scripts/kindeAuth.js', 'scripts/main.js', 'scripts/stateManagement.js'];
     
     for (const file of files) {
         console.log(`📄 File: ${file}`);

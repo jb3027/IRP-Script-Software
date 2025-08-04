@@ -157,3 +157,14 @@ window.cutLine = cutLine;
 window.floorPlanSyncInterval = floorPlanSyncInterval;
 window.lastFloorPlanStateHash = lastFloorPlanStateHash;
 window.floorPlanWindow = floorPlanWindow; 
+
+// Disable right click
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+});
+//Disable key combinations that allow a user to open developer tools
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'u' || e.ctrlKey && e.key === 'u' || e.ctrlKey && e.key === 'u') {
+        e.preventDefault();
+    }
+});

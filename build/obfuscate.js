@@ -68,18 +68,20 @@ const obfuscationConfigs = {
 
 // Files to obfuscate (excluding libraries and config files)
 const sourceFiles = [
-    // 'app.js',
-    'auth.js',
-    'auth-config.js', 
-    'auth-ui.js',
-    // 'camera-cards.js',
-    // 'floor-plan.js',
-    // 'main.js',
-    // 'running-order.js',
-    // 'utils.js',
-    // 'sketch.js',
-    'lib/preload.js',
-    'lib/test-utils.js'
+    'scripts/addRowHandlers.js',
+    'scripts/cameraCards.js',
+    'scripts/draggableTable.js',
+    'scripts/floorPlan.js',
+    'scripts/helperFunctions.js',
+    'scripts/inputHandlers.js',
+    'scripts/kindeAuth.js',
+    'scripts/main.js',
+    'scripts/modalHandlers.js',
+    'scripts/projectManagement.js',
+    'scripts/runningOrder.js',
+    'scripts/stateManagement.js',
+    'scripts/tableManagement.js',
+    'scripts/uiEventHandlers.js'
 ];
 
 // Files to copy as-is (libraries, configs, etc.)
@@ -160,7 +162,8 @@ async function copyLibraryFiles(outputDir) {
         'lib/libraries/fonts/**/*',
         'lib/libraries/p5.min.js',
         'lib/libraries/p5types/**/*',
-        'node_modules/**/*'
+        'node_modules/**/*',
+        'favicon.ico'
     ];
     
     for (const pattern of libraryPatterns) {
