@@ -386,11 +386,8 @@
             const isKindeLoggedIn = sessionStorage.getItem('isKindeLoggedIn');
             const projectName = sessionStorage.getItem('projectName');
             
-            console.log('Window onload check:', { isKindeLoggedIn, projectName });
-            
             // If user is authenticated with Kinde and has selected a project
             if (isKindeLoggedIn === 'true' && projectName) {
-                console.log('User authenticated with project, showing main content');
                 $('#logged_out_view').hide();
                 $('#project-login').hide();
                 $('.main-content').show();
@@ -412,7 +409,6 @@
                 }
             } else if (isKindeLoggedIn === 'true') {
                 // Authenticated but no project selected
-                console.log('User authenticated without project, showing project selection');
                 $('#logged_out_view').hide();
                 $('#project-login').show();
             } else {
@@ -424,6 +420,92 @@
             $('#loader').hide();
         }, 100); // Small delay to ensure Kinde script has finished
     };
+    
+    // Floor plan state synchronization variables
+    let floorPlanSyncInterval = null;
+    let lastFloorPlanStateHash = null;
+    
+    // Function to start monitoring floor plan state changes
+    function startFloorPlanSync() {
+        
+        if (floorPlanSyncInterval) {
+            clearInterval(floorPlanSyncInterval);
+        }
+        
+        // Test localStorage access immediately
+        const testState = localStorage.getItem('currentFloorPlanState');
+        
+        floorPlanSyncInterval = setInterval(function() {
+            const currentFloorPlanState = localStorage.getItem('currentFloorPlanState');
+            
+            if (currentFloorPlanState) {
+                // Create a proper hash to detect changes - use the entire string length and a checksum
+                const currentHash = currentFloorPlanState.length + '_' + btoa(currentFloorPlanState).slice(-10);
+                
+                if (currentHash !== lastFloorPlanStateHash) {
+                    lastFloorPlanStateHash = currentHash;
+                    
+                    // Parse the floor plan state to get the complete object
+                    try {
+                        const floorPlanData = JSON.parse(currentFloorPlanState);
+                        
+                        // Ensure productionState exists
+                        if (!productionState) {
+                            console.error('Production state is undefined or null');
+                            return;
+                        }
+                        
+                        let syncSuccessful = false;
+                        
+                        // Try to sync with production state using the proper function
+                        if (typeof saveFloorPlanState === 'function') {
+                            try {
+                                saveFloorPlanState(floorPlanData);
+                                syncSuccessful = true;
+                            } catch (error) {
+                                console.error('Error calling saveFloorPlanState:', error);
+                            }
+                        } else if (typeof window.saveFloorPlanState === 'function') {
+                            try {
+                                window.saveFloorPlanState(floorPlanData);
+                                syncSuccessful = true;
+                            } catch (error) {
+                                console.error('Error calling window.saveFloorPlanState:', error);
+                            }
+                        }
+
+                        // Fallback: Direct update to productionState if saveFloorPlanState function isn't available
+                        if (!syncSuccessful && typeof productionState !== 'undefined' && productionState && productionState.name) {
+                            try {
+                                // Store the complete floor plan data under the floorPlan key as expected by stateManagement.js
+                                productionState.floorPlan = JSON.stringify(floorPlanData);
+                                sessionStorage.setItem('productionState', JSON.stringify(productionState));
+                                syncSuccessful = true;
+                            } catch (error) {
+                                console.error('Error updating productionState.floorPlan directly:', error);
+                            }
+                        }
+                        
+                        if (!syncSuccessful) {
+                            console.error('CRITICAL: Floor plan sync completely failed - no method worked');
+                        }
+                        
+                    } catch (error) {
+                        console.error('Failed to parse or sync floor plan state:', error);
+                    }
+                }
+            }
+        }, 1000); // Check every second
+        
+    }
+    
+    // Function to stop monitoring floor plan state changes
+    function stopFloorPlanSync() {
+        if (floorPlanSyncInterval) {
+            clearInterval(floorPlanSyncInterval);
+            floorPlanSyncInterval = null;
+        }
+    }
     
     // Also listen for storage changes in case another tab modifies the session
     window.addEventListener('storage', function(e) {
@@ -586,7 +668,6 @@
         selection.removeAllRanges();
         selection.addRange(range);
         
-        console.log('Production title selected for editing');
       }
     }
     
@@ -820,7 +901,7 @@
 
         //HOME BUTTON - Return to project selection
         $('.home-button').on('click', function() {
-            console.log('Home button clicked');
+
             
             // Show confirmation dialog before proceeding
             showQuestionModal(
@@ -832,9 +913,7 @@
                     console.log('Home button action cancelled by user');
                 },
                 // Close Project callback - proceed with original functionality
-                function() {
-                    console.log('User confirmed closing project');
-                    
+                function() {                    
                     // Clear production state
                     if (typeof clearProductionState === 'function') {
                         clearProductionState();
@@ -844,7 +923,6 @@
                     sessionStorage.removeItem('projectName');
                     
                     // Hide main content and show project selection
-                    console.log('Hiding main content and showing project selection');
                     $('.main-content').hide();
                     $('#logged_out_view').hide();
                     
@@ -857,17 +935,12 @@
                     projectLogin[0].style.setProperty('visibility', 'visible', 'important');
                     projectLogin[0].style.setProperty('opacity', '1', 'important');
                     
-                    console.log('Project login visibility:', projectLogin.is(':visible'));
-                    console.log('Project login display:', projectLogin.css('display'));
-                    console.log('Project login element:', projectLogin.length);
-                    
                     // Clear the project input field
                     $('#projectName').val('');
                     
                     // Reset the page title
                     document.title = 'PaperworkPro';
                     
-                    console.log('Home button transition complete');
                 }
             );
         });
@@ -1536,6 +1609,9 @@
             camCardWindow.document.close();
         });
 
+        // Global reference to floor plan window
+        let floorPlanWindow = null;
+        
         //FLOORPLAN
         $('.floorPlan-button').on('click', function () {
             var productionTitle = $('.production-title').text();
@@ -1576,51 +1652,10 @@
             //If no subjects found, open floor plan directly
             if (subjectList.length === 0) {
                 openFloorPlan(productionTitle, camList, []);
+                
+                startFloorPlanSync();
                 return;
             }
-
-            //UNIQUE INITIAL FEATURE 
-            // //Generate unique initials for subjects
-            // subjectInitials = generateUniqueInitials(subjectList);
-            // console.log('Subject initials:', subjectInitials);
-
-            // //Function to generate unique initials
-            // function generateUniqueInitials(subjects) {
-            //     if (subjects.length === 0) return [];
-            //     if (subjects.length === 1) return [subjects[0].charAt(0)];
-
-            //     const initials = [];
-                
-            //     for (let i = 0; i < subjects.length; i++) {
-            //         const currentSubject = subjects[i];
-            //         let minLength = 1;
-                    
-            //         //Check against all other subjects to find minimum unique length
-            //         for (let j = 0; j < subjects.length; j++) {
-            //             if (i === j) continue; // Skip comparing with itself
-                        
-            //             const otherSubject = subjects[j];
-            //             const maxLength = Math.min(currentSubject.length, otherSubject.length);
-                        
-            //             //Find where the two subjects differ
-            //             for (let k = 0; k <= maxLength; k++) {
-            //                 if (k === maxLength || currentSubject.charAt(k) !== otherSubject.charAt(k)) {
-            //                     minLength = Math.max(minLength, k + 1);
-            //                     break;
-            //                 }
-            //             }
-            //         }
-            //         //Add the unique initial (minimum length needed)
-            //         //If more than 2 letters are needed, display the full subject name
-            //         if (minLength > 2) {
-            //             initials.push(currentSubject);
-            //         } else {
-            //             initials.push(currentSubject.substring(0, minLength));
-            //         }
-            //     }
-                
-            //     return initials;
-            // }
 
             // Populate the modal with checkboxes
             const subjectCheckboxes = document.getElementById('subjectCheckboxes');
@@ -1637,26 +1672,70 @@
             // Show the modal
             const subjectModal = new bootstrap.Modal(document.getElementById('subjectModal'));
             subjectModal.show();
+        });
 
-            //Handle submit button click
-            $('#submitSubjects').on('click', function() {
-                const selectedSubjects = [];
-                subjectList.forEach(subject => {
-                    const checkbox = document.getElementById(`subject_${subject}`);
-                    if (checkbox && checkbox.checked) {
-                        selectedSubjects.push(subject);
-                    }
-                });
-                
-                // Close modal and open floor plan
-                subjectModal.hide();
-                openFloorPlan(productionTitle, camList, selectedSubjects, subjectInitials);
+        // Handle submit button click with event delegation (outside the floor plan button click handler)
+        $(document).on('click', '#submitSubjects', function() {
+            
+            // Get all subjects from the checkboxes in the modal
+            const selectedSubjects = [];
+            $('#subjectCheckboxes .form-check-input:checked').each(function() {
+                selectedSubjects.push($(this).val());
             });
+            
+            
+            // Get the current modal instance and hide it
+            const subjectModal = bootstrap.Modal.getInstance(document.getElementById('subjectModal'));
+            if (subjectModal) {
+                subjectModal.hide();
+            }
+            
+            // Get the production title and data needed for floor plan
+            const productionTitle = $('.production-title').text();
+            let camList = [];
+            let eventInfo = [];
+
+            $('#event-table').find('tr.event_highlighted').each(function() {
+                const row = $(this);
+                const shotCell = row.find('td:nth-child(2)');
+        
+                const cameraNum = shotCell.find('.cameraNum').val() || '';
+                const shotSubject = shotCell.find('.shotSubject').val() || '';
+            
+                //Adds events to the camera array as objects
+                let event = {
+                    cameraNumber: cameraNum,
+                    shotSubject: shotSubject,
+                };  
+                eventInfo.push(event);
+            });
+
+            for(let i = 0; i < eventInfo.length; i++) {
+                let tempCamNum = eventInfo[i].cameraNumber;
+                if(tempCamNum && !(camList.includes(tempCamNum))) {
+                    camList.push(tempCamNum);
+                }
+            }
+            
+            
+            // Open floor plan with selected subjects
+            openFloorPlan(productionTitle, camList, selectedSubjects, []);
+            
+            
+            // Start monitoring floor plan state changes
+            startFloorPlanSync();
+            
         });
 
         // Function to open the floor plan window
         function openFloorPlan(productionTitle, camList, selectedSubjects, subjectInitials) {
+            // Stop any existing sync before opening new floor plan
+            stopFloorPlanSync();
+            
             const floorPlanWindow = window.open('', '_blank');
+            
+            // Store reference to floor plan window globally
+            window.floorPlanWindow = floorPlanWindow;
             floorPlanWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
@@ -1946,9 +2025,9 @@
             `);
             floorPlanWindow.document.close();
             
-            // Initialize everything in one function
+// Initialize everything in one function
             function initializeFloorPlan() {
-                console.log('Starting floor plan initialization...');
+                
                 
                 // Load FontAwesome script
                 const fontAwesomeScript = floorPlanWindow.document.createElement('script');
@@ -1961,8 +2040,7 @@
                 fabricScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js';
                 
                 fabricScript.onload = function() {
-                    console.log('Fabric.js loaded successfully');
-                    
+                                       
                     // Check if Fabric.js is available
                     if (typeof floorPlanWindow.fabric === 'undefined') {
                         console.error('Fabric.js not loaded properly');
@@ -1987,13 +2065,178 @@
                             isDrawingMode: false
                         });
                         
-                        console.log('Fabric.js canvas initialized successfully');
-                        
                         // Store canvas reference
                         floorPlanWindow.canvas = canvas;
                         
-                                        // Set up all event handlers and UI
-                setupFloorPlanUI(canvas);
+                        // Check for existing floor plan state and load it
+                        const savedFloorPlanState = localStorage.getItem('currentFloorPlanState');
+                        if (savedFloorPlanState) {
+                            try {
+                                // Parse the complete floor plan state
+                                const floorPlanData = JSON.parse(savedFloorPlanState);
+                                
+                                // Check if it's the new format with canvas and custom items
+                                if (floorPlanData.canvasJSON && floorPlanData.customItems !== undefined) {
+                                                                        
+                                    // New format: load canvas first, then restore custom items
+                                    if (floorPlanData.canvasJSON && floorPlanData.canvasJSON !== '{}') {
+                                        canvas.loadFromJSON(floorPlanData.canvasJSON, function() {
+                                            canvas.renderAll();
+                                        });
+                                    }
+                                    
+                                    // Restore custom script items after a short delay to ensure DOM is ready
+                                    setTimeout(() => {
+                                        restoreCustomScriptItems(floorPlanData.customItems);
+                                    }, 250);
+                                    
+                                } else {
+                                    // Legacy format: just canvas JSON
+                                    canvas.loadFromJSON(savedFloorPlanState, function() {
+                                        canvas.renderAll();
+                                    });
+                                }
+                            } catch (error) {
+                                console.error('Failed to load floor plan state:', error);
+                                // Try loading as legacy format
+                                try {
+                                    canvas.loadFromJSON(savedFloorPlanState, function() {
+                                        canvas.renderAll();
+                                    });
+                                } catch (legacyError) {
+                                    console.error('Failed to load floor plan state as legacy format:', legacyError);
+                                }
+                            }
+                        }
+                        
+                        
+                    // Function to sync floor plan state with main window
+                    window.syncFloorPlanWithMainWindow = function() {
+                        if (canvas) {
+                            const canvasJSON = JSON.stringify(canvas.toJSON());
+                            
+                            
+                            // Capture custom script items from the scriptItems list
+                            const customItems = captureCustomScriptItems();
+                            
+                            // Create complete floor plan state object
+                            const floorPlanState = {
+                                canvasJSON: canvasJSON,
+                                customItems: customItems
+                            };
+                            
+                            const floorPlanStateJSON = JSON.stringify(floorPlanState);
+                                                        
+                            localStorage.setItem('currentFloorPlanState', floorPlanStateJSON);
+                            localStorage.setItem('floorPlanStateChanged', Date.now().toString());
+                            
+                            
+                            // Call the global saveFloorPlanState function to sync with productionState
+                            if (typeof window.opener !== 'undefined' && window.opener && typeof window.opener.saveFloorPlanState === 'function') {
+                                
+                                window.opener.saveFloorPlanState(floorPlanState);
+                            } else if (typeof parent !== 'undefined' && parent !== window && typeof parent.saveFloorPlanState === 'function') {
+                                
+                                parent.saveFloorPlanState(floorPlanState);
+                            } else {
+                                
+                                // Trigger a custom storage event that the main window can listen for
+                                if (typeof window.opener !== 'undefined' && window.opener) {
+                                    try {
+                                        window.opener.dispatchEvent(new StorageEvent('storage', {
+                                            key: 'floorPlanStateChanged',
+                                            newValue: Date.now().toString(),
+                                            url: window.location.href
+                                        }));
+                                    } catch (e) {
+                                        console.log('Could not dispatch storage event to opener:', e);
+                                    }
+                                }
+                            }
+                            
+                        }
+                    };
+
+                        // Function to capture custom script items added by the user
+                        function captureCustomScriptItems() {
+                            const scriptItems = floorPlanWindow.document.getElementById('scriptItems');
+                            const customItems = [];
+                            
+                            if (scriptItems) {
+                                // Find all li elements that are custom items
+                                const listItems = scriptItems.querySelectorAll('li.option.tool');
+                                
+                                listItems.forEach((item, index) => {
+                                    const itemId = item.id;
+                                    const itemText = item.querySelector('span')?.textContent || itemId;
+                                                                        
+                                    // Include items that are:
+                                    // 1. Not camera items (don't start with 'camera-')
+                                    // 2. Not in the original selectedSubjects list
+                                    // This captures user-added custom subjects
+                                    if (itemId && !itemId.startsWith('camera-') && !selectedSubjects.includes(itemId)) {
+                                        
+                                        customItems.push({
+                                            id: itemId,
+                                            text: itemText
+                                        });
+                                    }
+                                });
+                            } else {
+                                console.error('CUSTOM ITEMS CAPTURE: scriptItems element not found!');
+                            }
+                            
+                            return customItems;
+                        }
+                        
+                        // Function to restore custom script items from saved state
+                        function restoreCustomScriptItems(customItems) {
+                            if (!customItems || customItems.length === 0) {
+                                return;
+                            }
+                            
+                            const scriptItems = floorPlanWindow.document.getElementById('scriptItems');
+                            if (!scriptItems) {
+                                console.error('FLOOR PLAN: Script items container not found');
+                                return;
+                            }
+                            
+                            // Add each custom item as a new list element
+                            customItems.forEach((item, index) => {
+                                // Sanitize the ID to make it safe for HTML
+                                const safeId = item.id.replace(/[^a-zA-Z0-9_-]/g, '_');
+                                
+                                const customItemHTML = `<li class="option tool" id="${safeId}">
+                                    <i class="fa-solid fa-user"></i>
+                                    <span>${item.text}</span>
+                                </li>`;
+                                
+                                // Check if item already exists to avoid duplicates
+                                const existingItem = scriptItems.querySelector(`#${safeId}`);
+                                if (!existingItem) {
+                                    scriptItems.insertAdjacentHTML('beforeend', customItemHTML);
+                                } else {
+                                }
+                            });
+                            
+                        }
+                        
+                        // Save floor plan state when canvas changes
+                        canvas.on('object:added', function(e) {
+                            syncFloorPlanWithMainWindow();
+                        });
+                        canvas.on('object:removed', function(e) {
+                            syncFloorPlanWithMainWindow();
+                        });
+                        canvas.on('object:modified', function(e) {
+                            syncFloorPlanWithMainWindow();
+                        });
+                        canvas.on('path:created', function(e) {
+                            syncFloorPlanWithMainWindow();
+                        });
+                        
+                        // Set up all event handlers and UI
+                        setupFloorPlanUI(canvas);
                 
                 // Configure canvas selection behavior - start in draw mode
                 canvas.selection = false;
@@ -2001,9 +2244,10 @@
                     obj.selectable = false;
                 });
                 
-                // Disable canvas default behaviors for drawing
-                canvas.defaultCursor = 'crosshair';
-                canvas.hoverCursor = 'crosshair';
+                        
+                        // Disable canvas default behaviors for drawing
+                        canvas.defaultCursor = 'crosshair';
+                        canvas.hoverCursor = 'crosshair';
                         
                     } catch (error) {
                         console.error('Error initializing Fabric.js canvas:', error);
@@ -2021,7 +2265,6 @@
             }
             
             function setupFloorPlanUI(canvasInstance) {
-                console.log('Setting up floor plan UI...');
                 
                 if (!canvasInstance) {
                     console.error('Canvas is not available for UI setup');
@@ -2122,7 +2365,6 @@
                     
                     // Update interactive arrow drawing
                     if (selectedTool === "arrow" && currentLine) {
-                        console.log("Updating arrow...");
                         currentLine.set({
                             x2: pointer.x,
                             y2: pointer.y
@@ -2220,7 +2462,6 @@
                     
                     // Handle interactive line and arrow drawing
                     if (selectedTool === "line" || selectedTool === "arrow") {
-                        console.log("Starting to draw:", selectedTool);
                         isDrawing = true;
                         lastPoint = pointer;
                         
@@ -2256,7 +2497,6 @@
 
                 // Shape drawing functions
                 const drawShape = function(shapeType, pointer) {
-                    console.log("Drawing shape:", shapeType, "at", pointer);
                     let shape;
                     
                     switch(shapeType) {
@@ -2420,7 +2660,6 @@
                     toolElement.classList.add("active");
                     toolElement.style.backgroundColor = '#e0e0e0';
                     selectedTool = toolElement.id;
-                    console.log("Selected tool:", selectedTool);
                     
                     // Setup free drawing for pencil/eraser
                     if (drawMode) {
@@ -2473,18 +2712,39 @@
 
                 addSubject.addEventListener("click", () => {
                     const newSubject = floorPlanWindow.document.getElementById("newSub").value;
-
-                    if(scriptItems.innerHTML === "") {
-                        scriptItems.innerHTML = `<li class="option tool" id="${newSubject}">
-                        <i class="fa-solid fa-user"></i>
-                        <span>${newSubject}</span>
-                    </li>`;
-                    } else {
-                        scriptItems.innerHTML += `<br /><li class="option tool" id="${newSubject}">
-                        <i class="fa-solid fa-user"></i>
-                        <span>${newSubject}</span>
-                    </li>`;
+                    
+                    if (newSubject.trim() === '') {
+                        alert('Please enter a subject name');
+                        return;
                     }
+
+                    // Create the new list item using proper DOM methods
+                    const newListItem = floorPlanWindow.document.createElement('li');
+                    newListItem.className = 'option tool';
+                    newListItem.id = newSubject;
+                    
+                    // Create the icon
+                    const icon = floorPlanWindow.document.createElement('i');
+                    icon.className = 'fa-solid fa-user';
+                    
+                    // Create the span with subject text
+                    const span = floorPlanWindow.document.createElement('span');
+                    span.textContent = newSubject;
+                    
+                    // Append icon and span to the list item
+                    newListItem.appendChild(icon);
+                    newListItem.appendChild(span);
+                    
+                    // Append the new list item to the script items container
+                    scriptItems.appendChild(newListItem);
+                    
+                    // Clear the input field
+                    floorPlanWindow.document.getElementById("newSub").value = '';
+                                      
+                    // Trigger floor plan state synchronization after adding the new subject
+                    setTimeout(() => {
+                        syncFloorPlanWithMainWindow();
+                    }, 100);
                 });
 
                 // Mode button event handlers
@@ -2492,7 +2752,6 @@
                     drawMode = true;
                     drawModeBtn.classList.add("active");
                     selectModeBtn.classList.remove("active");
-                    console.log("Switched to Draw Mode");
                     
                     // Disable selection in draw mode
                     canvasInstance.selection = false;
@@ -2512,7 +2771,6 @@
                     drawMode = false;
                     selectModeBtn.classList.add("active");
                     drawModeBtn.classList.remove("active");
-                    console.log("Switched to Select Mode");
                     
                     // Enable selection in select mode
                     canvasInstance.selection = true;
@@ -3098,7 +3356,6 @@
       
       // Only update if the title has actually changed and is not empty
       if (newTitle && newTitle !== sessionStorage.getItem('projectName')) {
-          console.log('Production title changed to:', newTitle);
           
           // Update session storage
           sessionStorage.setItem('projectName', newTitle);
@@ -3111,7 +3368,6 @@
               updateProductionTitle(newTitle);
           }
           
-          console.log('Production title updated in session and state');
       }
   });
 

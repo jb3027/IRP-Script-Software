@@ -169,29 +169,6 @@ function renderLoggedInView(user) {
         }
     }
     
-    // Additional debugging after a short delay to see final state
-    // setTimeout(() => {
-    //     if (loggedOutView) {
-    //         console.log('loggedOutView final state:');
-    //         console.log('- display:', loggedOutView.style.display);
-    //         console.log('- computed display:', window.getComputedStyle(loggedOutView).display);
-    //         console.log('- visible:', loggedOutView.offsetWidth > 0 && loggedOutView.offsetHeight > 0);
-    //     }
-    //     if (projectLogin) {
-    //         console.log('projectLogin final state:');
-    //         console.log('- display:', projectLogin.style.display);
-    //         console.log('- computed display:', window.getComputedStyle(projectLogin).display);
-    //         console.log('- visible:', projectLogin.offsetWidth > 0 && projectLogin.offsetHeight > 0);
-    //         console.log('- getBoundingClientRect:', projectLogin.getBoundingClientRect());
-    //     }
-    //     if (mainContent) {
-    //         console.log('mainContent final state:');
-    //         console.log('- display:', mainContent.style.display);
-    //         console.log('- computed display:', window.getComputedStyle(mainContent).display);
-    //         console.log('- visible:', mainContent.offsetWidth > 0 && mainContent.offsetHeight > 0);
-    //     }
-    // }, 500);
-    
 }
 
 function renderLoggedOutView() {
