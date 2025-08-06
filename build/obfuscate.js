@@ -182,7 +182,7 @@ async function main() {
         process.exit(1);
     }
     
-    const outputDir = `dist/${obfuscationLevel}`;
+    const outputDir = `docs/`;
     
     console.log(`🚀 Starting ${obfuscationLevel} obfuscation...`);
     console.log(`📁 Output directory: ${outputDir}`);
