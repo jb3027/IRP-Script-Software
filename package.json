@@ -7,7 +7,15 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:minify": "node build/obfuscate.js minify",
+    "build:basic": "node build/obfuscate.js basic",
+    "build:advanced": "node build/obfuscate.js advanced",
+    "build:all": "npm run build:minify && npm run build:basic && npm run build:advanced",
+    "compare": "node build/compare-obfuscation.js",
+    "serve:minify": "cd dist/minify && python3 -m http.server 8000",
+    "serve:basic": "cd dist/basic && python3 -m http.server 8080",
+    "serve:advanced": "cd dist/advanced && python3 -m http.server 8080"
   },
   "repository": {
     "type": "git",
@@ -23,5 +31,11 @@
   "homepage": "https://github.com/jb3027/IRP-Script-Software#readme",
   "dependencies": {
     "@kinde-oss/kinde-auth-pkce-js": "^4.3.0"
+  },
+  "devDependencies": {
+    "fs-extra": "^11.3.0",
+    "glob": "^11.0.3",
+    "javascript-obfuscator": "^4.1.1",
+    "terser": "^5.43.1"
   }
 }
