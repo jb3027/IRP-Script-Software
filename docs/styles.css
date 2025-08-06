@@ -12,7 +12,7 @@
     justify-content: center !important;
     align-items: center !important;
     min-height: 100vh !important;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: #05634d !important;
     padding: 20px !important;
     margin: 0 !important;
     position: fixed !important;
@@ -24,8 +24,8 @@
 }
 
 .auth-card {
-    background-color: #ffffff;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    background-color: #fcfdfe;
+    box-shadow: 2px 4px 16px  rgba(0, 224, 131, 0.5);
     border-radius: 12px;
     padding: 40px 30px;
     text-align: center;
@@ -36,7 +36,7 @@
 .app-icon {
     width: 60px;
     height: 60px;
-    background-color: #4c84ff;
+    background-color: #05634d;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -81,25 +81,23 @@
 }
 
 .btn-primary {
-    background-color: #4c84ff;
+    background-color: #05634d;
     color: white;
     border: none;
 }
 
 .btn-primary:hover {
-    background-color: #3366ff;
+    background-color: #2bc198;
     transform: translateY(-1px);
 }
 
 .btn-secondary {
     background-color: transparent;
-    color: #4c84ff;
-    border: 2px solid #4c84ff;
+    color: #05634d;
+    border: 2px solid #04503e;
 }
 
 .btn-secondary:hover {
-    background-color: #4c84ff;
-    color: white;
     transform: translateY(-1px);
 }
 
@@ -125,7 +123,7 @@
     justify-content: center !important;
     align-items: center !important;
     min-height: 100vh !important;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: linear-gradient(135deg, #05634d 0%, #2dc295 50%, #073229 100%) !important;
     padding: 20px !important;
     margin: 0 !important;
     position: fixed !important;
@@ -166,7 +164,7 @@
 
 .project-input:focus {
     outline: none;
-    border-color: #4c84ff;
+    border-color: #05634d;
     background-color: white;
     box-shadow: 0 0 0 3px rgba(76, 132, 255, 0.1);
 }
@@ -193,7 +191,7 @@
 
 .project-select:focus {
     outline: none;
-    border-color: #4c84ff;
+    border-color: #05634d;
     background-color: white;
     box-shadow: 0 0 0 3px rgba(76, 132, 255, 0.1);
 }
@@ -227,7 +225,7 @@
 
 .project-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(76, 132, 255, 0.3);
+    box-shadow: 0 4px 12px #05634d;
 }
 
 /* Load and style OpenDyslexic font */
@@ -313,34 +311,34 @@
 
   /* EVENT COLOUR  */
   tr.event_highlighted td:not(:last-child) {
-    background-color: rgba(100, 181, 246, 0.4) !important; 
+    background-color: #073229 !important; 
     position: relative;
   }
   /* INSERT COLOUR  */
   tr.insert_highlighted td:not(:last-child) {
-    background-color: rgba(149, 117, 205, 0.4) !important; 
+    background-color: #00e083 !important; 
     position: relative;
   }
   /* ITEM COLOUR */
   tr.item_highlighted td:not(:last-child) {
-    background-color: rgba(255, 183, 77, 0.4) !important; 
+    background-color: rgba(141, 255, 123, 0.4) !important; 
     position: relative;
   }
 
   /* EVENT HIGHLIGHT */
   tr.event_highlighted::after {
-    outline: 2px solid rgba(2, 114, 250, 0.6) !important;
-    box-shadow: 0 0 2px rgba(58, 118, 214, 0.3) !important;
+    outline: 2px solid #094639 !important;
+    box-shadow: 0 0 2px rgba(1, 54, 32, 0.3) !important;
   }
   /* INSERT HIGHLIGHT */
   tr.insert_highlighted::after {
-    outline: 2px solid rgba(147, 2, 230, 0.6) !important;
-    box-shadow: 0 0 2px rgba(141, 36, 149, 0.3) !important;
+    outline: 2px solid #00e083 !important;
+    box-shadow: 0 0 2px #002013 !important;
   }
   /* ITEM HIGHLIGHT */
   tr.item_highlighted::after {
-    outline: 2px solid rgb(255, 221, 0) !important;
-    box-shadow: 0 0 2px rgba(250, 222, 41, 0.3) !important;
+    outline: 2px solid rgba(141, 255, 123, 0.4) !important;
+    box-shadow: 0 0 2px rgba(57, 50, 0, 0.3) !important;
   }
 
   /* INSERT */
