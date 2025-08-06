@@ -31,7 +31,7 @@ Your JavaScript obfuscation system is now fully configured and ready to use for 
 # Build obfuscated version for production
 npm run build:advanced
 
-# Your obfuscated files will be in dist/advanced/
+# Your obfuscated files will be in docs/ so they can be served by GH Pages
 # Upload these files to your GitHub Pages repository
 ```
 
@@ -63,19 +63,10 @@ npm run serve:advanced
 
 After running any build command:
 ```
-dist/
-├── minify/          # Basic minification
-│   ├── index.html   # Your complete application
-│   ├── scripts/     # Minified JS files
-│   └── ...
-├── basic/           # Standard obfuscation  
-│   ├── index.html   # Your complete application
-│   ├── scripts/     # Obfuscated JS files
-│   └── ...
-└── advanced/        # Maximum protection
-    ├── index.html   # Your complete application  
-    ├── scripts/     # Heavily obfuscated JS files
-    └── ...
+docs/
+├── index.html   # Your complete application  
+├── scripts/     # Obfuscated and /or minified JS files
+└── ...
 ```
 
 ## 🔒 What Gets Protected
