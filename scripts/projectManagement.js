@@ -58,7 +58,10 @@ function createNewProduction() {
     const projectName = "New Production";
     sessionStorage.setItem('projectName', projectName);
     
-    // Hide project login and show main content
+    // Clear all existing data and start fresh
+    clearAllProductionData();
+    
+    // Hide project login and show main content immediately
     $('#project-login').hide();
     $('.main-content').show();
     $('.production-title').text(projectName);
@@ -71,9 +74,91 @@ function createNewProduction() {
     setTimeout(() => {
         initializeProductionState(projectName);
         
+        // Clear any existing camera card notes from previous projects
+        if (typeof clearCameraCardNotes === 'function') {
+            clearCameraCardNotes(projectName);
+        }
+        
         // Auto-select the production title for easy editing
         selectProductionTitle();
     }, 100);
+}
+
+function clearAllProductionData() {
+    // Clear the script table
+    const eventTable = document.getElementById('event-table');
+    if (eventTable && eventTable.querySelector('tbody')) {
+        eventTable.querySelector('tbody').innerHTML = '';
+    }
+    
+    // Clear any running order data
+    const runningOrderTable = document.getElementById('runningOrder-table');
+    if (runningOrderTable && runningOrderTable.querySelector('tbody')) {
+        runningOrderTable.querySelector('tbody').innerHTML = '';
+    }
+    
+    // Clear any view mode content
+    const viewContent = document.getElementById('view-content');
+    if (viewContent) {
+        viewContent.innerHTML = '';
+    }
+    
+    // Clear any camera cards content
+    const cameraCardsContent = document.getElementById('camera-cards-content');
+    if (cameraCardsContent) {
+        cameraCardsContent.innerHTML = '';
+    }
+    
+    // Clear any floor plan content
+    const floorPlanContent = document.getElementById('floor-plan-content');
+    if (floorPlanContent) {
+        floorPlanContent.innerHTML = '';
+    }
+    
+    // Clear any form inputs in the main content area
+    const inputs = document.querySelectorAll('.main-content input, .main-content textarea, .main-content select');
+    inputs.forEach(input => {
+        if (input.type === 'text' || input.type === 'textarea' || input.type === 'select-one') {
+            input.value = '';
+        } else if (input.type === 'checkbox' || input.type === 'radio') {
+            input.checked = false;
+        }
+    });
+    
+    // Clear any contenteditable elements
+    const contentEditableElements = document.querySelectorAll('[contenteditable="true"]');
+    contentEditableElements.forEach(element => {
+        if (element.classList.contains('production-title')) {
+            // Don't clear the production title as it's set to "New Production"
+            return;
+        }
+        element.textContent = '';
+    });
+    
+    // Clear any dropdowns or modals that might be open
+    $('.dropdown .options').removeClass('active');
+    $('.modal').modal('hide');
+    
+    // Reset any global state variables if they exist
+    if (typeof window.undoRedoManager !== 'undefined' && window.undoRedoManager.clearHistory) {
+        window.undoRedoManager.clearHistory();
+    }
+    
+    // Clear any localStorage or sessionStorage data related to the previous project
+    const keysToRemove = [];
+    for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key && (key.includes('production') || key.includes('script') || key.includes('camera') || key.includes('floorPlan'))) {
+            keysToRemove.push(key);
+        }
+    }
+    keysToRemove.forEach(key => {
+        if (key !== 'projectName' && key !== 'isKindeLoggedIn') {
+            sessionStorage.removeItem(key);
+        }
+    });
+    
+    console.log('All production data cleared - starting fresh!');
 }
 
 function loadExistingProduction() {

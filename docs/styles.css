@@ -1,3 +1,4 @@
+/* Font fallbacks - Coolvetica not available, using system fonts */
 /* Load and style OpenDyslexic font */
 @font-face {
     font-family: 'OpenDyslexic';
@@ -6,13 +7,857 @@
     font-style: normal;
 }
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    background: var(--primary-bg);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
+}
+
+/* GAIALITH Paperwork PRO Brand Colors */
+:root {
+    --primary-bg: #f5f5f5; /* Off-white background */
+    --secondary-bg: #f5f5f5; /* Same as primary for continuity */
+    --accent-green: #35c29a; /* Bright green accent */
+    --accent-green-hover: #2bc198; /* Darker green for hover */
+    --text-white: #333333; /* Dark text for light background */
+    --text-light: #666666; /* Medium gray text */
+    --border-color: #cccccc; /* Light gray borders */
+    --shadow-color: rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    --table-bg: rgba(255, 255, 255, 0.8); /* Semi-transparent white for tables */
+    --table-text: #333333; /* Dark text for tables */
+    --table-header: #e0e0e0; /* Light gray for headers */
+    --table-border: #cccccc; /* Light gray borders */
+    --main-text: rgb(6, 19, 1); /* Off-black colour for accessibility */
+    
+    /* New sidebar and navigation colors */
+    --sidebar-bg: rgba(7, 50, 41, 0.95); /* Almost black with transparency */
+    --sidebar-hover: rgba(53, 194, 154, 0.1); /* Bright green hover */
+    --sidebar-active: rgba(53, 194, 154, 0.2); /* Bright green active */
+    --sidebar-border: rgba(7, 50, 41, 0.95); /* Dark green border */
+    --nav-bg: rgba(7, 50, 41, 0.98); /* Almost black navigation */
+    --nav-border: rgba(53, 194, 154, 0.2); /* Bright green border */
+    
+    /* Login page colors */
+    --login-bg: #073229; /* Dark dark green for login */
+    --login-secondary: #0a4a3a; /* Slightly lighter teal for login */
+}
+
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    background: var(--sidebar-bg);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--sidebar-border);
+    z-index: 10000;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none; /* Removed drop shadow */
+}
+
+.sidebar.collapsed {
+    width: 80px !important;
+    overflow: hidden !important; /* Prevent content from spilling out */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    position: fixed !important; /* Keep fixed positioning to prevent shifting */
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid var(--sidebar-border);
+    position: relative; /* Positioning context for toggle button */
+}
+
+.sidebar-logo {
+    width: 40px;
+    height: 40px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-white);
+    font-size: 18px;
+    transition: all 0.3s ease;
+    flex-shrink: 0; /* Prevent squishing */
+}
+
+.sidebar.collapsed .sidebar-logo {
+    width: 40px; /* Keep same size */
+    height: 40px; /* Keep same size */
+    font-size: 18px; /* Keep same font size */
+}
+
+.sidebar-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 0;
+    transition: all 0.3s ease;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50vh;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 1000;
+}
+
+.sidebar-toggle:hover {
+    color: var(--accent-green);
+}
+
+.sidebar.collapsed .sidebar-toggle {
+    left: 50%;
+    right: auto;
+    top: 50vh;
+    transform: translate(-50%, -50%);
+}
+
+.sidebar.collapsed .sidebar-toggle i {
+    transform: rotate(180deg);
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebar.collapsed .sidebar-nav {
+    display: none !important;
+}
+
+.sidebar.collapsed .nav-list {
+    display: none !important;
+}
+
+.sidebar.collapsed .nav-item {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    margin: 0 !important;
+}
+
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    margin: 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Left align text */
+    padding: 16px 20px;
+    color: #ffffff; /* White text for dark sidebar */
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    position: relative;
+}
+
+.nav-link:hover {
+    background: var(--sidebar-hover);
+    color: var(--accent-green);
+    border-left-color: var(--accent-green);
+}
+
+.nav-link.active {
+    background: var(--sidebar-active);
+    color: var(--accent-green);
+    border-left-color: var(--accent-green);
+}
+
+.nav-link i {
+    display: none; /* Hide icons in expanded sidebar */
+    width: 0; /* No width when hidden */
+    height: 0; /* No height when hidden */
+    margin-right: 0; /* No margin when hidden */
+    font-size: 18px;
+    transition: all 0.3s ease;
+}
+
+/* Ensure icons are hidden only when sidebar is NOT collapsed */
+.sidebar:not(.collapsed) .nav-link i {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+.nav-text {
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.sidebar.collapsed .nav-text {
+    opacity: 0;
+    transform: translateX(-20px);
+    pointer-events: none; /* Prevent interference with icon positioning */
+}
+
+.sidebar.collapsed .nav-link {
+    padding: 16px 0 !important; /* Remove horizontal padding to center properly */
+    justify-content: center !important;
+    width: 100% !important; /* Ensure full width for centering */
+    text-align: center !important; /* Center text content */
+    margin: 0 !important; /* Remove any margins */
+    position: relative !important; /* Ensure proper positioning context for absolute icons */
+    left: 0 !important; /* Reset any left positioning */
+    right: 0 !important; /* Reset any right positioning */
+    z-index: 9998 !important; /* High z-index to prevent covering */
+    overflow: visible !important; /* Ensure content is visible */
+    min-height: 48px !important; /* Ensure minimum height for visibility */
+}
+
+/* Hide icons when sidebar is collapsed */
+.sidebar.collapsed .sidebar-nav .nav-list .nav-item .nav-link i {
+    display: none !important; /* Hide icons when collapsed */
+}
+
+
+
+
+
+/* Hide nav items when collapsed */
+.sidebar.collapsed .nav-item {
+    display: none !important;
+}
+
+/* Force flexbox centering for nav links */
+.sidebar.collapsed .nav-link {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    flex-direction: column !important;
+}
+
+
+
+
+
+/* Sidebar Content Area */
+.sidebar-content {
+    padding: 20px;
+    border-top: 1px solid var(--sidebar-border);
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100vh - 200px);
+}
+
+/* Sidebar Dropdown Styles */
+.sidebar-dropdown {
+    position: relative;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--sidebar-border);
+    border-top: none; /* Remove top border to eliminate gap */
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10001;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-top: 0; /* Ensure no margin interference */
+    top: 0; /* Remove any top spacing */
+}
+
+.sidebar-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    max-height: 300px;
+    transform: none;
+}
+
+.dropdown-content {
+    padding: 0 0 8px 0; /* Remove top padding to eliminate gap */
+}
+
+.dropdown-content .camera-option {
+    padding: 12px 16px 12px 32px; /* Indent the text like in the image */
+    color: #ffffff; /* Pure white text for visibility on dark background */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    background: var(--sidebar-bg); /* Use sidebar background */
+    width: 100%;
+    text-align: left;
+    font-size: 13px; /* Slightly smaller like in the image */
+    font-weight: 400; /* Less bold like in the image */
+}
+
+.dropdown-content .camera-option:hover {
+    background-color: #2bc198;
+    color: #ffffff; /* Pure white text on hover */
+}
+
+.dropdown-content .camera-option:not(:last-child) {
+    border-bottom: 1px solid var(--sidebar-border); /* Use site border color */
+}
+
+/* Ensure dropdown follows sidebar styling */
+.sidebar-dropdown {
+    background: var(--sidebar-bg) !important;
+    border-color: var(--sidebar-border) !important;
+}
+
+/* Alternative way to show dropdown when parent nav-item has active child */
+.nav-item:has(.nav-link[data-page="camera-cards"].active) .sidebar-dropdown {
+    opacity: 1 !important;
+    visibility: visible !important;
+    max-height: 300px !important;
+    transform: none !important;
+    display: block !important;
+}
+
+/* Position the dropdown relative to the nav item */
+.nav-item {
+    position: relative;
+    overflow: visible; /* Ensure dropdown is not clipped */
+}
+
+/* Dropdown arrow styling */
+.dropdown-arrow {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+    font-size: 12px;
+    color: #ffffff; /* Ensure arrow is visible */
+}
+
+.nav-link[data-page="camera-cards"].active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Show dropdown when camera cards tab is active */
+.nav-link[data-page="camera-cards"].active + .sidebar-dropdown {
+    opacity: 1 !important;
+    visibility: visible !important;
+    max-height: 300px !important;
+    transform: none !important;
+    display: block !important; /* Force display */
+}
+
+/* Active state styling for camera cards tab */
+.nav-link[data-page="camera-cards"].active {
+    background: var(--sidebar-hover); /* Use hover background instead of solid color */
+    color: var(--accent-green); /* Keep green text color like hover state */
+    position: relative;
+}
+
+/* Left bar indicator for active camera cards tab */
+.nav-link[data-page="camera-cards"].active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent-green);
+    border-radius: 0 2px 2px 0;
+}
+
+.sidebar-content h3 {
+    color: var(--text-white);
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.sidebar-content p {
+    color: var(--text-light);
+    margin-bottom: 15px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Camera Cards Sidebar Styles */
+.camera-cards-sidebar {
+    color: var(--text-white);
+}
+
+.sidebar-camera-options {
+    margin-top: 15px;
+}
+
+.sidebar-camera-options .btn {
+    width: 100%;
+    margin-bottom: 8px;
+    text-align: left;
+    padding: 10px 15px;
+    background: var(--accent-green);
+    color: var(--text-white);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sidebar-camera-options .btn:hover {
+    background: var(--accent-green-hover);
+    transform: translateY(-1px);
+}
+
+/* Running Order Sidebar Styles */
+.running-order-sidebar {
+    color: var(--text-white);
+}
+
+.sidebar-running-order-table {
+    margin-top: 15px;
+    overflow-x: auto;
+}
+
+.sidebar-running-order-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.sidebar-running-order-table th,
+.sidebar-running-order-table td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid var(--border-color);
+}
+
+.sidebar-running-order-table th {
+    background: var(--accent-green);
+    color: var(--text-white);
+    font-weight: 600;
+}
+
+/* View Mode Sidebar Styles */
+.view-mode-sidebar {
+    color: var(--text-white);
+}
+
+.sidebar-view-table {
+    margin-top: 15px;
+    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.sidebar-view-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.sidebar-view-table td {
+    padding: 4px 2px;
+    text-align: left;
+    border: none;
+    background: transparent;
+}
+
+.sidebar-view-table .pdf-button {
+    background: var(--accent-green);
+    color: var(--text-white);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-view-table .pdf-button:hover {
+    background: var(--accent-green-hover);
+}
+
+/* Content Wrapper */
+.content-wrapper {
+    margin-left: 280px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100vh;
+    background: var(--primary-bg);
+    background-attachment: fixed; /* Ensure background is fixed */
+    box-shadow: none; /* Remove any drop shadows */
+    border: none; /* Remove any borders */
+    outline: none; /* Remove any outlines */
+}
+
+.sidebar.collapsed + .content-wrapper {
+    margin-left: 80px;
+}
+
+/* Responsive content wrapper */
+@media (max-width: 1200px) {
+    .content-wrapper {
+        margin-left: 80px;
+    }
+    
+    .sidebar.collapsed + .content-wrapper {
+        margin-left: 80px;
+    }
+}
+
+@media (max-width: 768px) {
+    .content-wrapper {
+        margin-left: 0;
+    }
+    
+    .sidebar.collapsed + .content-wrapper {
+        margin-left: 0;
+    }
+}
+
+/* Page Container */
+.page-container {
+    padding-top: 40px; /* Reduced from 140px to 40px (moved up by 100px) */
+    min-height: calc(100vh - 40px);
+    box-shadow: none; /* Remove any drop shadows */
+    background: transparent; /* Ensure no background */
+    border: none; /* Remove any borders */
+    padding-left: 20px; /* Add left padding to prevent cutoff */
+    padding-right: 20px; /* Add right padding to prevent cutoff */
+}
+
+.page-content {
+    display: none;
+    padding: 20px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.page-content.active {
+    display: block;
+}
+
+.page-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.page-header h2 {
+    color: var(--text-white);
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.page-header p {
+    color: var(--text-light);
+    font-size: 16px;
+}
+
+/* Home page specific styles */
+#home-page .production-title-container {
+    margin-top: 0;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#home-page .production-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text-white);
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#home-page .production-title:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+#home-page .square {
+    display: none; /* Hide the old square element */
+}
+
+#home-page .container {
+    margin-top: 0;
+}
+
+/* New home page welcome styles */
+.home-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.welcome-icon {
+    width: 120px;
+    height: 120px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+    font-size: 48px;
+    color: var(--text-white);
+    box-shadow: 0 8px 32px var(--shadow-color);
+}
+
+.home-welcome h1 {
+    color: var(--text-white);
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+
+.home-welcome p {
+    color: var(--text-light);
+    font-size: 20px;
+    margin-bottom: 40px;
+    max-width: 500px;
+    line-height: 1.6;
+}
+
+.welcome-actions {
+    margin-top: 20px;
+}
+
+.welcome-actions .btn {
+    padding: 16px 32px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.welcome-actions .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px var(--shadow-color);
+}
+
+/* Script page specific styles */
+#script-page .production-title-container {
+    margin-top: 0;
+    text-align: left; /* Left align text */
+    margin-bottom: 30px;
+    padding-left: 0; /* Remove left padding to align with table */
+}
+
+#script-page .production-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--login-bg) !important; /* Dark green text color from login background */
+    padding: 20px 20px 20px 0; /* Remove left padding to align with table */
+    background: rgba(255, 255, 255, 0.9); /* Light background for contrast */
+    border-radius: 12px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Left align text */
+    margin-left: 20px; /* Keep left margin to align with table content */
+}
+
+#script-page .production-title:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+#script-page .square {
+    display: none; /* Hide the old square element */
+}
+
+#script-page .container {
+    margin-top: 0;
+    padding: 0 20px; /* Add horizontal padding to prevent cutoff */
+    max-width: none; /* Remove max-width constraint */
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+    background: transparent; /* Ensure no background */
+    border: none; /* Remove any borders */
+    box-shadow: none; /* Remove any shadows */
+}
+
+/* Table specific styles to prevent cutoff */
+#script-page .draggable-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    background: transparent; /* Remove table background for seamless look */
+    border-radius: 0; /* Remove border radius for seamless look */
+    overflow: visible; /* Allow content to be visible */
+}
+
+#script-page .draggable-table th,
+#script-page .draggable-table td {
+    padding: 12px;
+    text-align: left;
+    border: none; /* Remove borders for seamless look */
+}
+
+#script-page .draggable-table th:not(:last-child) {
+    background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--nav-bg) 100%) !important; /* Modern gradient background */
+    color: #f5f5f5 !important; /* Off-white text for modern look */
+    font-weight: 700 !important;
+    border-radius: 8px 8px 0 0; /* Modern rounded top corners */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* Subtle shadow for depth */
+    padding: 16px 20px !important; /* Increased padding for modern look */
+}
+
+/* Style for the last header column in script page - empty and not colored */
+#script-page .draggable-table th:last-child {
+    background: transparent !important; /* No background */
+    color: transparent !important; /* No text color */
+    border: none !important; /* No border */
+    box-shadow: none !important; /* No shadow */
+    padding: 16px 20px !important; /* Keep consistent padding */
+}
+
+
+
+#script-page .draggable-table td {
+    background: rgba(255, 255, 255, 0.05) !important; /* Subtle background for modern look */
+    color: var(--table-text);
+    border-radius: 4px; /* Subtle rounded corners */
+    margin: 2px 0; /* Add spacing between rows */
+}
+
+/* View page specific styles */
+.view-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.view-container h2 {
+    color: var(--text-white);
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+.view-table-container {
+    background: transparent; /* Remove background for seamless look */
+    border: none; /* Remove border for seamless look */
+    border-radius: 0; /* Remove border radius for seamless look */
+    padding: 20px;
+    overflow-x: auto;
+    margin-top: 100px !important;
+}
+
+/* Running order page specific styles */
+.running-order-preview,
+.camera-cards-preview,
+.floor-plan-preview {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.running-order-preview h3,
+.camera-cards-preview h3,
+.floor-plan-preview h3 {
+    color: var(--text-white);
+    margin-bottom: 16px;
+    font-size: 24px;
+}
+
+.running-order-preview p,
+.camera-cards-preview p,
+.floor-plan-preview p {
+    color: var(--text-light);
+    margin-bottom: 24px;
+    font-size: 16px;
+}
+
+/* Button styles for preview pages */
+.preview-pages .btn.button2 {
+    background: var(--accent-green);
+    border-color: var(--accent-green);
+    color: var(--text-white);
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.preview-pages .btn.button2:hover {
+    background: var(--accent-green-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    
+    .content-wrapper {
+        margin-left: 0;
+    }
+    
+    .sidebar.collapsed + .content-wrapper {
+        margin-left: 0;
+    }
+}
+
 /* Authentication Container - Only active when showing auth view */
 .auth-container:not([style*="display: none"]) {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     min-height: 100vh !important;
-    background: #05634d !important;
+    background: var(--login-bg) !important;
     padding: 20px !important;
     margin: 0 !important;
     position: fixed !important;
@@ -24,25 +869,26 @@
 }
 
 .auth-card {
-    background-color: #fcfdfe;
-    box-shadow: 2px 4px 16px  rgba(0, 224, 131, 0.5);
+    background-color: var(--login-secondary);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     border-radius: 12px;
     padding: 40px 30px;
     text-align: center;
     width: 100%;
     max-width: 400px;
+    border: 1px solid var(--accent-green);
 }
 
 .app-icon {
     width: 60px;
     height: 60px;
-    background-color: #05634d;
+    background-color: var(--accent-green);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 20px;
-    color: white;
+    color: var(--text-white);
     font-size: 24px;
 }
 
@@ -50,12 +896,12 @@
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 8px;
-    color: #1a1a1a;
+    color: #ffffff;
 }
 
 .app-subtitle {
     font-size: 16px;
-    color: #666;
+    color: var(--accent-green);
     margin-bottom: 32px;
     line-height: 1.4;
 }
@@ -81,24 +927,28 @@
 }
 
 .btn-primary {
-    background-color: #05634d;
-    color: white;
+    background-color: var(--accent-green);
+    color: var(--text-white);
     border: none;
 }
 
 .btn-primary:hover {
-    background-color: #2bc198;
+    background-color: var(--accent-green-hover);
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .btn-secondary {
     background-color: transparent;
-    color: #05634d;
-    border: 2px solid #04503e;
+    color: var(--accent-green);
+    border: 2px solid var(--accent-green);
 }
 
 .btn-secondary:hover {
+    background-color: var(--accent-green);
+    color: var(--text-white);
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .security-note {
@@ -106,15 +956,15 @@
     align-items: center;
     justify-content: center;
     padding: 12px 16px;
-    background-color: #f8fafc;
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 6px;
     font-size: 14px;
-    color: #64748b;
+    color: var(--text-light);
 }
 
 .security-note i {
     margin-right: 8px;
-    color: #10b981;
+    color: var(--accent-green);
 }
 
 /* Project Container - Similar styling to auth container */
@@ -123,7 +973,7 @@
     justify-content: center !important;
     align-items: center !important;
     min-height: 100vh !important;
-    background: linear-gradient(135deg, #05634d 0%, #2dc295 50%, #073229 100%) !important;
+    background: var(--login-bg) !important;
     padding: 20px !important;
     margin: 0 !important;
     position: fixed !important;
@@ -135,13 +985,14 @@
 }
 
 .project-card {
-    background-color: #ffffff;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    background-color: var(--login-secondary);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     border-radius: 12px;
     padding: 40px 30px;
     text-align: center;
     width: 100%;
     max-width: 400px;
+    border: 1px solid var(--accent-green);
 }
 
 .project-form {
@@ -155,57 +1006,59 @@
 .project-input {
     width: 100%;
     padding: 14px 16px;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 16px;
     transition: all 0.2s ease;
-    background-color: #f9fafb;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-white);
 }
 
 .project-input:focus {
     outline: none;
-    border-color: #05634d;
-    background-color: white;
-    box-shadow: 0 0 0 3px rgba(76, 132, 255, 0.1);
+    border-color: var(--accent-green);
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 3px var(--shadow-color);
 }
 
 .project-input::placeholder {
-    color: #9ca3af;
+    color: var(--text-light);
 }
 
 .project-select {
     width: 100%;
     padding: 14px 16px;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 16px;
     transition: all 0.2s ease;
-    background-color: #f9fafb;
+    background-color: rgba(255, 255, 255, 0.1);
     cursor: pointer;
     appearance: none;
-    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23666" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%2300e083" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 12px;
+    color: var(--text-white);
 }
 
 .project-select:focus {
     outline: none;
-    border-color: #05634d;
-    background-color: white;
-    box-shadow: 0 0 0 3px rgba(76, 132, 255, 0.1);
+    border-color: var(--accent-green);
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 3px var(--shadow-color);
 }
 
 .project-select:disabled {
-    background-color: #f3f4f6;
-    color: #9ca3af;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-light);
     cursor: not-allowed;
 }
 
 .project-select option {
     padding: 10px;
-    background-color: white;
-    color: #1f2937;
+    background-color: var(--secondary-bg);
+    color: var(--text-white);
 }
 
 .project-btn {
@@ -225,704 +1078,64 @@
 
 .project-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px #05634d;
+    box-shadow: 0 4px 12px var(--shadow-color);
 }
-
-/* Load and style OpenDyslexic font */
-@font-face {
-    font-family: 'OpenDyslexic';
-    src: url('lib/libraries/fonts/OpenDyslexic-Regular.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-  }
 
 /* --------------- MAIN CONTENT ------------------ */
-  body {
+body {
     padding-top: 20px;
-    /* Remove !important from font-family */
-    font-family: Arial, 'OpenDyslexic', sans-serif;
-    /*Off-white background colour and dark blue text colour for accessibility */
-    background-color: #f8f8f8 !important;
-    color: rgb(16, 16, 16) !important;
-    line-height: 1.5; /* Increased line space for accessibility */
-  }
+    font-family: 'coolvetica', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--primary-bg) !important; /* Use seamless background */
+    color: var(--text-white) !important;
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
 
-  .main-content {
+.main-content {
     display: none;
     width: device-width;
-  }
+    padding: 70px 20px 80px 20px; /* Reduced top padding from 120px to 70px to move content up */
+    max-width: none; /* Remove max-width constraint */
+    margin: 0; /* Remove auto margins for left alignment */
+    font-family: 'coolvetica', sans-serif;
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--main-text);
+    text-align: left;
+    position: relative;
+    z-index: 1;
+    background: transparent; /* Ensure no background */
+    border: none; /* Remove any borders */
+    box-shadow: none; /* Remove any shadows */
+}
 
-  /* ---------------- TABLE ------------ */
+/* ---------------- TABLE ------------ */
 
-  table {
-    width: 794px !important;
-    table-layout: fixed;
-    margin: 0 auto;
-    background-color: #f8f8f8 !important;
-    color: rgb(16, 16, 16) !important;
+table {
+    width: 100% !important; /* Use full width to prevent cutoff */
+    table-layout: auto; /* Allow dynamic column sizing */
+    margin: 20px 0; /* Add vertical margin for modern spacing */
+    background-color: transparent !important;
+    color: var(--main-text) !important;
     border-collapse: separate !important;
-    border-spacing: 0 10px;
-  }
+    border-spacing: 0 2px; /* Keep original spacing */
+    border-radius: 0; /* Remove border radius for seamless look */
+    overflow: visible; /* Allow content to be visible */
+}
 
-  /* HEADER */
-  thead tr {
-      border-radius: 12px;
-      overflow: hidden;
-  }
-
-  thead tr th:not(:last-child) {
-      /* better contrast for accessibility */
-      background-color: #2c3e50 !important;
-      color: #ffffff !important;
-      border-radius: 12px 12px 0 0;
-      
-      /* Text styling for better readability */
-      text-align: center !important;
-      vertical-align: middle !important;
-      height: 56px !important;
-      line-height: 1.6 !important;
-      font-weight: 700 !important;
-      text-transform: uppercase !important;
-      font-size: 1rem !important;
-      letter-spacing: 0.7px !important;
-      border-bottom: 3px solid #34495e !important;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
-      padding: 12px 16px !important;
-  }
-
-
-  .event-table thead tr th:last-child {
-      background-color: transparent !important;
-  }
-
-  /*--------------------- CELL DESIGN ----------------------*/
-  /* DEFAULT */
-  tr td {
-    background-color: #f8f8f8 !important;
-    color: rgb(16, 16, 16) !important;
-    vertical-align: top !important;
-    font-weight: 500 !important;
-  }
-
-  /* DEFAULT PADDING */
-  tr td:not(:last-child) {
-      padding: 10px;
-  }
-
-  /* EVENT COLOUR  */
-  tr.event_highlighted td:not(:last-child) {
-    background-color: #073229 !important; 
-    position: relative;
-  }
-  /* INSERT COLOUR  */
-  tr.insert_highlighted td:not(:last-child) {
-    background-color: #00e083 !important; 
-    position: relative;
-  }
-  /* ITEM COLOUR */
-  tr.item_highlighted td:not(:last-child) {
-    background-color: rgba(141, 255, 123, 0.4) !important; 
-    position: relative;
-  }
-
-  /* EVENT HIGHLIGHT */
-  tr.event_highlighted::after {
-    outline: 2px solid #094639 !important;
-    box-shadow: 0 0 2px rgba(1, 54, 32, 0.3) !important;
-  }
-  /* INSERT HIGHLIGHT */
-  tr.insert_highlighted::after {
-    outline: 2px solid #00e083 !important;
-    box-shadow: 0 0 2px #002013 !important;
-  }
-  /* ITEM HIGHLIGHT */
-  tr.item_highlighted::after {
-    outline: 2px solid rgba(141, 255, 123, 0.4) !important;
-    box-shadow: 0 0 2px rgba(57, 50, 0, 0.3) !important;
-  }
-
-  /* INSERT */
-  .insertTitle::placeholder,
-  .insertIn::placeholder,
-  .insertOut::placeholder,
-  .item-content::placeholder {
-      color: rgb(16, 16, 16) !important;
-  }
-
-  .item-content {
-      border: none !important; 
-      margin-left: -3px;
-      background-color: transparent !important;
-      text-decoration: underline;
-      width: auto;
-      min-width: 85%;
-      max-width: 85%;
-      height: auto;
-      overflow: visible;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      padding: 4px 8px;
-      box-sizing: border-box;
-  }
-
-  /* REMOVE CELL BORDERS */
-  tr.event_highlighted td,
-  tr.insert_highlighted td,
-  tr.item_highlighted td {
-    border: none !important; 
-  }
-  tr.event_highlighted,
-  tr.insert_highlighted,
-  tr.item_highlighted {
-    position: relative;
-  }
-
-  /* HOVER EFFECT */
-  tr.event_highlighted:hover td:not(:last-child),
-  tr.insert_highlighted:hover td:not(:last-child),
-  tr.item_highlighted:hover td:not(:last-child),
-  tr.insert_highlighted:hover .insert-duration-container {
-    background-color: rgba(248, 248, 248, 0.9) !important;
-    transition: background-color 0.2s ease;
-  }
-
-  /* STRUCTURE */
-  tr.event_highlighted::after,
-  tr.insert_highlighted::after,
-  tr.item_highlighted::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 90px;
-    bottom: 0;
+/* HEADER */
+thead tr {
     border-radius: 12px;
-    pointer-events: none;
-    transition: all 0.2s ease-in-out;
-  }
-
-  /* ROUND EDGES */
-  tr.event_highlighted td:first-child,
-  tr.insert_highlighted td:first-child,
-  tr.item_highlighted td:first-child {
-    border-top-left-radius: 12px;
-    border-bottom-left-radius: 12px;
-  }
-
-  tr.event_highlighted td:nth-child(4),
-  tr.insert_highlighted td:nth-child(4),
-  tr.item_highlighted td:nth-child(4) {
-    border-top-right-radius: 12px;
-    border-bottom-right-radius: 12px;
-  }
-
-  /* EDITABLE CELL STYLING */
-  .editable-cell,
-  .editable-text,
-  div[contenteditable] {
-      outline: none !important;
-      border: none !important;
-      min-height: 24px;
-      vertical-align: top !important;
-      height: auto;
-      min-height: 24px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      overflow: visible;
-      resize: vertical;
-      padding: 4px 8px;
-      width: 100%;
-      box-sizing: border-box;
-  }
-
-  tr.event_highlighted .editable-cell,
-  tr.event_highlighted .editable-text,
-  tr.event_highlighted div[contenteditable] {
-      background-color: inherit !important;
-  }
-
-  /* EDITABLE INSERT CELLS */
-  tr.insert_highlighted .editable-cell,
-  tr.insert_highlighted .editable-text,
-  tr.insert_highlighted div[contenteditable] {
-      background-color: inherit !important;
-      border: 0px solid rgb(255, 214, 235);
-  }
-
-  /* SHOT TYPE USER INPUT */
-  .shot-type-select {
-      width: fit-content;
-      text-align: left;
-      border: none;
-      outline: none;
-      background-color: none !important;
-  }
-
-  
-  .shot-type-select option {
-    background-color: white !important;
-    color: rgb(16, 16, 16) !important;
-    padding: 8px !important;
-  }
-
-  /* DROP DOWN OPEN */
-  .shot-type-select:focus {
-    background-color: rgba(240, 240, 240, 0.3) !important;
-  }
-
-  /* -------------------- NAV BAR ---------------------------*/
-  
-  ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  li {
-    float: none;
-  }
-
-  .nav-toolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #2c3e50 !important;
-      padding: 12px 24px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      width: 100%;
-      box-sizing: border-box;
-      z-index: 1000;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-
-  .toolbar-group {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-  }
-
-  .toolbar-group.left {
-      margin-right: auto;
-  }
-
-  .toolbar-group.right {
-      margin-left: auto;
-      justify-content: flex-end;
-  }
-
-  .toolbar-group.logout-container {
-      flex-shrink: 0;
-  }
-
-  .toolbar-group.dynamic-buttons {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-  }
-
-  /* ---------------- BUTTONS ----------- */
-  .button2 {
-      background-color: transparent !important;
-      color: #ecf0f1 !important;
-      padding: 5px 10px;
-      border-radius: 4px;
-      border: 1px solid transparent;
-      text-align: center !important;
-      font-weight: 600 !important;
-      text-transform: uppercase !important;
-      font-size: 0.9rem !important;
-      letter-spacing: 0.5px !important;
-      line-height: 1.4 !important;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-  }
-
-  .button3 .createCamCard-button {
-      position: absolute;
-      top: 70px;
-      width: 100%;
-      overflow: hidden;
-      display: none;
-      color: default;
-      background-color: #fff;
-      padding: 10px 20px;
-      cursor: pointer;
-  }
-
-  .button3.createCamCard-button:hover {
-    background: #62baea;
-    color: #fff;
-  }
-
-  .dropdown {
-    position: relative;
-    width: 175px;
-    height: 50px;
-    top: 9px;
-    margin-right: -45px;
-  }
-
-  .dropdown::before {
-      content: "";
-      background-color: inherit !important;
-      position: absolute;
-      top: 14px;
-      z-index: 1000;
-      width: 8px;
-      height: 8px;
-      border: 2px solid #333;
-      border-top: 2px solid #fff;
-      border-right: 2px solid #fff;
-      transform: rotate(-45deg);
-      transition: 0.5s;
-      pointer-events: none;
-  }
-
-  .dropdown.active::before {
-      top: 12px;
-      transform: rotate(-225deg);
-  }
-
-  .dropdown input {
-      position: absolute;
-      background-color: inherit !important;
-      color: #ffffff !important;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-      font-size: inherit;
-      border: none;
-      outline: none;
-      padding: 12px 20px;
-      border-radius: 10px;
-  }
-
-  .dropdown input::placeholder {
-      color: #ffffff !important;
-      opacity: 1;
-  }
-
-  .dropdown input::-webkit-input-placeholder {
-      color: #ffffff !important;
-      opacity: 1;
-  }
-
-  .dropdown input::-moz-placeholder {
-      color: #ffffff !important;
-      opacity: 1;
-  }
-
-  .dropdown .options {
-      position: absolute;
-      right: 18px;
-      top: 53px;
-      width: 100%;
-      overflow: hidden;
-      display: none;
-  }
-
-  .dropdown.active .options {
-      display: block;
-  }
-
-  .dropdown .options div {
-      padding: 12px 20px;
-      cursor: pointer;
-  }
-
-  .dropdown .options div:hover {
-      background: #62baea;
-      color: #fff;
-  }
-
-  .addSubject-button,
-  .submitSubject-button,
-  .btn-success {
-    background: #62baea;
-    color: #fff;
-  }
-
-  .addSubject-button:hover,
-  .submitSubject-button:hover,
-  .btn-success:hover {
-    background: #fff;
-    color: #0e0e0e;
-  }
-
-  /* EVENT BUTTON */
-  .button2 .event-button:hover {
-      background-color: rgba(100, 181, 246, 0.4) !important; 
-  }
-  /* ITEM BUTTON */
-  .button2 .item-button:hover {
-      background-color: rgba(255, 183, 77, 0.4) !important; 
-  }
-  /* INSERT BUTTON */
-  .button2 .insert-button:hover {
-      background-color: rgba(149, 117, 205, 0.4) !important; 
-  }
-
-  .button2.primary {
-      background-color: #3498db !important;
-  }
-
-  .button2.primary:hover {
-      background-color: #2980b9 !important;
-  }
-
-  .button2.warning {
-      background-color: #e74c3c !important;
-  }
-
-  .button2.warning:hover {
-      background-color: #c0392b !important;
-  }
-
-  .button2.addEvent-button:hover {
-    background-color: rgba(100, 181, 246, 0.4) !important;
-    border-color: rgba(100, 181, 246, 0.6) !important;
+    overflow: hidden;
+    border: none !important;
 }
 
-.button2.addItem-button:hover {
-    background-color: rgba(255, 183, 77, 0.4) !important;
-    border-color: rgba(255, 183, 77, 0.6) !important;
-}
-
-.button2.addInsert-button:hover {
-    background-color: rgba(149, 117, 205, 0.4) !important;
-    border-color: rgba(149, 117, 205, 0.6) !important;
-}
-
-.button2:not(.addEvent-button):not(.addItem-button):not(.addInsert-button):hover {
-    background-color: rgba(255,255,255,0.1) !important;
-    border-color: rgba(255,255,255,0.2);
-}
-
-  /* ---------------------------------------------------------*/
-
-  .editable-cell:not(.production-title),
-  .editable-text:not(.production-title),
-  div[contenteditable]:not(.production-title) {
-    display: block;
-    width: 100%;
-    position: relative;
-    user-select: text; 
-    background-color: rgba(244, 244, 244, 0.3) !important;
-    outline: 0px !important;
-  }
-
-  .editable-cell span {
-    display: inline-block;
-    position: relative;
-    width: 100%;
-  }
-
-  .editable-cell span::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 3px;
-    width: 100%;
-    height: 1px;
-    background-color: black;
-    outline: 1px solid blue;
-  }
-
-  .shot-type-flex-container {
-      display: flex;
-      align-items: center;
-      gap: 2px; 
-  }
-  
-  .shot-type-text {
-      flex-grow: 1;
-      margin-left: 8px;
-  }
-  
-  .shot-type-dropdown {
-      flex-shrink: 0;
-      margin-right: 4px;
-  }
-
-  .shotSubject {
-      flex: 1; 
-      min-width: 0; 
-      color: rgb(16, 16, 16) !important;
-  }
-
-  /* CUSTOM SHOT TYPE */
-  .custom-shot-type {
-    width: 100%;
-    border: 0.5px solid rgb(155, 180, 203);
-    border-radius: 8px;
-    background-color: inherit !important;
-    color: rgb(16, 16, 16) !important;
-    padding: 2px 6px;
-    display: none;
-}
-
-  /* PLACEHOLDER TEXT */
-  .shotSubject::placeholder, 
-  .cameraNum::placeholder,
-  .cameraPos::placeholder,
-  .extraInfo::placeholder {
-      color: rgb(16, 16, 16) !important;
-  }
-
-  .shotSubject::-moz-placeholder,
-  .cameraNum::-moz-placeholder,
-  .cameraPos::-moz-placeholder,
-  .extraInfo::-moz-placeholder {
-      color: rgb(16, 16, 16) !important;
-  }
-
-  .modal-dialog {
-    margin-top: 15%;
-    text-align: center;
-  }
-  .modal-footer {
-    justify-content: center !important;
-    text-align: center;
-    gap: 15px;
-  }
-
-  /* USER INPUT DURATION */
-  .insert-duration-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      margin: 0 auto;
-      background-color: inherit !important; 
-  }
-
-  .insert-duration-container > * {
-      display: inline-block;
-      vertical-align: middle;
-      margin: 0;
-      background-color: inherit !important; 
-  }
-
-  .insertDuration {
-      padding-right: 4px !important;
-      text-align: right !important;
-      background-color: black !important;
-  }
-
-  /* --------- VIEW MODE ---------- */
-  .view-mode .insert-duration-container {
-      display: flex;
-      justify-content: center;
-      text-align: center;
-  }
-
-  .view-mode .insertDuration {
-      padding-right: 4px;
-  }
-
-  /* ----------- TITLE ---------- */
-  .production-title-container {
-      text-align: left;
-      padding: 10px 0;
-      margin-top: 30px;
-      margin-bottom: -80px;
-      margin-left: 165px;
-  }
-
-  .production-title {
-      font-size: 24px;
-      font-weight: bold;
-      padding: 8px 16px;
-      border-radius: 4px;
-      display: inline-block;
-      background-color: #f8f8f8 !important;
-      outline: none !important;
-      border: none !important;
-      color: rgb(16, 16, 16) !important;
-  }
-
-  /* ------------ ACTION BUTTONS -------------- */
-  .row-actions {
-      display: flex;
-      gap: 4px;
-      justify-content: center;
-      align-items: center;
-      opacity: 0.6;
-      transition: opacity 0.2s ease;
-      height: 100%; 
-      padding: 8px 0;
-  }
-
-  .row-actions:hover {
-      opacity: 1;
-  }
-
-  td:last-child {
-      vertical-align: middle !important; 
-      position: relative; 
-  }
-
-  .row-button {
-      width: 28px;
-      height: 28px;
-      padding: 0;
-      border: none;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      background: transparent;
-      color: #2c3e50; 
-  }
-
-  .row-button.drag {
-      color: #ffffff;
-      background-color: #0c0c0c; 
-  }
-
-  .row-button.drag:hover {
-      background-color: #34ca0b; 
-  }
-
-  .row-button.remove {
-      color: #ffffff;
-      background-color: #0c0c0c;   
-  }
-
-  .row-button.remove:hover {
-      background-color: #ed0606; 
-  }
-
-  /* -------------- DRAGGING ------------- */
-  tr.dragging {
-      opacity: 0.5;
-      background-color: #e3e3e3;
-  }
-  
-  tbody tr {
-      cursor: default;  
-  }
-
-  .row-button.drag {
-      cursor: move;  
-  }
-
-    /* Change styling of last header column in running order */
-    #runningOrder-table thead tr th:last-child {
-    /* better contrast for accessibility */
-    background-color: #2c3e50 !important;
-    color: #ffffff !important;
-    border-radius: 12px 12px 0 0;
-
-    /* Text styling for better readability */
+thead tr th:not(:last-child) {
+    background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--nav-bg) 100%) !important; /* Modern gradient background */
+    color: #f5f5f5 !important; /* Off-white text for modern look */
+    border-radius: 8px 8px 0 0; /* Modern rounded top corners */
+    
     text-align: center !important;
     vertical-align: middle !important;
     height: 56px !important;
@@ -931,99 +1144,2159 @@
     text-transform: uppercase !important;
     font-size: 1rem !important;
     letter-spacing: 0.7px !important;
-    border-bottom: 3px solid #34495e !important;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
-    padding: 12px 16px !important;
-    }
+    padding: 16px 20px !important; /* Increased padding for modern look */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* Subtle shadow for depth */
+    position: relative !important;
+    overflow: hidden !important;
+    transition: none !important; /* Disable hover transitions */
+}
 
-    #event-table, #runningOrder-table {
-    width: 1140px !important;
+/* Style for the last header column - empty and not colored */
+thead tr th:last-child {
+    background: transparent !important; /* No background */
+    color: transparent !important; /* No text color */
+    border: none !important; /* No border */
+    box-shadow: none !important; /* No shadow */
+    padding: 16px 20px !important; /* Keep consistent padding */
+}
+
+/* Header hover effect disabled to prevent movement */
+thead tr th:not(:last-child):hover {
+    background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--nav-bg) 100%) !important;
+    transform: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    transition: none !important;
+}
+
+.event-table thead tr th:last-child {
+    background-color: transparent !important;
+}
+
+/*--------------------- CELL DESIGN ----------------------*/
+/* DEFAULT */
+tr td {
+    background-color: rgba(255, 255, 255, 0.05) !important; /* Subtle background for modern look */
+    color: var(--main-text) !important; /* Use main-text for table content */
+    vertical-align: top !important;
+    font-weight: 500 !important;
+    border-radius: 4px; /* Restore original rounded corners */
+    margin: 2px 0; /* Restore original margin */
+}
+
+/* DEFAULT PADDING */
+tr td:not(:last-child) {
+    padding: 10px;
+}
+
+/* EVENT COLOUR - Full background color */
+tr.event_highlighted {
+    transition: all 0.3s ease;
+}
+
+tr.event_highlighted:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3);
+}
+
+/* Apply background to first 4 columns (EVENT NUMBER, SHOT, SCRIPT, DETAILS) */
+#event-table tr.event_highlighted td:nth-child(1) {
+    background: linear-gradient(to right, rgba(126, 205, 201, 0.17), rgba(126, 205, 201, 0.17)) !important; /* Full mint/teal on left */
+}
+#event-table tr.event_highlighted td:nth-child(2) {
+    background: linear-gradient(to right, rgba(126, 205, 201, 0.17), rgba(126, 205, 201, 0.12)) !important; /* Mint/teal fading to lighter */
+}
+#event-table tr.event_highlighted td:nth-child(3) {
+    background: linear-gradient(to right, rgba(126, 205, 201, 0.12), rgba(126, 205, 201, 0.07)) !important; /* Lighter mint/teal fading to very light */
+}
+#event-table tr.event_highlighted td:nth-child(4) {
+    background: linear-gradient(to right, rgba(126, 205, 201, 0.07), transparent) !important; /* Very light mint/teal fading to transparent */
+}
+
+/* Leftmost cell - left border only with neon effect */
+#event-table tr.event_highlighted td:nth-child(1) {
+    border-left: 4px solid #7ECDC9 !important; /* Light mint/teal left border */
+    box-shadow: -4px 0 8px rgba(126, 205, 201, 0.6) !important; /* Neon mint glow effect */
+}
+
+/* Left border only on first column */
+#event-table tr.event_highlighted td:nth-child(1) {
+    border-left: 4px solid #7ECDC9 !important; /* Light mint/teal left border */
+    border-top-left-radius: 8px !important; /* More curved top-left corner */
+    border-bottom-left-radius: 8px !important; /* More curved bottom-left corner */
+}
+
+/* INSERT COLOUR - Full background color */
+tr.insert_highlighted {
+    transition: all 0.3s ease;
+}
+
+tr.insert_highlighted:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(224, 160, 128, 0.3);
+}
+
+/* Apply background to first 4 columns (EVENT NUMBER, SHOT, SCRIPT, DETAILS) */
+#event-table tr.insert_highlighted td:nth-child(1) {
+    background: linear-gradient(to right, rgba(224, 160, 128, 0.15), rgba(224, 160, 128, 0.15)) !important; /* Full orange/terracotta on left */
+}
+#event-table tr.insert_highlighted td:nth-child(2) {
+    background: linear-gradient(to right, rgba(224, 160, 128, 0.15), rgba(224, 160, 128, 0.1)) !important; /* Orange/terracotta fading to lighter */
+}
+#event-table tr.insert_highlighted td:nth-child(3) {
+    background: linear-gradient(to right, rgba(224, 160, 128, 0.1), rgba(224, 160, 128, 0.05)) !important; /* Lighter orange/terracotta fading to very light */
+}
+#event-table tr.insert_highlighted td:nth-child(4) {
+    background: linear-gradient(to right, rgba(224, 160, 128, 0.05), transparent) !important; /* Very light orange/terracotta fading to transparent */
+}
+
+/* Leftmost cell - left border only with neon effect */
+#event-table tr.insert_highlighted td:nth-child(1) {
+    border-left: 4px solid #E0A080 !important; /* Orange/terracotta left border */
+    box-shadow: -4px 0 8px rgba(224, 160, 128, 0.6) !important; /* Neon orange glow effect */
+}
+
+/* Left border only on first column */
+#event-table tr.insert_highlighted td:nth-child(1) {
+    border-left: 4px solid #E0A080 !important; /* Orange/terracotta left border */
+    border-top-left-radius: 8px !important; /* More curved top-left corner */
+    border-bottom-left-radius: 8px !important; /* More curved bottom-left corner */
+}
+
+/* ITEM COLOUR - Full background color */
+tr.item_highlighted {
+    transition: all 0.3s ease;
+}
+
+tr.item_highlighted:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(48, 96, 112, 0.3);
+}
+
+/* Apply background to first 4 columns (EVENT NUMBER, SHOT, SCRIPT, DETAILS) */
+#event-table tr.item_highlighted td:nth-child(1) {
+    background: linear-gradient(to right, rgba(48, 96, 112, 0.13), rgba(48, 96, 112, 0.13)) !important; /* Full dark blue/teal on left */
+}
+#event-table tr.item_highlighted td:nth-child(2) {
+    background: linear-gradient(to right, rgba(48, 96, 112, 0.13), rgba(48, 96, 112, 0.08)) !important; /* Dark blue/teal fading to lighter */
+}
+#event-table tr.item_highlighted td:nth-child(3) {
+    background: linear-gradient(to right, rgba(48, 96, 112, 0.08), rgba(48, 96, 112, 0.03)) !important; /* Lighter dark blue/teal fading to very light */
+}
+#event-table tr.item_highlighted td:nth-child(4) {
+    background: linear-gradient(to right, rgba(48, 96, 112, 0.03), transparent) !important; /* Very light dark blue/teal fading to transparent */
+}
+
+/* Leftmost cell - left border only */
+#event-table tr.item_highlighted td:nth-child(1) {
+    border-left: 4px solid #306070 !important; /* Dark blue/teal left border */
+    box-shadow: -4px 0 8px rgba(48, 96, 112, 0.6) !important; /* Neon dark blue glow effect */
+}
+
+/* Remove duplicate rule */
+
+/* Make item content display inline */
+.item-cell-container {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+}
+
+/* Camera Card Full Page Styles */
+.camera-card-full-page {
+    max-width: 1200px;
     margin: 0 auto;
-    table-layout: fixed;
-    }
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
-    #event-table th, #event-table td,
-    #runningOrder-table th {
-    border: 1px solid black;
+.camera-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--accent-green);
+}
+
+.camera-card-header h2 {
+    margin: 0;
+    color: var(--text-white);
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.camera-card-content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.camera-card-preview .camera-header {
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+    margin: 20px 0 30px 0;
+    color: #000;
+    padding-bottom: 15px;
+    border-bottom: 3px solid var(--accent-green);
+}
+
+.camera-card-preview .shot-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+}
+
+.camera-card-preview .shot-table th {
+    background-color: var(--accent-green);
+    color: white;
+    border: 1px solid #000;
+    padding: 15px 12px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.camera-card-preview .shot-table td {
+    border: 1px solid #000;
+    padding: 12px 10px;
+    text-align: left;
+    vertical-align: top;
+    font-size: 13px;
+    background: white;
+}
+
+.camera-card-preview .shot-table th:nth-child(1) { width: 15%; }
+.camera-card-preview .shot-table th:nth-child(2) { width: 15%; }
+.camera-card-preview .shot-table th:nth-child(3) { width: 40%; }
+.camera-card-preview .shot-table th:nth-child(4) { width: 30%; }
+
+.camera-card-preview .print-button {
+    background: var(--accent-green);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.camera-card-preview .print-button:hover {
+    background: var(--accent-green-hover);
+}
+
+/* Print styles for camera cards */
+@media print {
+    .camera-card-full-page {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+    }
+    
+    .camera-card-header {
+        border-bottom: 2px solid #000;
+    }
+    
+    .camera-card-preview .camera-header {
+        border-bottom: 3px solid #000;
+    }
+    
+    .camera-card-preview .shot-table th {
+        background-color: #f0f0f0 !important;
+        color: #000 !important;
+    }
+}
+
+/* Camera Card Specific Styling - Completely Isolated from Main Script Table */
+#camera-cards-page .camera-card-table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    background: white !important;
+}
+
+#camera-cards-page .camera-card-thead {
+    background: transparent !important;
+}
+
+#camera-cards-page .camera-card-header-row {
+    background: transparent !important;
+}
+
+#camera-cards-page .camera-card-th {
+    background-color: #f0f0f0 !important;
+    border: 1px solid #000 !important;
+    padding: 12px 8px !important;
+    text-align: center !important;
+    font-weight: bold !important;
+    font-size: 14px !important;
+    color: black !important;
+    background-image: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Force override any existing CSS */
+#camera-cards-page .camera-card-th[style*="background-color"] {
+    background-color: #f0f0f0 !important;
+}
+
+#camera-cards-page .camera-card-th[style*="color"] {
+    color: black !important;
+}
+
+.camera-card-tbody {
+    background: transparent !important;
+}
+
+.camera-card-row {
+    background: white !important;
+}
+
+.camera-card-td {
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+    text-align: left !important;
+    vertical-align: top !important;
+    font-size: 11px !important;
+    color: black !important;
+    background: white !important;
+    background-image: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Override any conflicting styles from main script table */
+.camera-card-table .camera-card-th,
+.camera-card-table .camera-card-td {
+    background-color: inherit !important;
+    border: inherit !important;
+    color: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    text-align: inherit !important;
+    padding: inherit !important;
+    margin: inherit !important;
+    border-radius: inherit !important;
+    box-shadow: inherit !important;
+    transform: inherit !important;
+    transition: inherit !important;
+}
+
+/* INSERT */
+.insertTitle::placeholder,
+.insertIn::placeholder,
+.insertOut::placeholder,
+.item-content::placeholder {
+    color: var(--main-text) !important; 
+}
+
+.item-content {
+    border: none; 
+    margin-left: -3px;
+    background-color: transparent !important;
+    text-decoration: underline;
+    width: auto;
+    min-width: 85%;
+    max-width: 85%;
+    height: auto;
+    overflow: visible;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    padding: 4px 8px;
+    box-sizing: border-box;
+    color: var(--main-text) !important;
+}
+
+/* REMOVE CELL BORDERS */
+tr.event_highlighted td,
+tr.insert_highlighted td,
+tr.item_highlighted td {
+    border: none !important; 
+}
+tr.event_highlighted,
+tr.insert_highlighted,
+tr.item_highlighted {
+    position: relative;
+}
+
+
+
+
+
+
+
+/* EDITABLE CELL STYLING */
+.editable-cell,
+.editable-text,
+div[contenteditable] {
+    outline: none !important;
+    border: none !important;
+    min-height: 24px;
+    vertical-align: top !important;
+    height: auto;
+    min-height: 24px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: visible;
+    resize: vertical;
+    padding: 4px 8px;
+    width: 100%;
+    box-sizing: border-box;
+    color: var(--main-text) !important; /* Use main-text for insert text boxes */
+}
+
+/* Event editable cells now handled by the comprehensive rule above */
+
+/* Insert editable cells now handled by the comprehensive rule above */
+
+/* Insert editable cells now handled by the comprehensive rule above */
+
+/* Item editable cells now handled by the comprehensive rule above */
+
+/* Ensure all form elements within colored rows inherit backgrounds (excluding last column) */
+tr.event_highlighted td:not(:last-child) input,
+tr.event_highlighted td:not(:last-child) select,
+tr.event_highlighted td:not(:last-child) textarea,
+tr.event_highlighted td:not(:last-child) .editable-cell,
+tr.event_highlighted td:not(:last-child) .editable-text,
+tr.event_highlighted td:not(:last-child) div[contenteditable] {
+    background-color: transparent !important; /* Transparent to show cell background */
+    border: none !important; /* No borders */
+}
+
+tr.insert_highlighted td:not(:last-child) input,
+tr.insert_highlighted td:not(:last-child) select,
+tr.insert_highlighted td:not(:last-child) textarea,
+tr.insert_highlighted td:not(:last-child) .editable-cell,
+tr.insert_highlighted td:not(:last-child) .editable-text,
+tr.insert_highlighted td:not(:last-child) div[contenteditable] {
+    background-color: transparent !important; /* Transparent to show cell background */
+    border: none !important; /* No borders */
+}
+
+tr.item_highlighted td:not(:last-child) input,
+tr.item_highlighted td:not(:last-child) .editable-text,
+tr.item_highlighted td:not(:last-child) div[contenteditable] {
+    background-color: transparent !important; /* Transparent to show cell background */
+    border: none !important; /* No borders */
+}
+
+/* SHOT TYPE USER INPUT */
+.shot-type-select {
+    width: fit-content;
+    text-align: left;
+    border: none;
+    outline: none;
+    background-color: transparent !important;
+    color: var(--main-text) !important; /* Changed from text-white to main-text for better contrast */
+    display: flex !important; /* Ensure flex display for proper alignment */
+}
+
+/* Ensure shot type select inherits row background */
+tr.event_highlighted td:not(:last-child) .shot-type-select {
+    background-color: transparent !important; /* Transparent to show cell background */
+}
+
+/* SHOT SUBJECT TEXTAREA */
+.shotSubject {
+    min-height: 30px !important;
+    height: auto !important;
+    line-height: 1.2 !important;
+    overflow: hidden !important;
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
+    resize: none !important;
+    max-height: none !important; /* Remove any max-height constraints */
+    display: flex !important; /* Use flex display to align with shot type dropdown */
+    flex-shrink: 0 !important; /* Prevent flexbox from shrinking the textarea */
+    background-color: transparent !important; /* Allow background to show through */
+    border: none !important;
+    outline: none !important;
+}
+
+/* Ensure shot subject inherits row background */
+tr.event_highlighted td:not(:last-child) .shotSubject {
+    background-color: transparent !important; /* Transparent to show cell background */
+}
+
+.shot-type-select option {
+    background-color: var(--secondary-bg) !important;
+    color: var(--text-white) !important;
+    padding: 8px !important;
+}
+
+/* DROP DOWN OPEN */
+.shot-type-select:focus {
+    background-color: rgba(126, 205, 201, 0.2) !important; /* Light mint/teal focus to match event theme */
+}
+
+/* -------------------- NAV BAR ---------------------------*/
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    float: none;
+}
+
+/* ---------------- BUTTONS ----------- */
+.button2 {
+    background: transparent !important;
+    color: var(--text-white) !important;
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    text-align: center !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    font-size: 0.8rem !important;
+    letter-spacing: 0.5px !important;
+    line-height: 1.4 !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-width: 100px;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.button2:hover {
+    background: rgba(74, 253, 203, 0.1) !important;
+    border-color: var(--accent-green) !important;
+    transform: translateY(-1px);
+}
+
+.button2.primary {
+    background: var(--accent-green) !important;
+    color: var(--main-text) !important;
+    border-color: var(--accent-green) !important;
+}
+
+.button2.primary:hover {
+    background: var(--accent-green-hover) !important;
+    transform: translateY(-1px);
+}
+
+/* Navigation bar spacing fixed - no more conflicts */
+
+/* Navigation Bar - Modern Design with Glassmorphism */
+.nav-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--nav-bg);
+    backdrop-filter: blur(20px);
+    padding: 20px 24px;
+    position: fixed;
+    top: 0;
+    left: 280px; /* Default position when sidebar is open */
+    right: 0;
+    height: 80px;
+    z-index: 9999;
+    box-shadow: none; /* Removed drop shadow */
+    border-bottom: 1px solid var(--nav-border);
+    border-radius: 0 0 20px 20px;
+    box-sizing: border-box;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Adjust navigation bar position when sidebar is collapsed */
+.sidebar.collapsed ~ .content-wrapper .nav-toolbar,
+.sidebar.collapsed + .content-wrapper .nav-toolbar {
+    left: 80px;
+}
+
+/* Ensure nav toolbar buttons are always visible regardless of sidebar state */
+.nav-toolbar {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
+}
+
+.nav-toolbar .toolbar-group {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
+}
+
+.nav-toolbar .btn,
+.nav-toolbar .button2,
+.nav-toolbar .dropdown {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: inline-flex !important;
+}
+
+/* Mobile navigation toggle */
+.nav-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--text-white);
+    font-size: 20px;
+    cursor: pointer;
     padding: 8px;
-    }
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
 
-    .view-mode #event-table {
+.nav-toggle:hover {
+    background: var(--sidebar-hover);
+}
+
+/* Responsive navigation */
+@media (max-width: 1200px) {
+    .nav-toolbar {
+        left: 80px;
+        right: 0;
+    }
+    
+    .sidebar.collapsed ~ .content-wrapper .nav-toolbar,
+    .sidebar.collapsed + .content-wrapper .nav-toolbar {
+        left: 80px;
+    }
+    
+    .mode-nav-toolbar {
+        left: 80px;
+        right: 0;
+    }
+    
+    .sidebar.collapsed ~ .content-wrapper .mode-nav-toolbar,
+    .sidebar.collapsed + .content-wrapper .mode-nav-toolbar {
+        left: 80px;
+    }
+    
+    .toolbar-group.center,
+    .toolbar-group.formatting {
+        display: none;
+    }
+    
+    .nav-toggle {
+        display: block;
+    }
+    
+    .nav-toolbar .toolbar-group.left {
+        flex: 1;
+        justify-content: flex-start;
+    }
+    
+    .nav-toolbar .toolbar-group.right {
+        flex: 0 0 auto;
+    }
+}
+
+/* Mode Navigation Bar - Styled like the image */
+.mode-nav-toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    padding: 16px 24px;
+    position: fixed;
+    top: 80px; /* Position below the main nav-toolbar */
+    left: 280px; /* Default position when sidebar is open */
+    right: 0;
+    height: 60px;
+    z-index: 9998;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 12px 12px;
+    box-sizing: border-box;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Adjust mode navigation toolbar position when sidebar is collapsed */
+.sidebar.collapsed ~ .content-wrapper .mode-nav-toolbar,
+.sidebar.collapsed + .content-wrapper .mode-nav-toolbar {
+    left: 80px;
+}
+
+/* COMPLETELY SEPARATE NAV BAR DROPDOWN STYLING - NO SIDEBAR INHERITANCE */
+.mode-nav-toolbar .dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Kill ALL arrows from general dropdown rules */
+.mode-nav-toolbar .dropdown::before,
+.mode-nav-toolbar .dropdown::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Nav bar dropdown options - COMPLETELY INDEPENDENT STYLING */
+.mode-nav-toolbar .dropdown .options {
+    position: absolute !important;
+    top: 100% !important;
+    left: 3px !important;
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+    border: 1px solid #ddd !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    z-index: 10000 !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
+    display: none;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+/* OVERRIDE ANY CSS VARIABLES */
+.mode-nav-toolbar .dropdown .options {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+}
+
+/* Nav bar dropdown buttons - COMPLETELY INDEPENDENT STYLING */
+.mode-nav-toolbar .dropdown .options button,
+.mode-nav-toolbar .dropdown .options .createCamCard-button,
+.mode-nav-toolbar .dropdown .options .btn,
+.mode-nav-toolbar .dropdown .options .button3 {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    border: none !important;
+    color: #333 !important;
+    padding: 8px 12px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    text-align: left !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: background-color 0.2s ease !important;
+    display: block !important;
+}
+
+/* FORCE HOVER OVERRIDE - Override any inherited hover styles */
+.mode-nav-toolbar .dropdown .options .button3:hover,
+.mode-nav-toolbar .dropdown .options .createCamCard-button:hover,
+.mode-nav-toolbar .dropdown .options .btn:hover,
+.mode-nav-toolbar .dropdown .options button:hover {
+    background: var(--accent-green) !important;
+    background-color: var(--accent-green) !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* ULTRA AGGRESSIVE HOVER OVERRIDE - Force green background */
+.mode-nav-toolbar .dropdown .options .button3:hover,
+.mode-nav-toolbar .dropdown .options .createCamCard-button:hover,
+.mode-nav-toolbar .dropdown .options .btn:hover,
+.mode-nav-toolbar .dropdown .options button:hover,
+.mode-nav-toolbar .dropdown .options .button3:hover *,
+.mode-nav-toolbar .dropdown .options .createCamCard-button:hover *,
+.mode-nav-toolbar .dropdown .options .btn:hover *,
+.mode-nav-toolbar .dropdown .options button:hover * {
+    background: var(--accent-green) !important;
+    background-color: var(--accent-green) !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Nav bar dropdown hover - COMPLETELY INDEPENDENT STYLING */
+.mode-nav-toolbar .dropdown .options button:hover,
+.mode-nav-toolbar .dropdown .options .createCamCard-button:hover,
+.mode-nav-toolbar .dropdown .options .btn:hover,
+.mode-nav-toolbar .dropdown .options .button3:hover {
+    background: var(--accent-green) !important;
+    background-color: var(--accent-green) !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+    color: white !important;
+}
+
+/* FORCE HOVER BACKGROUND - Override any inherited background styles */
+.mode-nav-toolbar .dropdown .options button:hover,
+.mode-nav-toolbar .dropdown .options .createCamCard-button:hover,
+.mode-nav-toolbar .dropdown .options .btn:hover,
+.mode-nav-toolbar .dropdown .options .button3:hover {
+    background: var(--accent-green) !important;
+    background-color: var(--accent-green) !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* ULTRA SPECIFIC HOVER OVERRIDE - Target exact HTML structure */
+#camera-cards-mode-btn + .dropdown .options button:hover,
+#camera-cards-mode-btn ~ .dropdown .options button:hover,
+#camera-cards-mode-btn .dropdown .options button:hover,
+#camera-cards-mode-btn + .dropdown .options .createCamCard-button:hover,
+#camera-cards-mode-btn ~ .dropdown .options .createCamCard-button:hover,
+#camera-cards-mode-btn .dropdown .options .createCamCard-button:hover,
+#camera-cards-mode-btn + .dropdown .options .btn:hover,
+#camera-cards-mode-btn ~ .dropdown .options .btn:hover,
+#camera-cards-mode-btn .dropdown .options .btn:hover,
+#camera-cards-mode-btn + .dropdown .options .button3:hover,
+#camera-cards-mode-btn ~ .dropdown .options .button3:hover,
+#camera-cards-mode-btn .dropdown .options .button3:hover {
+    background: var(--accent-green) !important;
+    background-color: var(--accent-green) !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* FORCE HOVER BACKGROUND - Override any inherited background styles */
+#camera-cards-mode-btn + .dropdown .options button:hover,
+#camera-cards-mode-btn ~ .dropdown .options button:hover,
+#camera-cards-mode-btn .dropdown .options button:hover,
+#camera-cards-mode-btn + .dropdown .options .createCamCard-button:hover,
+#camera-cards-mode-btn ~ .dropdown .options .createCamCard-button:hover,
+#camera-cards-mode-btn .dropdown .options .createCamCard-button:hover,
+#camera-cards-mode-btn + .dropdown .options .btn:hover,
+#camera-cards-mode-btn ~ .dropdown .options .btn:hover,
+#camera-cards-mode-btn .dropdown .options .btn:hover,
+#camera-cards-mode-btn + .dropdown .options .button3:hover,
+#camera-cards-mode-btn ~ .dropdown .options .button3:hover,
+#camera-cards-mode-btn .dropdown .options .button3:hover {
+    background: var(--accent-green) !important;
+    background-color: var(--accent-green) !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* NUCLEAR HOVER OVERRIDE - Target by ID */
+#camera-options button:hover,
+#camera-options .createCamCard-button:hover,
+#camera-options .btn:hover,
+#camera-options .button3:hover {
+    background: var(--accent-green) !important;
+    background-color: var(--accent-green) !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Force override any inherited styles with maximum specificity */
+.mode-nav-toolbar .dropdown .options *,
+.mode-nav-toolbar .dropdown .options div,
+.mode-nav-toolbar .dropdown .options span {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+}
+
+/* NUCLEAR OVERRIDE - Force white background on dropdown container and all children */
+.mode-nav-toolbar .dropdown .options,
+.mode-nav-toolbar .dropdown .options *,
+.mode-nav-toolbar .dropdown .options div,
+.mode-nav-toolbar .dropdown .options span,
+.mode-nav-toolbar .dropdown .options button,
+.mode-nav-toolbar .dropdown .options .btn,
+.mode-nav-toolbar .dropdown .options .button3,
+.mode-nav-toolbar .dropdown .options .createCamCard-button {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+}
+
+/* ULTRA NUCLEAR - Target the exact HTML structure by ID */
+#camera-options,
+#camera-options *,
+#camera-options div,
+#camera-options span,
+#camera-options button,
+#camera-options .btn,
+#camera-options .button3,
+#camera-options .createCamCard-button {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+}
+
+/* FINAL NUCLEAR - Target the exact dropdown structure */
+.mode-nav-toolbar .dropdown .options#camera-options,
+.mode-nav-toolbar .dropdown .options#camera-options *,
+.mode-nav-toolbar .dropdown .options#camera-options div,
+.mode-nav-toolbar .dropdown .options#camera-options span,
+.mode-nav-toolbar .dropdown .options#camera-options button,
+.mode-nav-toolbar .dropdown .options#camera-options .btn,
+.mode-nav-toolbar .dropdown .options#camera-options .button3,
+.mode-nav-toolbar .dropdown .options#camera-options .createCamCard-button {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+}
+
+/* ULTRA SPECIFIC OVERRIDE - Target exact nav bar dropdown structure */
+#camera-cards-mode-btn + .dropdown .options,
+#camera-cards-mode-btn ~ .dropdown .options,
+#camera-cards-mode-btn .dropdown .options {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    border: 1px solid #ddd !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
+    left: 3px !important;
+    box-shadow: none !important;
+}
+
+/* NUCLEAR OPTION - Override ALL button3 and createCamCard-button styles */
+.mode-nav-toolbar .dropdown .options .button3,
+.mode-nav-toolbar .dropdown .options .createCamCard-button,
+.mode-nav-toolbar .dropdown .options .btn,
+.mode-nav-toolbar .dropdown .options button {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    border: none !important;
+    color: #333 !important;
+    padding: 8px 12px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    text-align: left !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: background-color 0.2s ease !important;
+    display: block !important;
+    height: auto !important;
+    line-height: 1.2 !important;
+}
+
+/* ULTRA NUCLEAR - Override with maximum specificity and !important */
+.mode-nav-toolbar .dropdown .options .button3,
+.mode-nav-toolbar .dropdown .options .createCamCard-button,
+.mode-nav-toolbar .dropdown .options .btn,
+.mode-nav-toolbar .dropdown .options button,
+.mode-nav-toolbar .dropdown .options .button3 *,
+.mode-nav-toolbar .dropdown .options .createCamCard-button *,
+.mode-nav-toolbar .dropdown .options .btn *,
+.mode-nav-toolbar .dropdown .options button * {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+}
+
+/* FINAL NUCLEAR - Target the exact HTML structure with attribute selectors */
+.mode-nav-toolbar .dropdown .options [class*="button3"],
+.mode-nav-toolbar .dropdown .options [class*="createCamCard"],
+.mode-nav-toolbar .dropdown .options [class*="btn"],
+.mode-nav-toolbar .dropdown .options [class*="button"],
+.mode-nav-toolbar .dropdown .options [id*="camera"],
+.mode-nav-toolbar .dropdown .options [style*="background"] {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+}
+
+/* Override any inline styles that might be set by JavaScript */
+.mode-nav-toolbar .dropdown .options .button3[style*="background"],
+.mode-nav-toolbar .dropdown .options .createCamCard-button[style*="background"],
+.mode-nav-toolbar .dropdown .options .btn[style*="background"],
+.mode-nav-toolbar .dropdown .options button[style*="background"] {
+    background: white !important;
+    background-color: white !important;
+}
+
+#camera-cards-mode-btn + .dropdown .options *,
+#camera-cards-mode-btn ~ .dropdown .options *,
+#camera-cards-mode-btn .dropdown .options * {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+}
+
+#camera-cards-mode-btn + .dropdown .options button,
+#camera-cards-mode-btn ~ .dropdown .options button,
+#camera-cards-mode-btn .dropdown .options button,
+#camera-cards-mode-btn + .dropdown .options .createCamCard-button,
+#camera-cards-mode-btn ~ .dropdown .options .createCamCard-button,
+#camera-cards-mode-btn .dropdown .options .createCamCard-button {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    border: none !important;
+    color: #333 !important;
+    padding: 8px 12px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    text-align: left !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: background-color 0.2s ease !important;
+    display: block !important;
+    height: auto !important;
+    line-height: 1.2 !important;
+}
+
+#camera-cards-mode-btn + .dropdown .options button:hover,
+#camera-cards-mode-btn ~ .dropdown .options button:hover,
+#camera-cards-mode-btn .dropdown .options button:hover,
+#camera-cards-mode-btn + .dropdown .options .createCamCard-button:hover,
+#camera-cards-mode-btn ~ .dropdown .options .createCamCard-button:hover,
+#camera-cards-mode-btn .dropdown .options .createCamCard-button:hover {
+    background: var(--accent-green) !important;
+    background-color: var(--accent-green) !important;
+    background-image: none !important;
+    background-size: none !important;
+    background-repeat: none !important;
+    background-position: none !important;
+    color: white !important;
+}
+
+.sidebar.collapsed ~ .content-wrapper .mode-nav-toolbar {
+    left: 80px;
+}
+
+.mode-nav-container {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    height: 100%;
+}
+
+.mode-nav-btn {
+    background: transparent;
+    border: none;
+    color: #666;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+}
+
+/* Make camera cards button position relative for dropdown positioning */
+#camera-cards-mode-btn {
+    position: relative !important;
+    margin-right: 20px !important; /* Add space between camera cards and arrow */
+}
+
+
+
+/* Add spacing to floor plan button for better balance */
+#floor-plan-mode-btn {
+    margin-left: 20px; /* Add space between arrow and floor plan */
+}
+
+.mode-nav-btn:hover {
+    color: #333;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.mode-nav-btn.active {
+    color: var(--accent-green);
+    background: transparent;
+}
+
+.mode-nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background: var(--accent-green);
+    border-radius: 2px;
+}
+
+.mode-text {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* Style for "No cameras found" message to match nav bar colors */
+.mode-nav-toolbar .dropdown .options div[style*="color: #666"] {
+    color: #666 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Add missing active state rule */
+.mode-nav-toolbar .dropdown .options.active {
+    display: block !important;
+}
+
+@media (max-width: 768px) {
+    .nav-toolbar {
+        left: 0;
+        right: 0;
+        padding: 15px 20px;
+    }
+    
+    .sidebar.collapsed ~ .content-wrapper .nav-toolbar,
+    .sidebar.collapsed + .content-wrapper .nav-toolbar {
+        left: 0;
+    }
+    
+    .toolbar-group.center,
+    .toolbar-group.formatting {
+        display: none;
+    }
+    
+    .nav-toggle {
+        display: block;
+    }
+}
+
+.nav-toolbar:hover {
+    border-bottom: 1px solid rgba(74, 253, 203, 0.2);
+}
+
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.toolbar-group.left {
+    flex: 0 0 auto;
+    gap: 4px;
+    justify-content: flex-start;
+}
+
+.toolbar-group.center {
+    flex: 1;
+    justify-content: center;
+    gap: 4px;
+    margin: 0 8px;
+}
+
+.toolbar-group.formatting {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 8px;
+    padding: 0 16px;
+    border-left: 1px solid var(--nav-border);
+    border-right: 1px solid var(--nav-border);
+}
+
+/* Formatting buttons now use button2 class for consistent styling */
+/* Ensure formatting buttons in nav bar have consistent styling */
+.toolbar-group.formatting .button2 {
+    min-width: 40px; /* Keep consistent sizing for formatting buttons */
+    height: 40px; /* Keep consistent height for formatting buttons */
+    margin: 0 2px; /* Keep consistent spacing for formatting buttons */
+}
+
+/* Camera Cards Styling */
+.camera-cards-container {
+    padding: 20px;
+}
+
+.camera-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--accent-green);
+    border-radius: 12px;
+    margin: 20px 0;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.camera-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--accent-green);
+}
+
+.camera-card-header h4 {
+    color: var(--accent-green);
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.camera-shots-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.camera-shots-table th {
+    background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--nav-bg) 100%);
+    color: #f5f5f5;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    border-radius: 8px 8px 0 0;
+}
+
+.camera-shots-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.camera-notes {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px 8px;
+    transition: all 0.2s ease;
+}
+
+.camera-notes:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-green);
+    outline: none;
+}
+
+/* View Mode Styling */
+.view-content {
+    padding: 20px;
+}
+
+.view-content table,
+.view-container table,
+.view-table-container table {
+    border: none !important;
+    background: transparent !important;
+    margin-top: 150px !important;
+}
+
+/* Additional spacing for view mode content */
+.view-container {
     margin-top: 100px !important;
-    }
+}
 
-    td:nth-child(3) {
-      vertical-align: top !important;
-      padding-top: 8px !important;
+.view-table-container {
+    margin-top: 50px !important;
+}
+
+.view-content th,
+.view-content td {
+    border: none !important;
+    background: transparent !important;
+}
+
+/* Running Order Styling */
+.running-order-container {
+    padding: 20px;
+}
+
+.running-order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.running-order-table th {
+    background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--nav-bg) 100%);
+    color: #f5f5f5;
+    padding: 16px 20px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid var(--accent-green);
+}
+
+.running-order-table td {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.running-time {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px 8px;
+    transition: all 0.2s ease;
+    font-family: monospace;
+    text-align: center;
+}
+
+.running-time:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-green);
+    outline: none;
+}
+
+.toolbar-group.right {
+    flex: 0 0 auto;
+    gap: 4px;
+    justify-content: flex-end;
+}
+
+.toolbar-group.logout-container {
+    flex-shrink: 0;
+}
+
+.toolbar-group.dynamic-buttons {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.toolbar-group.right-buttons {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.toolbar-group.save-container {
+    flex-shrink: 0;
+}
+
+/* Ensure buttons don't wrap and maintain consistent spacing */
+.nav-toolbar .btn,
+.nav-toolbar .dropdown {
+    flex-shrink: 0;
+    margin: 0;
+}
+
+/* Home button removed - functionality moved to sidebar */
+
+/* Ensure all buttons in the toolbar have consistent height */
+.nav-toolbar .button2 {
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important; /* Override general button2 background */
+    border: none !important; /* No border by default - override general button2 border */
+    color: #f5f5f5 !important; /* Off-white text for visibility - override general button2 styles */
+    padding: 8px 16px !important; /* Override general button2 padding */
+    border-radius: 8px !important; /* Override general button2 border-radius */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500 !important; /* Override general button2 font-weight */
+    letter-spacing: 0.3px !important; /* Override general button2 letter-spacing */
+    text-transform: none !important; /* Override general button2 text-transform */
+    font-size: inherit !important; /* Override general button2 font-size */
+    min-width: auto !important; /* Override general button2 min-width */
+}
+
+/* Logout button specific styling */
+.nav-toolbar .logout-button {
+    padding: 8px;
+    min-width: 40px;
+    position: relative;
+}
+
+.nav-toolbar .logout-button::after {
+    content: 'Logout';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--nav-bg);
+    color: var(--text-white);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 10001;
+    margin-top: 8px;
+    border: 1px solid var(--nav-border);
+}
+
+.nav-toolbar .logout-button:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+.nav-toolbar .button2:hover {
+    background: var(--sidebar-hover) !important; /* Override general button2 hover background */
+    border: 1px solid var(--accent-green) !important; /* Show border only on hover - override general button2 hover border */
+    color: var(--accent-green) !important; /* Override general button2 hover color */
+    transform: translateY(-1px);
+}
+
+.nav-toolbar .button2.primary {
+    background: var(--accent-green) !important; /* Override general button2 primary background */
+    border-color: var(--accent-green) !important; /* Override general button2 primary border */
+    color: var(--text-white) !important; /* Override general button2 primary color */
+}
+
+.nav-toolbar .button2.primary:hover {
+    background: var(--accent-green-hover) !important; /* Override general button2 primary hover background */
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 1400px) {
+    .nav-toolbar {
+        padding: 50px 10px 20px 10px;
     }
     
-    .view-mode td:nth-child(3) {
-      vertical-align: top !important;
-      padding-top: 8px !important;
-    }
-      
-    .view-mode td {
-      vertical-align: top !important;
-      padding-top: 8px !important;
+    .toolbar-group.center {
+        margin: 0 5px;
     }
     
-    .view-mode td > div {
-      text-align: left;
-      margin-top: 0;
-      padding-top: 0;
+    .toolbar-group.right-buttons {
+        margin-left: 5px;
     }
+}
+
+/* Divider - make invisible for seamless navbar */
+.divider {
+    display: none;
+}
+
+/* Camera Options Dropdown */
+.dropdown #camera-options,
+.dropdown .options#camera-options,
+#camera-options.options,
+div#camera-options.options,
+div.options#camera-options {
+    /* Hidden by default */
+    display: none !important;
+    position: absolute !important;
+    top: 100% !important;
+    background: rgba(10, 26, 26, 0.95) !important;
+    border: 1px solid rgba(74, 253, 203, 0.2) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    z-index: 99999 !important;
+    max-height: 300px !important;
+    overflow-y: auto !important;
+    margin-top: 5px !important;
+    /* Width will be set by JavaScript */
+    box-sizing: border-box !important;
+}
+
+.dropdown #camera-options.active,
+.dropdown .options#camera-options.active,
+#camera-options.options.active,
+div#camera-options.options.active,
+div.options#camera-options.active {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* Ensure it's positioned correctly when active */
+    position: absolute !important;
+    top: 100% !important;
+}
+
+#camera-options .createCamCard-button {
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-white);
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin: 2px 8px;
+    width: calc(100% - 16px);
+}
+
+#camera-options .createCamCard-button:hover {
+    background: rgba(74, 253, 203, 0.1);
+    color: var(--accent-color);
+}
+
+/* Ensure dropdown container has relative positioning */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    /*width: 50px !important; */
+}
+
+/* Dropdown arrow (::before pseudo-element) */
+.dropdown::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%) rotate(180deg);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--text-white);
+    transition: transform 0.3s ease;
+    pointer-events: none;
+    z-index: 10002;
+}
+
+.dropdown.active::before {
+    transform: translateY(-50%) rotate(0deg);
+}
+
+/* Ensure no other arrows are shown */
+.dropdown .camCard-button::before,
+.dropdown .camCard-button::after,
+.btn::before,
+.btn::after,
+.button2::before,
+.button2::after,
+.camCard-button::before,
+.camCard-button::after {
+    display: none !important;
+}
+
+/* Camera Cards dropdown button styling - inherits from button2 */
+.dropdown .camCard-button {
+    /* Inherits all styles from .button2 class */
+    position: relative;
+    padding-right: 35px !important; /* Make room for the arrow */
+}
+
+/* ---------------- BUTTONS ----------- */
+.button2 {
+    background: transparent !important;
+    color: var(--text-white) !important;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    text-align: center !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.5px !important;
+    line-height: 1.4 !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-width: 90px;
+    margin: 0;
+}
+
+.button2:hover {
+    background: rgba(74, 253, 203, 0.1) !important;
+    border-color: var(--accent-green) !important;
+    transform: translateY(-1px);
+}
+
+.button2.primary {
+    background: var(--accent-green) !important;
+    color: var(--main-text) !important;
+    border-color: var(--accent-green) !important;
+}
+
+.button2.primary:hover {
+    background: var(--accent-green-hover) !important;
+    transform: translateY(-1px);
+}
+
+/* Disabled button states for undo/redo */
+.button2.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.button2.disabled:hover {
+    background: transparent !important;
+    border-color: transparent;
+    transform: none;
+    box-shadow: none;
+}
+
+.button3 .createCamCard-button {
+    width: 100%;
+    background-color: var(--secondary-bg);
+    padding: 10px 20px;
+    cursor: pointer;
+    color: var(--text-white);
+    border: none;
+    border-radius: 8px;
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+
+
+
+
+.addSubject-button,
+.submitSubject-button,
+.btn-success {
+    background: var(--accent-green);
+    color: var(--text-white);
+}
+
+.addSubject-button:hover,
+.submitSubject-button:hover,
+.btn-success:hover {
+    background: var(--accent-green-hover);
+    color: var(--text-white);
+}
+
+/* EVENT BUTTON */
+.button2.addEvent-button:hover {
+    background-color: rgba(126, 205, 201, 0.1) !important; /* Light mint/teal background */
+    border-color: #7ECDC9 !important; /* Light mint/teal border */
+    color: #7ECDC9 !important; /* Light mint/teal text */
+    transform: scale(1.02) !important; /* Subtle scale effect */
+    transition: all 0.3s ease !important;
+}
+
+/* ITEM BUTTON */
+.button2.addItem-button:hover {
+    background-color: rgba(48, 96, 112, 0.1) !important; /* Dark blue/teal background */
+    border-color: #f5f5f5 !important; /* Off-white border for better readability */
+    color: #f5f5f5 !important; /* Off-white text for better readability */
+    box-shadow: 0 0 10px rgba(245, 245, 245, 0.4) !important; /* Subtle neon glow */
+    text-shadow: 0 0 8px rgba(245, 245, 245, 0.6) !important; /* Text neon effect */
+    transform: scale(1.02) !important; /* Subtle scale effect */
+    transition: all 0.3s ease !important;
+}
+
+/* INSERT BUTTON */
+.button2.addInsert-button:hover {
+    background-color: rgba(224, 160, 128, 0.1) !important; /* Orange/terracotta background */
+    border-color: #E0A080 !important; /* Orange/terracotta border */
+    color: #E0A080 !important; /* Orange/terracotta text */
+    transform: scale(1.02) !important; /* Subtle scale effect */
+    transition: all 0.3s ease !important;
+}
+
+.button2:not(.addEvent-button):not(.addItem-button):not(.addInsert-button):hover {
+    background-color: rgba(74, 253, 203, 0.2) !important;
+    border-color: var(--accent-green);
+}
+
+/* ---------------------------------------------------------*/
+
+.editable-cell:not(.production-title),
+.editable-text:not(.production-title),
+div[contenteditable]:not(.production-title) {
+    display: block;
+    width: 100%;
+    position: relative;
+    user-select: text; 
+    background-color: rgba(74, 253, 203, 0.1) !important;
+    outline: 0px !important;
+    color: var(--text-white) !important;
+}
+
+.editable-cell span {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+.editable-cell span::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 3px;
+    width: 100%;
+    height: 1px;
+    background-color: var(--accent-green);
+    outline: 1px solid var(--accent-green);
+}
+
+.shot-type-flex-container {
+    display: flex;
+    align-items: center;
+    gap: 2px; 
+}
+
+.shot-type-text {
+    flex-grow: 1;
+    margin-left: 8px;
+}
+
+.shot-type-dropdown {
+    flex-shrink: 0;
+    margin-right: 4px;
+}
+
+.shotSubject {
+    flex: 1; 
+    min-width: 0; 
+    color: var(--text-white) !important;
+}
+
+/* CUSTOM SHOT TYPE */
+.custom-shot-type {
+    /* Width and styling rules moved to comprehensive rule below to avoid conflicts */
+    display: none;
+}
+
+/* PLACEHOLDER TEXT */
+.shotSubject::placeholder, 
+.cameraNum::placeholder,
+.cameraPos::placeholder,
+.extraInfo::placeholder {
+    color: var(--text-light) !important;
+}
+
+.shotSubject::-moz-placeholder,
+.cameraNum::-moz-placeholder,
+.cameraPos::-moz-placeholder,
+.extraInfo::-moz-placeholder {
+    color: var(--text-light) !important;
+}
+
+.modal-dialog {
+    margin-top: 15%;
+    text-align: center;
+}
+.modal-footer {
+    justify-content: center !important;
+    text-align: center;
+    gap: 15px;
+}
+
+/* USER INPUT DURATION */
+.insert-duration-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin: 0 auto;
+    background-color: inherit !important; 
+}
+
+.insert-duration-container > * {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    background-color: inherit !important; 
+}
+
+.insertDuration {
+    padding-right: 4px !important;
+    text-align: right !important;
+    background-color: var(--accent-green) !important;
+    color: var(--text-white) !important;
+}
+
+/* --------- VIEW MODE ---------- */
+.view-mode .insert-duration-container {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.view-mode .insertDuration {
+    padding-right: 4px;
+}
+
+/* ----------- TITLE ---------- */
+.production-title-container {
+    text-align: left;
+    padding: 0px 0;
+    margin-top: 0px;
+    margin-bottom: -100px;
+    margin-left: 0px; /* Align with main-content padding */
+    max-width: none; /* Remove max-width constraint */
+    margin-right: 0; /* Remove auto margins for left alignment */
+    margin-left: 0; /* Remove auto margins for left alignment */
+    padding-left: 0; /* Remove left padding for seamless alignment */
+}
+
+.production-title {
+    font-size: 28px;
+    font-weight: bold;
+    padding: 16px 24px;
+    border-radius: 16px;
+    display: inline-block;
+    background: transparent !important;
+    outline: none !important;
+    border: 2px solid rgba(74, 253, 203, 0.3) !important;
+    color: var(--table-header) !important;
+    font-family: 'coolvetica', sans-serif;
+    letter-spacing: 1px;
+    margin-left: 20px !important; /* Add left margin to align with table content */
+}
+
+/* Force purple color with higher specificity */
+div.production-title,
+.production-title-container .production-title,
+div[contenteditable].production-title {
+    color: var(--table-header) !important;
+    margin-top: 20px !important;
+    margin-left: 20px !important; /* Align with table left edge */ 
+
+}
+
+/* Override for script page to use dark green color */
+#script-page div.production-title,
+#script-page .production-title-container .production-title,
+#script-page div[contenteditable].production-title {
+    color: var(--login-bg) !important; /* Dark green text color from login background */
+}
+
+
+/* Formatting Sidebar */
+.formatting-sidebar {
+    position: fixed;
+    left: 10px;
+    top: 100px;
+    width: 60px;
+    background: rgba(10, 26, 26, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(74, 253, 203, 0.2);
+    border-radius: 16px;
+    padding: 8px;
+    z-index: 999;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    user-select: none;
+    will-change: transform;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.formatting-sidebar:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(74, 253, 203, 0.3);
+}
+
+.formatting-sidebar.dragging {
+    opacity: 100;
+    transform: scale(1.02);
+    transition: none;
+}
+
+.drag-handle {
+    width: 100%;
+    height: 24px;
+    background: linear-gradient(135deg, #4afdcb 0%, #2bc198 100%);
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    color: #073229;
+    font-size: 12px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(74, 253, 203, 0.3);
+}
+
+.drag-handle:hover {
+    background: linear-gradient(135deg, #2bc198 0%, #4afdcb 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(74, 253, 203, 0.4);
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.formatting-tools {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+}
+
+.format-btn {
+    width: 44px;
+    height: 44px;
+    background: rgba(74, 253, 203, 0.1);
+    border: 1px solid rgba(74, 253, 203, 0.2);
+    border-radius: 12px;
+    color: var(--text-white) !important; /* Keep sidebar text white */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.format-btn:hover {
+    background: rgba(74, 253, 203, 0.2);
+    border-color: rgba(74, 253, 203, 0.4);
+    color: var(--text-white) !important; /* Keep hover text white */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 253, 203, 0.3);
+}
+
+.format-btn.active {
+    background: linear-gradient(135deg, #4afdcb 0%, #2bc198 100%);
+    color: #073229;
+    border-color: #4afdcb;
+    box-shadow: 0 4px 15px rgba(74, 253, 203, 0.4);
+}
+
+/* ------------ ACTION BUTTONS -------------- */
+.row-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    height: 100%; 
+    padding: 8px 0;
+}
+
+.row-actions:hover {
+    opacity: 1;
+}
+
+td:last-child {
+    vertical-align: middle !important; 
+    position: relative; 
+}
+
+.row-button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    background: transparent;
+    color: var(--text-white); 
+}
+
+.row-button.drag {
+    color: var(--text-white);
+    background-color: var(--accent-green); 
+}
+
+.row-button.drag:hover {
+    background-color: var(--accent-green-hover); 
+}
+
+.row-button.remove {
+    color: var(--text-white);
+    background-color: #e74c3c;   
+}
+
+.row-button.remove:hover {
+    background-color: #c0392b; 
+}
+
+/* -------------- DRAGGING ------------- */
+tr.dragging {
+    opacity: 0.5;
+    background-color: var(--secondary-bg);
+}
+
+tbody tr {
+    cursor: default;  
+}
+
+.row-button.drag {
+    cursor: move;  
+}
+
+/* Change styling of last header column in running order */
+#runningOrder-table thead tr th:last-child {
+    background-color: var(--accent-green) !important;
+    color: var(--text-white) !important;
+    border-radius: 12px 12px 0 0;
     
-  /* =================================================================================
-   * Notification System
-   * ================================================================================= */
-  
-  .notification {
+    text-align: center !important;
+    vertical-align: middle !important;
+    height: 56px !important;
+    line-height: 1.6 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 1rem !important;
+    letter-spacing: 0.7px !important;
+    border-bottom: 3px solid var(--accent-green-hover) !important;
+    box-shadow: 0 4px 6px var(--shadow-color) !important;
+    padding: 12px 16px !important;
+}
+
+#event-table, #runningOrder-table {
+    width: 100% !important; /* Use full width to prevent cutoff */
+    margin: 0; /* Remove auto margins for left alignment */
+    table-layout: auto; /* Changed from fixed to allow dynamic column expansion */
+}
+
+#event-table th, #event-table td,
+#runningOrder-table th {
+    border: none; /* Remove borders for seamless look */
+    padding: 8px;
+}
+
+/* Modern styling for event table headers */
+#event-table th:not(:last-child),
+#runningOrder-table th:not(:last-child) {
+    background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--nav-bg) 100%) !important; /* Modern gradient background */
+    color: #f5f5f5 !important; /* Off-white text for modern look */
+    border-radius: 8px 8px 0 0; /* Modern rounded top corners */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* Subtle shadow for depth */
+    padding: 16px 20px !important; /* Increased padding for modern look */
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.7px !important;
+}
+
+/* Style for the last header column in event tables - empty and not colored */
+#event-table th:last-child,
+#runningOrder-table th:last-child {
+    background: transparent !important; /* No background */
+    color: transparent !important; /* No text color */
+    border: none !important; /* No border */
+    box-shadow: none !important; /* No shadow */
+    padding: 16px 20px !important; /* Keep consistent padding */
+}
+
+.view-mode #event-table {
+    margin-top: 100px !important;
+}
+
+td:nth-child(3) {
+    vertical-align: top !important;
+    padding-top: 8px !important;
+}
+
+.view-mode td:nth-child(3) {
+    vertical-align: top !important;
+    padding-top: 8px !important;
+}
+
+.view-mode td {
+    vertical-align: top !important;
+    padding-top: 8px !important;
+}
+
+.view-mode td > div {
+    text-align: left;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* =================================================================================
+ * Notification System
+ * ================================================================================= */
+
+.notification {
     position: fixed;
     top: 20px;
     right: 20px;
     z-index: 10000;
-    background: white;
+    background: var(--secondary-bg);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px var(--shadow-color);
     padding: 16px 20px;
     min-width: 300px;
     max-width: 400px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-left: 4px solid #4c84ff;
+    border-left: 4px solid var(--accent-green);
     animation: slideInRight 0.3s ease-out;
-  }
-  
-  .notification-success {
-    border-left-color: #28a745;
-  }
-  
-  .notification-error {
-    border-left-color: #dc3545;
-  }
-  
-  .notification-warning {
-    border-left-color: #ffc107;
-  }
-  
-  .notification-info {
-    border-left-color: #17a2b8;
-  }
-  
-  .notification-message {
+}
+
+.notification-success {
+    border-left-color: var(--accent-green);
+}
+
+.notification-error {
+    border-left-color: #e74c3c;
+}
+
+.notification-warning {
+    border-left-color: #f39c12;
+}
+
+.notification-info {
+    border-left-color: var(--accent-green);
+}
+
+.notification-message {
     flex: 1;
     margin-right: 12px;
     font-size: 14px;
-    color: #333;
+    color: var(--text-white);
     line-height: 1.4;
-  }
-  
-  .notification-close {
+}
+
+.notification-close {
     background: none;
     border: none;
     font-size: 18px;
-    color: #666;
+    color: var(--text-light);
     cursor: pointer;
     padding: 0;
     width: 20px;
@@ -1033,174 +3306,1155 @@
     justify-content: center;
     border-radius: 50%;
     transition: all 0.2s ease;
-  }
-  
-  .notification-close:hover {
-    background-color: #f0f0f0;
-    color: #333;
-  }
-  
-  @keyframes slideInRight {
+}
+
+.notification-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-white);
+}
+
+@keyframes slideInRight {
     from {
-      transform: translateX(100%);
-      opacity: 0;
+        transform: translateX(100%);
+        opacity: 0;
     }
     to {
-      transform: translateX(0);
-      opacity: 1;
+        transform: translateX(0);
+        opacity: 1;
     }
-  }
+}
 
-  /* Imported from index file */
-  td:nth-child(3) {
+/* Imported from index file */
+td:nth-child(3) {
     vertical-align: top !important;
     padding-top: 8px !important;
-  }
-  
-  /* For view mode */
-  .view-mode td:nth-child(3) {
+}
+
+/* For view mode */
+.view-mode td:nth-child(3) {
     vertical-align: top !important;
     padding-top: 8px !important;
     width: 400px !important;
-  }
-  
-  /* Add these new styles */
-  .view-mode td {
+}
+
+/* Add these new styles */
+.view-mode td {
     vertical-align: top !important;
     padding-top: 8px !important;
-  }
-  
-  .view-mode td > div {
+}
+
+.view-mode td > div {
     text-align: left;
     margin-top: 0;
     padding-top: 0;
-  }
+}
 
-  /* Update cut line styling */
-  .cut-line {
-      position: relative;
-      display: inline;
-  }
-  
-  .cut-line::after {
-      content: '';
-      position: absolute;
-      left: -350px; /* Extend line to the left */
-      right: 0; /* Extend line to the right */
-      bottom: -3px; /* Move line down by adjusting this value */
-      height: 2px;
-      background-color: black;
-      z-index: 1;
-      pointer-events: none;
-  }
+/* Update cut line styling */
+.cut-line {
+    position: relative;
+    display: inline;
+}
 
-  /* shot type dropdown styling */
-  .shot-type-select {
-      background-color: transparent !important;
-      border: none;
-      outline: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      padding: 2px 2px 2px 2px;
-      width: auto;
-  }
+.cut-line::after {
+    content: '';
+    position: absolute;
+    left: -350px;
+    right: 0;
+    bottom: -3px;
+    height: 2px;
+    background-color: var(--accent-green);
+    z-index: 1;
+    pointer-events: none;
+}
 
-  .shot-type-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 100%;
-      background-color: transparent !important;
-      margin: 0;
-      padding: 0;
-  }
+/* SHOT TYPE SELECT */
+.shot-type-select {
+    background-color: transparent !important;
+    border: none;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 2px 2px 2px 2px;
+    width: auto;
+    color: var(--main-text) !important; /* Use main-text for dropdown text */
+}
 
-  /* Ensure proper positioning for cut line reference */
-  td:nth-child(2), td:nth-child(3) {
-      position: relative;
-  }
+/* Shot Type Wrapper and Dynamic Inputs */
+.shot-type-wrapper {
+    position: relative;
+}
 
-  /* Update view mode specific styles */
-  .view-mode td:nth-child(2) > div,
-  .view-mode td:nth-child(2) .shot-type-flex-container,
-  .view-mode td:nth-child(2) .editable-cell {
-      position: relative;
-      top: var(--original-top) !important;
-  }
+.shot-inputs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0; /* Remove gap that might interfere with width calculation */
+}
 
-  /* Ensure proper positioning for cut line reference in view mode */
-  .view-mode td:nth-child(2), 
-  .view-mode td:nth-child(3) {
-      position: relative;
-  }
+.shot-input-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0; /* Remove gap that might interfere with width calculation */
+    position: relative;
+    width: 100%;
+    min-height: 30px;
+    flex-wrap: nowrap; /* Prevent wrapping */
+}
 
-  /* shot type cell layout */
-  .shot-type-flex-container {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-  }
+/* SIMPLE LAYOUT - Clean implementation */
+.shot-input-row .shot-type-select,
+.shot-input-row .shotSubject {
+    flex: 0 0 120px !important; /* Fixed width - use !important to override conflicting rules */
+    width: 120px !important;
+    display: inline-block !important; /* Use inline-block for proper inline positioning */
+    margin-right: 8px; /* Add spacing between elements */
+    vertical-align: top !important; /* Ensure alignment */
+    position: static !important; /* Prevent positioning issues */
+    transform: none !important; /* Prevent transform issues */
+}
 
-  .shotTypeDropdown {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      width: fit-content;
-  }
+/* Ensure shot subject is always visible and inline */
+.shot-input-row .shotSubject {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important; /* Use static positioning */
+    float: none !important; /* Prevent floating */
+    clear: none !important; /* Prevent clearing */
+    top: auto !important; /* Reset any top positioning */
+    left: auto !important; /* Reset any left positioning */
+    right: auto !important; /* Reset any right positioning */
+    bottom: auto !important; /* Reset any bottom positioning */
+    margin: 0 !important; /* Reset margins */
+    padding: 0 !important; /* Reset padding */
+}
 
-  .shotSubject {
-      flex: 1;
-      border: none;
-      outline: none;
-      background: transparent;
-      margin-left: 4px;
-  }
+/* Ensure proper flexbox layout for all shot rows */
+.shot-input-row {
+    display: flex !important;
+    align-items: center !important; /* Center align items vertically */
+    gap: 8px !important; /* Add consistent spacing between elements */
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important; /* Align items to the left */
+    position: relative !important; /* Ensure proper positioning context */
+    overflow: visible !important; /* Prevent overflow issues */
+}
 
-  .editable-cell {
-      width: 100%;
-      border: none;
-      outline: none;
-      background: transparent;
-      margin-bottom: 2px;
-      padding: 2px 8px;
-  }
 
-  /* Ensure proper spacing in view mode */
-  .view-mode .shot-type-flex-container > div {
-      margin-bottom: 2px;
-  }
 
-  /* Ensure proper vertical spacing */
-  td:nth-child(2) > div {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-  }
-  /* Loader styles */
-  .loader-container {
+
+
+
+
+
+
+
+
+.shot-input-row .custom-shot-type {
+    flex: 1; /* Take remaining space */
+    min-width: 0;
+    width: auto; /* Let flexbox handle width */
+    z-index: 9999; /* Ensure it's frontmost */
+    position: relative; /* Enable z-index */
+}
+
+
+
+
+
+
+
+
+
+.shot-input-row:not(:first-child) {
+    padding-left: 0;
+}
+
+.shot-input-row:not(:first-child)::before {
+    display: none;
+}
+
+/* Add Shot Button */
+.add-shot-btn {
+    display: none; /* Hidden by default, appears on hover */
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    width: 100%;
+    justify-content: center;
+    position: relative;
+    clear: both;
+}
+
+/* Show add button on hover */
+.shot-type-wrapper:hover .add-shot-btn {
+    display: flex !important;
+}
+
+/* Alternative hover for the container */
+.shot-inputs-container:hover .add-shot-btn {
+    display: flex !important;
+}
+
+/* Force shot subject to always be inline - override any conflicting styles */
+.shot-input-row .shotSubject {
+    display: inline-block !important;
+    position: static !important;
+    float: none !important;
+    clear: none !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+    width: 120px !important;
+    height: auto !important;
+    line-height: normal !important;
+    vertical-align: top !important;
+}
+
+/* Additional forceful rules to ensure inline display */
+.shot-input-row .shotSubject,
+.shot-input-row textarea[name="shotSubject"],
+.shot-input-row .editable-text.shotSubject {
+    display: inline-block !important;
+    float: none !important;
+    clear: none !important;
+    position: static !important;
+    width: 120px !important;
+    margin-left: 8px !important;
+    vertical-align: top !important;
+}
+
+/* Ensure shot type dropdown and shot subject are always side by side */
+.shot-input-row .shot-type-select + .shotSubject {
+    margin-left: 8px !important;
+    display: inline-block !important;
+}
+
+/* Ensure add button appears below the shot inputs */
+.shot-inputs-container .add-shot-btn {
+    order: 999;
+    align-self: stretch;
+    margin-top: 8px;
+    width: 100%;
+    justify-content: center;
+}
+
+.add-shot-btn:hover {
+    opacity: 0.8;
+}
+
+.add-btn-line {
+    height: 1px;
+    background-color: #7ECDC9; /* Event teal color */
+    flex: 1;
+}
+
+.add-btn-circle {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #7ECDC9; /* Event teal color */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    transition: background-color 0.2s ease;
+}
+
+.add-btn-circle:hover {
+    background-color: #7ECDC9; /* Event teal color */
+}
+
+.add-btn-plus {
+    color: #7ECDC9; /* Event teal color */
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.add-btn-circle:hover .add-btn-plus {
+    color: white;
+}
+
+/* Remove Button for Additional Shot Inputs */
+.remove-shot-btn {
+    display: flex;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #e74c3c;
+    border-radius: 50%;
+    background-color: transparent;
+    color: #e74c3c;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    position: absolute;
+    right: -8px; /* Position to overlap with shot type inputs on the right */
+    top: 8px; /* Align to top of the row */
+    z-index: 1000; /* Higher z-index to ensure it's on top */
+    pointer-events: auto; /* Ensure button is clickable */
+}
+
+.remove-shot-btn:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.shot-type-select option {
+    background-color: white !important;
+    color: var(--main-text) !important; /* Use main-text for dropdown options */
+}
+
+.shot-type-select:focus {
+    background-color: rgba(74, 253, 203, 0.2) !important;
+}
+
+.shot-type-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0; /* Remove gap that might interfere with width calculation */
+    width: 100%;
+    background-color: transparent !important;
+    margin: 0;
+    padding: 0;
+}
+
+/* SIMPLE CUSTOM SHOT TYPE - Clean implementation */
+.custom-shot-type {
+    display: none; /* Hidden by default */
+    width: 200px; /* Fixed width */
+    padding: 4px 8px;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    color: var(--main-text);
+    font-size: 1rem;
+    box-sizing: border-box;
+    resize: none;
+    overflow: visible;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* CAMERA INPUTS */
+.cameraNum,
+.cameraPos {
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: var(--main-text) !important; /* Use main-text for camera inputs */
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    width: 100%;
+    padding: 4px 8px;
+    box-sizing: border-box;
+}
+
+/* INSERT INPUT BOXES */
+.insertTitle,
+.insertIn,
+.insertOut {
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: var(--main-text) !important; /* Use main-text for insert input boxes */
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    width: 100%;
+    padding: 4px 8px;
+    box-sizing: border-box;
+}
+
+/* DURATION INPUT */
+.insertDuration {
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: var(--main-text) !important; /* Use main-text for duration input */
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    width: 100%;
+    padding: 4px 8px;
+    box-sizing: border-box;
+}
+
+/* ITEM CONTENT - Script table only */
+#event-table .item-content {
+    border: none; 
+    margin-left: -3px;
+    background-color: transparent !important;
+    text-decoration: underline;
+    width: auto;
+    min-width: 85%;
+    max-width: 85%;
+    height: auto;
+    overflow: visible;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    padding: 4px 8px;
+    box-sizing: border-box;
+    color: var(--main-text) !important; /* Use main-text for item content */
+}
+
+/* Ensure proper positioning for cut line reference */
+td:nth-child(2), td:nth-child(3) {
+    position: relative;
+}
+
+
+
+/* Update view mode specific styles */
+.view-mode td:nth-child(2) > div,
+.view-mode td:nth-child(2) .shot-type-flex-container,
+.view-mode td:nth-child(2) .editable-cell {
+    position: relative;
+    top: var(--original-top) !important;
+}
+
+/* Ensure proper positioning for cut line reference in view mode */
+.view-mode td:nth-child(2), 
+.view-mode td:nth-child(3) {
+    position: relative;
+}
+
+/* shot type cell layout */
+.shot-type-flex-container {
+    display: flex;
+    align-items: center;
+    gap: 0; /* Remove gap that might interfere with width calculation */
+}
+
+.shotTypeDropdown {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    width: fit-content;
+}
+
+.shotSubject {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    margin-left: 4px;
+    color: var(--text-white) !important;
+}
+
+.editable-cell {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    margin-bottom: 2px;
+    padding: 2px 8px;
+    color: var(--text-white) !important;
+}
+
+/* Ensure proper spacing in view mode */
+.view-mode .shot-type-flex-container > div {
+    margin-bottom: 2px;
+}
+
+/* Ensure proper vertical spacing */
+td:nth-child(2) > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+/* Loader styles */
+.loader-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #f8f9fa;
+    background-color: var(--primary-bg);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
-  }
-  
-  .loader {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
+}
+
+.loader {
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--accent-green);
     border-radius: 50%;
     width: 40px;
     height: 40px;
     animation: spin 1s linear infinite;
-  }
-  
-  @keyframes spin {
+}
+
+@keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive Design */
+/* Responsive adjustments for Bootstrap navbar */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 100px 20px 60px 20px;
+        font-size: 16px;
+    }
+    
+    .navbar {
+        padding: 15px 20px !important;
+    }
+    
+    .production-title {
+        font-size: 24px;
+        padding: 12px 18px;
+        margin-left: 20px;
+    }
+    
+    .production-title-container {
+        margin-left: 20px;
+    }
+    
+    /* Override for script page in responsive mode */
+    #script-page .production-title {
+        color: var(--login-bg) !important; /* Dark green text color from login background */
+    }
+    
+    .formatting-sidebar {
+        left: 10px;
+        top: 175px;
+        width: 50px;
+    }
+    
+    .format-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 14px;
+    }
+    
+    .drag-handle {
+        height: 20px;
+        font-size: 10px;
+    }
+}
+
+/* Handle very small screens */
+@media (max-width: 480px) {
+    .navbar {
+        padding: 10px 10px !important;
+    }
+    
+    .navbar-collapse {
+        padding: 15px;
+    }
+    
+    .navbar .button2 {
+        padding: 6px 8px;
+        font-size: 0.7rem;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus states for accessibility */
+.button2:focus,
+.format-btn:focus,
+.production-title:focus {
+    outline: 2px solid #4afdcb;
+    outline-offset: 2px;
+}
+
+/* Font Awesome Icon Fixes */
+.fas, .fa {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+}
+
+/* Navigation bar spacing fixed - no more conflicts */
+
+/* Additional Bootstrap navbar containment */
+.navbar .container-fluid {
+    max-width: 100%;
+    padding: 0 15px;
+}
+
+.navbar-nav.me-auto {
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
+.navbar-nav.mx-auto {
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
+.navbar-nav.ms-auto {
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
+/* Ensure buttons don't overflow on smaller screens */
+@media (max-width: 1200px) {
+    .navbar .button2 {
+        padding: 6px 8px;
+        font-size: 0.7rem;
+        min-width: 70px;
+    }
+    
+    .navbar-nav .btn {
+        margin: 0 1px;
+    }
+}
+
+@media (max-width: 992px) {
+    .navbar {
+        padding: 15px 10px !important;
+    }
+    
+    .navbar .container-fluid {
+        padding: 0 10px;
+    }
+}
+
+/* Force burger menu on smaller screens */
+@media (max-width: 991.98px) {
+    .navbar-nav.me-auto,
+    .navbar-nav.mx-auto,
+    .navbar-nav.ms-auto {
+        display: none !important;
+    }
+    
+    .navbar-collapse {
+        display: block !important;
+    }
+}
+
+/* Final override not needed since dropdown is always visible now */
+
+/* Ensure the Shot column can expand dynamically */
+#event-table th:nth-child(2),
+#event-table td:nth-child(2) {
+    min-width: 350px; /* Minimum width to maintain layout */
+    width: auto; /* Allow dynamic expansion */
+    max-width: none; /* No maximum width constraint */
+    overflow: visible !important; /* Allow content to overflow */
+    white-space: normal !important; /* Allow text wrapping in cell */
+}
+
+/* Force table cell to expand beyond normal constraints */
+#event-table td:nth-child(2) {
+    overflow: visible !important; /* Allow content to overflow */
+    white-space: normal !important; /* Allow text wrapping in cell */
+    height: auto !important; /* Allow height to grow with content */
+    min-height: auto !important; /* Allow height to shrink */
+}
+
+/* Ensure the shot type flex container can expand */
+.shot-type-flex-container {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Force table to use auto layout for better column expansion */
+#event-table {
+    table-layout: auto !important;
+}
+
+/* COMPREHENSIVE RULE: ALL custom inputs get proper width expansion */
+.shot-input-row .custom-shot-type {
+    width: 100% !important; /* Use full available width */
+    max-width: 100% !important; /* Override any max-width constraints */
+    min-width: 100% !important; /* Ensure minimum width */
+    overflow: hidden !important; /* Hide scrollbars - we want auto-expansion instead */
+    word-wrap: break-word !important; /* Allow long words to break */
+    white-space: pre-wrap !important; /* Preserve line breaks and spaces */
+    box-sizing: border-box !important; /* Include padding in width calculation */
+    color: black !important; /* Use black text for better visibility */
+    background: transparent !important; /* Match editable cell background */
+    border: none !important; /* Remove any border */
+    outline: none !important; /* Remove any outline */
+    flex: 1 1 auto !important; /* Allow flexbox expansion */
+    position: relative !important; /* Ensure proper positioning */
+    z-index: 9999 !important; /* Ensure it's above everything */
+    resize: none !important; /* Prevent manual resizing */
+    min-height: 30px !important; /* Minimum height for textarea */
+    height: auto !important; /* Allow height to grow with content */
+    line-height: 1.2 !important; /* Proper line spacing */
+    max-height: none !important; /* Remove any max-height constraints */
+    display: block !important; /* Ensure block display for proper height calculation */
+    flex-shrink: 0 !important; /* Prevent flexbox from shrinking the textarea */
+}
+
+/* COMPLETELY ISOLATED RULE: Bypass all constraints */
+#event-table td:nth-child(2) .shot-type-flex-container .shot-type-wrapper .shot-inputs-container .shot-input-row .custom-shot-type {
+    width: 100% !important; /* Use full available width */
+    max-width: 100% !important; /* Override any max-width constraints */
+    min-width: 100% !important; /* Ensure minimum width */
+    overflow: hidden !important; /* Hide scrollbars - we want auto-expansion instead */
+    word-wrap: break-word !important; /* Allow long words to break */
+    white-space: pre-wrap !important; /* Preserve line breaks and spaces */
+    box-sizing: border-box !important; /* Include padding in width calculation */
+    color: black !important; /* Use black text for better visibility */
+    background: transparent !important; /* Match editable cell background */
+    border: none !important; /* Remove any border */
+    outline: none !important; /* Remove any outline */
+    position: relative !important; /* Ensure proper positioning */
+    z-index: 9999 !important; /* Ensure it's above everything */
+    left: 0 !important; /* Reset positioning */
+    right: auto !important; /* Allow natural expansion */
+    margin: 0 !important; /* Remove any margins */
+    padding: 4px 8px !important; /* Set consistent padding */
+    resize: none !important; /* Prevent manual resizing */
+    min-height: 30px !important; /* Minimum height for textarea */
+    height: auto !important; /* Allow height to grow with content */
+    line-height: 1.2 !important; /* Proper line spacing */
+    max-height: none !important; /* Remove any max-height constraints */
+}
+
+/* FINAL OVERRIDE: Ensure custom inputs get proper width */
+.custom-shot-type[style*="display:block"] {
+    width: 100% !important; /* Use full available width */
+    max-width: 100% !important; /* Override any max-width constraints */
+    min-width: 100% !important; /* Ensure minimum width */
+    overflow: hidden !important; /* Hide scrollbars - we want auto-expansion instead */
+    word-wrap: break-word !important; /* Allow long words to break */
+    white-space: pre-wrap !important; /* Preserve line breaks and spaces */
+    box-sizing: border-box !important; /* Include padding in width calculation */
+    color: black !important; /* Use black text for better visibility */
+    background: transparent !important; /* Match editable cell background */
+    border: none !important; /* Remove any border */
+    outline: none !important; /* Remove any outline */
+    position: relative !important; /* Ensure proper positioning */
+    z-index: 9999 !important; /* Ensure it's above everything */
+    left: 0 !important; /* Reset positioning */
+    right: auto !important; /* Allow natural expansion */
+    margin: 0 !important; /* Remove any margins */
+    padding: 4px 8px !important; /* Set consistent padding */
+    resize: none !important; /* Prevent manual resizing */
+}
+
+/* SPECIAL CASE: When there's only one shot row, adjust layout */
+.shot-input-row.single-row {
+    padding-right: 0 !important;
+    width: 100% !important;
+}
+
+/* Ensure shot inputs container can expand */
+.shot-inputs-container {
+    width: 100% !important;
+    min-width: 100% !important;
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important; /* Allow content to overflow and expand container */
+}
+
+/* Ensure shot type wrapper can expand */
+.shot-type-wrapper {
+    width: 100% !important;
+    min-width: 100% !important;
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important; /* Allow content to overflow and expand container */
+}
+
+/* Ensure shot input row can expand */
+.shot-input-row {
+    width: 100% !important;
+    min-width: 100% !important;
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important; /* Allow content to overflow and expand container */
+    align-items: flex-start !important; /* Align items to top so they don't stretch */
+}
+
+.shot-input-row.single-row .custom-shot-type {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    color: black !important; /* Use black text for better visibility */
+    background: transparent !important; /* Match editable cell background */
+    overflow: hidden !important; /* Hide scrollbars - we want auto-expansion instead */
+    word-wrap: break-word !important; /* Allow long words to break */
+    white-space: pre-wrap !important; /* Preserve line breaks and spaces */
+    resize: none !important; /* Prevent manual resizing */
+}
+
+/* Sidebar Camera Options */
+.camera-cards-sidebar {
+    padding: 20px;
+    color: var(--text-white);
+}
+
+.camera-cards-sidebar h3 {
+    margin-bottom: 15px;
+    color: var(--text-white);
+    font-size: 1.5rem;
+}
+
+.camera-cards-sidebar p {
+    margin-bottom: 20px;
+    color: var(--text-light);
+}
+
+.sidebar-camera-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-camera-options .createCamCard-button {
+    width: 100%;
+    text-align: center;
+    padding: 12px 16px;
+    background: var(--accent-green);
+    color: var(--main-text);
+    border: 1px solid var(--accent-green);
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.sidebar-camera-options .createCamCard-button:hover {
+    background: var(--accent-green-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 253, 203, 0.3);
+}
+
+/* Sidebar Camera Card */
+.sidebar-camera-card {
+    margin-top: 20px;
+    padding: 15px;
+    background: var(--secondary-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-camera-card h4 {
+    margin-bottom: 15px;
+    color: var(--text-white);
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+}
+
+.camera-card-content p {
+    margin-bottom: 8px;
+    color: var(--text-white);
+}
+
+.camera-card-content p strong {
+    color: var(--accent-green);
+}
+
+.sidebar-cam-card-btn {
+    background: var(--accent-green);
+    color: var(--main-text);
+    border: 1px solid var(--accent-green);
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.sidebar-cam-card-btn:hover {
+    background: var(--accent-green-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 253, 203, 0.3);
+}
+
+/* Sidebar Running Order */
+.running-order-sidebar {
+    padding: 20px;
+    color: var(--text-white);
+}
+
+.running-order-sidebar h3 {
+    margin-bottom: 15px;
+    color: var(--text-white);
+    font-size: 1.5rem;
+}
+
+.running-order-sidebar p {
+    margin-bottom: 20px;
+    color: var(--text-light);
+}
+
+.sidebar-running-order-table {
+    margin-top: 15px;
+}
+
+.sidebar-running-order-table .running-order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: var(--table-bg);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sidebar-running-order-table .running-order-table th {
+    background: var(--table-header);
+    color: var(--text-white);
+    padding: 12px 10px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+    font-weight: 600;
+}
+
+.sidebar-running-order-table .running-order-table td {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    color: var(--table-text);
+}
+
+.sidebar-running-order-table .running-order-table tfoot tr {
+    background: var(--accent-green);
+    color: var(--main-text);
+    font-weight: bold;
+}
+
+.coming-soon-notice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-light);
+    background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+    margin: 20px;
+    border-radius: 12px;
+    transition: all 0.5s ease;
+    margin-top: calc(50vh - 100px);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+
+
+
+
+.coming-soon-notice i {
+    font-size: 24px;
+    color: #ffffff;
+    margin-bottom: 12px;
+    animation: pulse 2s infinite;
+}
+
+.coming-soon-notice span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.4;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Ensure shot type dropdown and shot subject are always side by side */
+.shot-input-row .shot-type-select + .shotSubject {
+    margin-left: 8px !important;
+    display: inline-block !important;
+}
+
+/* Force shot type and shot subject to always be inline and side by side */
+.shot-input-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+}
+
+.shot-input-row .shot-type-select {
+    flex: 0 0 120px !important;
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+    display: inline-block !important;
+    vertical-align: top !important;
+    position: static !important;
+    float: none !important;
+}
+
+.shot-input-row .shotSubject {
+    flex: 0 0 120px !important;
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+    display: inline-block !important;
+    vertical-align: top !important;
+    position: static !important;
+    float: none !important;
+    margin-left: 8px !important;
+}
+
+/* Ensure the shot type wrapper maintains proper layout */
+.shot-type-wrapper .shot-inputs-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+}
+
+/* Override any conflicting positioning */
+.shot-input-row .shot-type-select,
+.shot-input-row .shotSubject {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    float: none !important;
+    clear: none !important;
+}
+
+/* TEMPORARILY HIDE UNDO/REDO BUTTONS */
+.undo-button,
+.redo-button {
+    display: none !important;
+}
+
+/* Cut button styling */
+.addCut-button {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
+    transform: translateY(2px) !important;
+}
+
+/* Brand text styling */
+.brand-text {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: 1px;
+    margin-left: 15px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Action buttons group positioning */
+.toolbar-group.action-buttons {
+    margin-right: 30px; /* Space between action buttons and styling buttons */
+    gap: 12px; /* Space between individual action buttons */
+}
+
+/* Improved spacing for all toolbar groups */
+.toolbar-group {
+    gap: 15px; /* Consistent spacing between button groups */
+}
+
+/* Center group spacing */
+.toolbar-group.center {
+    margin: 0 40px; /* More space around center area */
+}
+
+/* Formatting buttons spacing */
+.toolbar-group.formatting {
+    margin-left: 25px; /* Space between action buttons and formatting */
+    gap: 8px; /* Tighter spacing between formatting buttons */
+}
+
+/* Right side spacing */
+.toolbar-group.right {
+    margin-left: 30px; /* Space between formatting and right side buttons */
+}
+
+/* Force shot subject inline positioning - maximum specificity override */
+.shot-input-row .shotSubject,
+.shot-input-row textarea[name="shotSubject"],
+.shot-input-row .editable-text.shotSubject,
+.shot-type-wrapper .shotSubject,
+.shot-type-wrapper .shot-inputs-container .shot-input-row .shotSubject {
+    display: inline-block !important;
+    position: static !important;
+    float: none !important;
+    clear: none !important;
+    margin-left: 8px !important;
+    vertical-align: top !important;
+    width: 120px !important;
+    flex: 0 0 120px !important;
+    margin-right: 8px !important;
+    transform: translateY(-4px) !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: 1 !important;
+}
+
+/* Ensure shot input row layout */
+.shot-input-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+}
+
+
+

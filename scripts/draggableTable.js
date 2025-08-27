@@ -5,6 +5,12 @@
 window.initDraggable = function() {
     const tbody = document.querySelector('#event-table tbody');
     
+    // Safety check - ensure tbody exists before proceeding
+    if (!tbody) {
+        console.warn('Table tbody not found. Draggable functionality will not be initialized.');
+        return;
+    }
+    
     // Enable drag only on drag buttons
     tbody.querySelectorAll('.row-button.drag').forEach(button => {
         const row = button.closest('tr');

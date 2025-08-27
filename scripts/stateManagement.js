@@ -46,7 +46,6 @@ function saveFloorPlanState(floorPlanData, customItems = null) {
     // Update session storage
     sessionStorage.setItem('productionState', JSON.stringify(productionState));
     
-    console.log('Session storage updated with floorPlan data');
 }
 
 /**
@@ -64,12 +63,9 @@ function getFloorPlanState() {
  */
 function restoreFloorPlanToLocalStorage() {
     if (productionState && productionState.floorPlan) {
-        console.log('Restoring floor plan state to localStorage from production state');
         localStorage.setItem('currentFloorPlanState', productionState.floorPlan);
         localStorage.setItem('floorPlanStateChanged', Date.now().toString());
-        console.log('Floor plan state restored to localStorage');
     } else {
-        console.log('No floor plan state in production to restore');
         // Clear any stale floor plan data
         localStorage.removeItem('currentFloorPlanState');
         localStorage.removeItem('floorPlanStateChanged');
@@ -98,7 +94,6 @@ let isInitializing = true; // Prevents state sync during page load
  * @param {string} name - The name of the production.
  */
 function initializeProductionState(name) {
-    console.log(`Initializing state for project: ${name}`);
     isInitializing = true; // Set flag to block premature syncs
     productionState = {
         name: name,
@@ -112,12 +107,10 @@ function initializeProductionState(name) {
     // Defer enabling sync to ensure all initialization is complete
     setTimeout(() => {
         isInitializing = false;
-        console.log("Initialization complete. State sync is now active.");
         
         // If no state was restored, the table will have the default starting row.
         // We need to perform the first sync now to capture it.
         if (!stateRestored) {
-            console.log("No existing state found. Performing initial sync.");
             syncStateFromTable();
         }
     }, 500); // Delay to ensure DOM is fully loaded and processed
@@ -135,7 +128,6 @@ function updateProductionTitle(newTitle) {
     }
     
     const trimmedTitle = newTitle.trim();
-    console.log(`Updating production title from "${productionState.name}" to "${trimmedTitle}"`);
     
     // Update the production state
     productionState.name = trimmedTitle;
@@ -143,7 +135,6 @@ function updateProductionTitle(newTitle) {
     // Save the updated state to session storage
     sessionStorage.setItem('productionState', JSON.stringify(productionState));
     
-    console.log('Production title updated successfully in state');
 }
 
 /**
@@ -151,7 +142,6 @@ function updateProductionTitle(newTitle) {
  * This function is called by the home button to reset the application state.
  */
 function clearProductionState() {
-    console.log('Clearing production state');
     
     // Reset the production state object
     productionState = {};
@@ -166,7 +156,6 @@ function clearProductionState() {
     // Clear the production title
     $('.production-title').text('');
     
-    console.log('Production state cleared');
 }
 
 /**
@@ -193,18 +182,40 @@ function extractRowData(row) {
     // Extract data based on the type
     switch (rowObject.type) {
         case 'event':
-            const shotTypeSelect = rowJQuery.find('.shot-type-select');
-            let shotType = shotTypeSelect.val();
-            if (shotType === 'CUSTOM') {
-                shotType = rowJQuery.find('.custom-shot-type').val() || 'CUSTOM';
-            }
+            // Extract all shot types and subjects
+            const shotRows = rowJQuery.find('.shot-input-row');
+            const shots = [];
+            
+            shotRows.each(function() {
+                const row = $(this);
+                const shotTypeSelect = row.find('.shot-type-select');
+                let shotType = shotTypeSelect.val();
+                let customText = '';
+                let isCustom = false;
+                
+                if (shotType === 'CUSTOM') {
+                    customText = row.find('.custom-shot-type').val() || '';
+                    isCustom = true;
+                    // Keep the shotType as 'CUSTOM' but store custom text separately
+                    shotType = 'CUSTOM';
+                }
+                
+                const shotSubject = row.find('.shotSubject').val();
+                
+                // Always include the shot, even if it's the default "SHOT TYPE"
+                shots.push({
+                    shotType: shotType,
+                    shotSubject: shotSubject,
+                    customText: customText,
+                    isCustom: isCustom
+                });
+            });
 
             rowObject.eventNumber = rowJQuery.find('td:first-child').text();
             rowObject.shot = {
                 cameraNum: rowJQuery.find('.cameraNum').val(),
                 cameraPos: rowJQuery.find('.cameraPos').val(),
-                shotType: shotType,
-                shotSubject: rowJQuery.find('.shotSubject').val(),
+                shots: shots,
                 extraInfo: rowJQuery.find('.extraInfo').val()
             };
             rowObject.script = rowJQuery.find('td:nth-child(3)').html(); // Includes HTML formatting
@@ -280,10 +291,8 @@ function updateInsertInputsInDOM() {
  */
 function syncStateFromTable() {
     if (isInitializing) {
-        console.log("Sync deferred: application is still initializing.");
         return;
     }
-    console.log("Syncing state from table...");
     
     // Update time inputs in DOM to ensure accurate state capture
     updateTimeInputsInDOM();
@@ -314,18 +323,88 @@ function rebuildTableFromState() {
     // Helper functions to create row elements
     function createEventRow(event) {
         const shotTypeOptions = ['SHOT TYPE', 'ES', 'WS', '2S', '3S', 'MS', 'MCU', 'CU', 'ECU', 'AS DIRECTED', 'CUSTOM'];
-
-        // Build the shot type select options with the saved selection
-        const shotTypeSelectHTML = shotTypeOptions.map(option => `
-            <option value="${option}" ${option === event.shot.shotType ? 'selected' : ''}>${option}</option>
-        `).join('');
-
-        const shotTypeSelect = `<select class="form-control shot-type-select">${shotTypeSelectHTML}</select>`;
         
-        // If CUSTOM, include the custom input with the saved value
-        const customInput = event.shot.shotType === 'CUSTOM'
-            ? `<input type="text" class="custom-shot-type" autocomplete="off" style="display:block" value="${event.shot.shotType}">`
-            : `<input type="text" class="custom-shot-type" autocomplete="off" style="display:none" value="">`;
+        // Handle both old format (single shot) and new format (shots array)
+        let shots = event.shot.shots || [];
+        
+        // Ensure we always have at least one shot row
+        if (shots.length === 0) {
+            if (event.shot.shotType && event.shot.shotType !== 'SHOT TYPE') {
+                shots = [{
+                    shotType: event.shot.shotType,
+                    shotSubject: event.shot.shotSubject || ''
+                }];
+            } else {
+                shots = [{
+                    shotType: 'SHOT TYPE',
+                    shotSubject: ''
+                }];
+            }
+        }
+        
+        // Build shot type wrapper content
+        let shotTypeWrapperContent = '';
+        shots.forEach((shot, index) => {
+            const isFirst = index === 0;
+            // Create the shot type select dropdown HTML with all options and selected state
+            const shotTypeSelectHTML = `
+                <option value="SHOT TYPE" ${shot.shotType === 'SHOT TYPE' ? 'selected' : ''}>SHOT TYPE</option>
+                <option value="ES" ${shot.shotType === 'ES' ? 'selected' : ''}>ES</option>
+                <option value="WS" ${shot.shotType === 'WS' ? 'selected' : ''}>WS</option>
+                <option value="2S" ${shot.shotType === '2S' ? 'selected' : ''}>2S</option>
+                <option value="3S" ${shot.shotType === '3S' ? 'selected' : ''}>3S</option>
+                <option value="MS" ${shot.shotType === 'MS' ? 'selected' : ''}>MS</option>
+                <option value="MCU" ${shot.shotType === 'MCU' ? 'selected' : ''}>MCU</option>
+                <option value="CU" ${shot.shotType === 'CU' ? 'selected' : ''}>CU</option>
+                <option value="ECU" ${shot.shotType === 'ECU' ? 'selected' : ''}>ECU</option>
+                <option value="AS DIRECTED" ${shot.shotType === 'AS DIRECTED' ? 'selected' : ''}>AS DIRECTED</option>
+                <option value="CUSTOM" ${shot.shotType === 'CUSTOM' ? 'selected' : ''}>CUSTOM</option>
+            `;
+            
+            // Always include remove button - no minimum restriction
+            const removeButton = '<button class="remove-shot-btn" title="Remove this shot type and subject">×</button>';
+            
+            // If this is a custom shot, create a hidden spacer to maintain layout
+            if (shot.isCustom) {
+                const shotTypeSelect = `<select class="form-control shot-type-select" style="display:none; width:120px; visibility:hidden;">${shotTypeSelectHTML}</select>`;
+                const customInput = `<textarea class="custom-shot-type" autocomplete="off" style="display:block; width: 100% !important; max-width: 100% !important; min-width: 100% !important; overflow: hidden !important; box-sizing: border-box !important; resize: none;">${shot.customText || ''}</textarea>`;
+                const shotSubject = `<textarea class="editable-text shotSubject" name="shotSubject" autocomplete="off" placeholder="Shot Subject" style="resize: none; flex: 0 0 120px; width: 120px; display: inline-block;">${shot.shotSubject || ''}</textarea>`;
+                
+                shotTypeWrapperContent += `
+                    <div class="shot-input-row" data-shot-index="${index}">
+                        ${shotTypeSelect}
+                        ${customInput}
+                        ${shotSubject}
+                        ${removeButton}
+                        
+                    </div>
+                `;
+            } else {
+                const shotTypeSelect = `<select class="form-control shot-type-select" style="flex: 0 0 120px; width: 120px;">${shotTypeSelectHTML}</select>`;
+                const customInput = '';
+                const shotSubject = `<textarea class="editable-text shotSubject" name="shotSubject" autocomplete="off" placeholder="Shot Subject" style="resize: none; flex: 0 0 120px; width: 120px; display: inline-block;">${shot.shotSubject || ''}</textarea>`;
+                
+                shotTypeWrapperContent += `
+                    <div class="shot-input-row" data-shot-index="${index}">
+                        ${shotTypeSelect}
+                        ${customInput}
+                        ${shotSubject}
+                        ${removeButton}
+                    </div>
+                `;
+            }
+        });
+        
+        // Add the add button after the last shot row
+        shotTypeWrapperContent += `
+            <div class="add-shot-btn" title="Add another shot type and subject">
+                <div class="add-btn-line"></div>
+                <div class="add-btn-circle">
+                    <span class="add-btn-plus">+</span>
+                </div>
+                <div class="add-btn-line"></div>
+            </div>
+        `;
 
         const shotCellContent = `
             <div>
@@ -334,10 +413,10 @@ function rebuildTableFromState() {
                     <input type="text" class="editable-cell cameraPos event_highlighted" name="cameraPos" autocomplete="off" placeholder="Camera Position" value="${event.shot.cameraPos || ''}">
                 </div>
                 <div class="shot-type-flex-container event_highlighted">
-                    <div class="shot-type-wrapper">
-                        ${shotTypeSelect}
-                        ${customInput}
-                        <input type="text" class="editable-text shotSubject" name="shotSubject" autocomplete="off" placeholder="Shot Subject" value="${event.shot.shotSubject || ''}">
+                    <div class="shot-type-wrapper" data-shot-group="0">
+                        <div class="shot-inputs-container">
+                            ${shotTypeWrapperContent}
+                        </div>
                     </div>
                 </div>
                 <input type="text" class="editable-cell extraInfo event_highlighted" name="extraInfo" autocomplete="off" placeholder="Additional Info (E.g., TRACK OUT)" value="${event.shot.extraInfo || ''}">
@@ -453,6 +532,35 @@ function rebuildTableFromState() {
     } else {
         console.warn('initDraggable function not available');
     }
+    
+    // Update remove button visibility for all shot type wrappers
+    $('.shot-type-wrapper').each(function() {
+        if (typeof updateRemoveButtonVisibility === 'function') {
+            updateRemoveButtonVisibility($(this));
+        }
+    });
+    
+    // Trigger event to notify that state restoration is complete
+    $(document).trigger('stateRestored');
+    
+    // Ensure all form elements have their values properly set
+    setTimeout(() => {
+        $('.shot-type-select').each(function() {
+            const $select = $(this);
+            const selectedValue = $select.find('option:selected').val();
+            if (selectedValue) {
+                $select.val(selectedValue);
+            }
+        });
+        
+        $('.shotSubject').each(function() {
+            const $textarea = $(this);
+            const content = $textarea.text() || $textarea.val() || '';
+            if (content) {
+                $textarea.val(content);
+            }
+        });
+    }, 300);
 }
 
 
@@ -462,7 +570,6 @@ function reloadProductionStateIfPresent() {
         try {
             const state = JSON.parse(stateString);
             if (state.name && productionState.name && state.name === productionState.name && Array.isArray(state.events) && state.events.length > 0) {
-                console.log('Found existing state for project:', state.name, 'with', state.events.length, 'events');
                 productionState = state;
                 rebuildTableFromState();
                 return true; // Indicate that state was restored
@@ -492,7 +599,6 @@ function loadProductionFromFile(fileContent) {
             return false;
         }
         
-        console.log(`Successfully loaded production: "${loadedState.name}"`);
         
         // Update the global state
         productionState = loadedState;
@@ -508,7 +614,8 @@ function loadProductionFromFile(fileContent) {
         $('.production-title').text(productionState.name);
         document.title = `${productionState.name} - Studio Script Writer`;
         
-        // Ensure we start in Script view, not Running Order view
+        //@
+        // // Ensure we start in Script view, not Running Order view
         if (typeof window.resetToScriptView === 'function') {
             window.resetToScriptView();
         }
@@ -516,7 +623,6 @@ function loadProductionFromFile(fileContent) {
         // Rebuild the table with the loaded data
         rebuildTableFromState();
         
-        console.log('Production loaded and UI updated successfully');
         return true;
         
     } catch (error) {
@@ -542,7 +648,6 @@ function saveStateToFile() {
     if (mainTable.is(':visible') && mainTable.find('tbody tr').length > 0) {
         syncStateFromTable();
     } else {
-        console.log('Main table not visible (probably in Running Order view), using existing state for save');
     }
 
     // Convert the state object to a formatted JSON string
@@ -567,7 +672,6 @@ function saveStateToFile() {
     const filename = `${productionState.name}-script.pwpro`;
     showNotification(`File saved successfully and downloaded as: ${filename}`, 'success');
     
-    console.log("Production state saved to file with", productionState.events.length, "events");
 }
 
 /**

@@ -211,6 +211,7 @@ $(document).ready(function() {
             const span = document.createElement('span');
             span.className = 'cut-line';
             span.textContent = text;
+            span.style.transform = 'translateY(5px)';
             return span;
         }
 
@@ -286,7 +287,6 @@ $(document).ready(function() {
                 const textNode = addSlashAfter(newSpan);
                 moveCursorAfter(textNode);
             } catch (e) {
-                console.log("Could not add cut line: Selection may be invalid");
             }
         }
     });

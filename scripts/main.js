@@ -15,10 +15,25 @@ let floorPlanWindow = null;
 
 // Main application initialization
 $(document).ready(function() {
-    console.log('Main application initializing...');
     
-    // Initialize the first item row
-    $('.addItem-button').trigger('click');
+    // Initialize sidebar navigation if it exists
+    if (typeof sidebarNav !== 'undefined') {
+        // Handle URL hash navigation
+        if (window.location.hash) {
+            const page = window.location.hash.substring(1);
+            sidebarNav.navigateToPage(page);
+        }
+        
+        // Initialize the first rows on the script page
+        if (typeof sidebarNav !== 'undefined') {
+            // Wait for the script page to be loaded, then initialize rows
+            setTimeout(() => {
+                if (sidebarNav.getCurrentPage() === 'script') {
+                    // Removed automatic row creation - let users add rows manually
+                }
+            }, 100);
+        }
+    }
     
     // Set up storage event listeners
     window.addEventListener('storage', function(e) {
@@ -57,11 +72,19 @@ $(document).ready(function() {
         // Only update if the title has actually changed and is not empty
         if (newTitle && newTitle !== sessionStorage.getItem('projectName')) {
             
+            // Get the old project name before updating
+            const oldProjectName = sessionStorage.getItem('projectName');
+            
             // Update session storage
             sessionStorage.setItem('projectName', newTitle);
             
             // Update the page title
             document.title = newTitle + ' - Studio Script Writer';
+            
+            // Clear camera card notes from the old project if it exists
+            if (oldProjectName && typeof clearCameraCardNotes === 'function') {
+                clearCameraCardNotes(oldProjectName);
+            }
             
             // Update the production state if the function exists
             if (typeof updateProductionTitle === 'function') {
@@ -79,19 +102,19 @@ $(document).ready(function() {
     
     // Set up row action event listeners
     $(document).on('click', '.row-button.remove', function() {
-        if ($('#event-table tbody tr').length > 1) {
-            $(this).closest('tr').remove();
-            updateEventNumbers(); // Reorder event numbers
-            updateItemNumbers(); // Reorder item numbers for the running order
-            initDraggable(); // Reinitialize draggable after removing a row
-            
-            // Sync state after removing row
-            setTimeout(function() {
-                if (typeof syncStateFromTable === 'function') {
-                    syncStateFromTable();
-                }
-            }, 150);
-        }
+        
+        $(this).closest('tr').remove();
+        updateEventNumbers(); // Reorder event numbers
+        updateItemNumbers(); // Reorder item numbers for the running order
+        initDraggable(); // Reinitialize draggable after removing a row
+        
+        // Sync state after removing row
+        setTimeout(function() {
+            if (typeof syncStateFromTable === 'function') {
+                syncStateFromTable();
+            }
+        }, 150);
+    
     });
     
     // Set up draggable reinitialization
@@ -99,7 +122,6 @@ $(document).ready(function() {
         setTimeout(initDraggable, 0);
     });
     
-    console.log('Main application initialization complete');
 });
 
 // Page load handler for authentication and project state
@@ -137,9 +159,16 @@ window.onload = function() {
                 logoutContainer.style.display = 'flex';
             }
         } else if (isKindeLoggedIn === 'true') {
-            // Authenticated but no project selected
-            $('#logged_out_view').hide();
-            $('#project-login').show();
+            // Authenticated but no project selected - only show project-login if no project is being created
+            if (!sessionStorage.getItem('projectName')) {
+                $('#logged_out_view').hide();
+                $('#project-login').show();
+            } else {
+                // If there's a project name, go straight to main content
+                $('#logged_out_view').hide();
+                $('#project-login').hide();
+                $('.main-content').show();
+            }
         } else {
             // Not authenticated
             $('#logged_out_view').show();

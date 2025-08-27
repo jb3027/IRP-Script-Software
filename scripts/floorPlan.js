@@ -626,7 +626,6 @@ function initializeFloorPlan(floorPlanWindow, selectedSubjects, camList) {
                                     url: window.location.href
                                 }));
                             } catch (e) {
-                                console.log('Could not dispatch storage event to opener:', e);
                             }
                         }
                     }
@@ -1232,3 +1231,250 @@ window.stopFloorPlanSync = stopFloorPlanSync;
 window.openFloorPlan = openFloorPlan;
 window.initializeFloorPlan = initializeFloorPlan;
 window.setupFloorPlanUI = setupFloorPlanUI; 
+
+// Function to load floor plan content (for sidebar navigation)
+window.loadFloorPlan = function() {
+    const floorPlanContent = document.getElementById('floor-plan-content');
+    if (!floorPlanContent) return;
+
+    // Check if there's existing floor plan data
+    const existingFloorPlan = localStorage.getItem('currentFloorPlanState');
+    
+    if (existingFloorPlan) {
+        try {
+            const floorPlanData = JSON.parse(existingFloorPlan);
+            this.loadExistingFloorPlan(floorPlanContent, floorPlanData);
+        } catch (error) {
+            console.error('Error parsing floor plan data:', error);
+            this.createNewFloorPlan(floorPlanContent);
+        }
+    } else {
+        this.createNewFloorPlan(floorPlanContent);
+    }
+};
+
+// Helper function to load existing floor plan
+function loadExistingFloorPlan(container, floorPlanData) {
+    container.innerHTML = `
+        <div class="floor-plan-container">
+            <div class="floor-plan-header">
+                <h3>Floor Plan</h3>
+                <div class="floor-plan-actions">
+                    <button class="btn button2" onclick="editFloorPlan()">Edit Floor Plan</button>
+                    <button class="btn button2" onclick="exportFloorPlan()">Export</button>
+                    <button class="btn button2" onclick="createNewFloorPlan()">New Floor Plan</button>
+                </div>
+            </div>
+            <div class="floor-plan-preview">
+                <div class="floor-plan-canvas" id="floor-plan-canvas">
+                    <!-- Floor plan canvas will be loaded here -->
+                </div>
+            </div>
+            <div class="floor-plan-info">
+                <h4>Floor Plan Information</h4>
+                <p><strong>Last Modified:</strong> ${new Date(floorPlanData.lastModified || Date.now()).toLocaleString()}</p>
+                <p><strong>Items:</strong> ${floorPlanData.customItems ? floorPlanData.customItems.length : 0} custom items</p>
+            </div>
+        </div>
+    `;
+
+    // Apply floor plan styles
+    this.applyFloorPlanStyles();
+    
+    // Load the actual floor plan canvas if it exists
+    if (floorPlanData.canvasJSON) {
+        this.loadFloorPlanCanvas(floorPlanData.canvasJSON);
+    }
+}
+
+// Helper function to create new floor plan
+function createNewFloorPlan(container) {
+    container.innerHTML = `
+        <div class="floor-plan-container">
+            <div class="floor-plan-header">
+                <h3>Create New Floor Plan</h3>
+                <p>Design your set layout and camera positions</p>
+            </div>
+            <div class="floor-plan-setup">
+                <div class="setup-options">
+                    <h4>Setup Options</h4>
+                    <div class="option-group">
+                        <label>Canvas Size:</label>
+                        <select id="canvas-size">
+                            <option value="800x600">800 x 600</option>
+                            <option value="1024x768">1024 x 768</option>
+                            <option value="1200x900">1200 x 900</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label>Background:</label>
+                        <select id="background-type">
+                            <option value="grid">Grid</option>
+                            <option value="plain">Plain</option>
+                            <option value="image">Image</option>
+                        </select>
+                    </div>
+                    <button class="btn button2 primary" onclick="initializeFloorPlan()">Create Floor Plan</button>
+                </div>
+                <div class="setup-preview">
+                    <h4>Preview</h4>
+                    <div class="preview-canvas">
+                        <div class="canvas-placeholder">
+                            <i class="fas fa-map"></i>
+                            <p>Floor plan preview will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Apply floor plan styles
+    this.applyFloorPlanStyles();
+}
+
+// Helper function to apply floor plan styles
+function applyFloorPlanStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .floor-plan-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .floor-plan-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .floor-plan-header h3 {
+            color: var(--text-white);
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .floor-plan-header p {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+        .floor-plan-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+        .floor-plan-preview {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            min-height: 400px;
+        }
+        .floor-plan-canvas {
+            width: 100%;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .floor-plan-info {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .floor-plan-info h4 {
+            color: var(--text-white);
+            margin-bottom: 16px;
+        }
+        .floor-plan-info p {
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        .floor-plan-setup {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .setup-options {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .setup-options h4 {
+            color: var(--text-white);
+            margin-bottom: 20px;
+        }
+        .option-group {
+            margin-bottom: 20px;
+        }
+        .option-group label {
+            display: block;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        .option-group select {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-white);
+        }
+        .setup-preview {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .setup-preview h4 {
+            color: var(--text-white);
+            margin-bottom: 20px;
+        }
+        .preview-canvas {
+            height: 300px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .canvas-placeholder {
+            text-align: center;
+            color: var(--text-light);
+        }
+        .canvas-placeholder i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--accent-green);
+        }
+        @media (max-width: 768px) {
+            .floor-plan-setup {
+                grid-template-columns: 1fr;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Helper function to load floor plan canvas
+function loadFloorPlanCanvas(canvasJSON) {
+    // This would integrate with the existing floor plan system
+    // For now, we'll show a placeholder
+    const canvas = document.getElementById('floor-plan-canvas');
+    if (canvas) {
+        canvas.innerHTML = `
+            <div class="canvas-loaded">
+                <i class="fas fa-check-circle"></i>
+                <p>Floor plan loaded successfully</p>
+                <small>Canvas data available</small>
+            </div>
+        `;
+    }
+} 

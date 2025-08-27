@@ -11,17 +11,33 @@ const dropdownOptions = ['SHOT TYPE', 'ES', 'WS', '2S', '3S', 'MS', 'MCU', 'CU',
 // CREATE SHOT TYPE CELL
 function createShotTypeCell(shotType, firstTime) {
     const selectHTML = `
-        <div class="shot-type-wrapper">
-            <select class="form-control shot-type-select">
-                ${dropdownOptions.map(option => `
-                    <option value="${option}" ${(option === shotType) ? 'selected' : ''}>${option}</option>
-                `).join('')}
-            </select>
-            <input type="text" class="custom-shot-type" name="customShotType" autocomplete="off" style="display:none">
-            <input type="text" class="editable-text shotSubject" name="shotSubject" autocomplete="off" placeholder="Shot Subject">
+        <div class="shot-type-wrapper" data-shot-group="0">
+            <div class="shot-inputs-container">
+                <div class="shot-input-row" data-shot-index="0">
+                    <select class="form-control shot-type-select">
+                        <option value="">SHOT TYPE</option>
+                        <option value="ES">ES</option>
+                        <option value="WS">WS</option>
+                        <option value="2S">2S</option>
+                        <option value="3S">3S</option>
+                        <option value="MS">MS</option>
+                        <option value="CU">CU</option>
+                    </select>
+                    <textarea class="custom-shot-type" autocomplete="off" style="display:none; width: 100% !important; max-width: 100% !important; min-width: 100% !important; overflow: hidden !important; box-sizing: border-box !important; resize: none;"></textarea>
+                    <textarea class="editable-text shotSubject" name="shotSubject" autocomplete="off" placeholder="Shot Subject" style="resize: none;"></textarea>
+                    <button class="remove-shot-btn" title="Remove this shot type and subject" style="display:none">×</button>
+                </div>
+                <div class="add-shot-btn" title="Add another shot type and subject">
+                    <div class="add-btn-line"></div>
+                    <div class="add-btn-circle">
+                        <span class="add-btn-plus">+</span>
+                    </div>
+                    <div class="add-btn-line"></div>
+                </div>
+            </div>
         </div>`;
 
-    return '<div>' +
+    const result = '<div>' +
         '<div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">' +
             '<input type="text" class="editable-cell cameraNum event_highlighted" name="cameraNum" autocomplete="off" placeholder="Camera Number">' + 
             '<input type="text" class="editable-cell cameraPos event_highlighted" name="cameraPos" autocomplete="off" placeholder="Camera Position">' + 
@@ -31,6 +47,8 @@ function createShotTypeCell(shotType, firstTime) {
         '</div>' +
         '<input type="text" class="editable-cell extraInfo event_highlighted" name="extraInfo" autocomplete="off" placeholder="Additional Info (E.g., TRACK OUT)">' +
     '</div>';
+    
+    return result;
 }
 
 // CREATE INSERT CELL

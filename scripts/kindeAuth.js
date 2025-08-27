@@ -1,6 +1,38 @@
 // Initialize Kinde client - wait for DOM to load
 let kinde;
 
+// Function to check and handle authentication redirect
+async function handleAuthRedirect() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+    
+    if (code && state) {
+        
+        // Clear URL parameters immediately to prevent reprocessing
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Wait a moment for Kinde to process the authentication
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        try {
+            if (kinde) {
+                const isAuthenticated = await kinde.isAuthenticated();
+                if (isAuthenticated) {
+                    const user = await kinde.getUser();
+                    if (user) {
+                        handleAuthentication(user);
+                        return true; // Successfully handled
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error handling auth redirect:', error);
+        }
+    }
+    return false; // No redirect or failed to handle
+}
+
 // Initialize the Kinde client after DOM loads
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -24,6 +56,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
         });
+        
+        // Try to handle any authentication redirect first
+        const redirectHandled = await handleAuthRedirect();
+        if (redirectHandled) {
+            // Redirect was handled, skip normal authentication check
+            setupEventListeners();
+            return;
+        }
         
         // Check if user is already authenticated using multiple methods
         let isAuthenticated = false;
@@ -76,14 +116,24 @@ function setupEventListeners() {
     if (loginBtn) {
         loginBtn.addEventListener('click', async (e) => {
             e.preventDefault();
+            
             try {
                 if (!kinde) {
                     console.error('Kinde client not initialized');
                     return;
                 }
+                
                 await kinde.login();
+                
             } catch (error) {
                 console.error('Login error:', error);
+                // Try to get more details about the error
+                if (error.message) {
+                    console.error('Error message:', error.message);
+                }
+                if (error.stack) {
+                    console.error('Error stack:', error.stack);
+                }
             }
         });
     }
@@ -91,14 +141,24 @@ function setupEventListeners() {
     if (registerBtn) {
         registerBtn.addEventListener('click', async (e) => {
             e.preventDefault();
+            
             try {
                 if (!kinde) {
                     console.error('Kinde client not initialized');
                     return;
                 }
+                
                 await kinde.register();
+                
             } catch (error) {
                 console.error('Register error:', error);
+                // Try to get more details about the error
+                if (error.message) {
+                    console.error('Error message:', error.message);
+                }
+                if (error.stack) {
+                    console.error('Error stack:', error.stack);
+                }
             }
         });
     }
@@ -135,7 +195,6 @@ function renderLoggedInView(user) {
     
     if (existingProjectName) {
         // User already has a project selected, show main content directly
-        console.log('Project already selected, showing main content:', existingProjectName);
         if (projectLogin) projectLogin.style.display = 'none';
         if (mainContent) {
             mainContent.style.display = 'block';
@@ -148,7 +207,6 @@ function renderLoggedInView(user) {
         }
     } else {
         // No project selected, show project selection screen
-        console.log('No project selected, showing project selection screen');
         if (mainContent) mainContent.style.display = 'none';
         
         // Show project selection with extensive debugging and force visibility
@@ -203,9 +261,9 @@ function addLogoutButton() {
     // Create logout button
     const logoutBtn = document.createElement('button');
     logoutBtn.id = 'kinde-logout-btn';
-    logoutBtn.className = 'btn button2';
+    logoutBtn.className = 'btn button2 logout-button';
     logoutBtn.title = 'Logout';
-    logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+    logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i>';
     
     // Add click handler
     logoutBtn.addEventListener('click', async () => {

@@ -13,7 +13,7 @@ Your JavaScript obfuscation system is now fully configured and ready to use for 
 ### 2. NPM Scripts Added
 - `npm run build:minify` - Basic minification (fastest, least protection)
 - `npm run build:basic` - Standard obfuscation (good protection/performance balance)
-- `npm run build:advanced` - Maximum protection (slower, highest security)
+- `npm run build:advanced` - Maximum protection (slower, highest security) ****
 - `npm run build:all` - Builds all three versions
 - `npm run compare` - Compare obfuscation levels
 - `npm run serve:minify/basic/advanced` - Local testing servers

@@ -1,6 +1,117 @@
 // UI Event Handlers
 // This file handles all toolbar button clicks and UI interactions
 
+// Draggable Formatting Sidebar
+$(document).ready(function() {
+    const sidebar = $('#formatting-sidebar');
+    const dragHandle = $('#drag-handle');
+    let isDragging = false;
+    let currentX = 0;
+    let currentY = 0;
+    let initialX = 0;
+    let initialY = 0;
+    let xOffset = 0;
+    let yOffset = 0;
+
+    // Get sidebar dimensions and screen boundaries
+    function getBoundaries() {
+        const sidebarWidth = sidebar.outerWidth();
+        const sidebarHeight = sidebar.outerHeight();
+        const navHeight = $('.nav-toolbar').outerHeight() || 40; // Default nav height
+        const windowWidth = $(window).width();
+        const windowHeight = $(window).height();
+        
+        return {
+            minX: -20,
+            maxX: windowWidth - sidebarWidth - 5,
+            minY: navHeight - 100, // 1px padding below nav
+            maxY: windowHeight - sidebarHeight - 100, // 10px padding from bottom
+            sidebarWidth,
+            sidebarHeight
+        };
+    }
+
+    // Only allow dragging when clicking on the drag handle
+    dragHandle.on('mousedown', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        isDragging = true;
+        sidebar.addClass('dragging');
+        
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+        
+        // Change cursor to grabbing
+        dragHandle.css('cursor', 'grabbing');
+    });
+
+    // Optimized mousemove with requestAnimationFrame and boundary constraints
+    let animationId;
+    $(document).on('mousemove', function(e) {
+        if (!isDragging) return;
+        
+        e.preventDefault();
+        
+        // Cancel any pending animation frame
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
+        
+        // Use requestAnimationFrame for smooth dragging
+        animationId = requestAnimationFrame(function() {
+            const boundaries = getBoundaries();
+            
+            // Calculate new position
+            let newX = e.clientX - initialX;
+            let newY = e.clientY - initialY;
+            
+            // Apply boundary constraints
+            newX = Math.max(boundaries.minX, Math.min(boundaries.maxX, newX));
+            newY = Math.max(boundaries.minY, Math.min(boundaries.maxY, newY));
+            
+            xOffset = newX;
+            yOffset = newY;
+            
+            setTranslate(newX, newY, sidebar);
+        });
+    });
+
+    $(document).on('mouseup', function() {
+        if (!isDragging) return;
+        
+        isDragging = false;
+        sidebar.removeClass('dragging');
+        dragHandle.css('cursor', 'grab');
+        
+        // Cancel any pending animation
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
+        
+        // Store final position
+        initialX = xOffset;
+        initialY = yOffset;
+    });
+
+    // Handle window resize to keep sidebar within bounds
+    $(window).on('resize', function() {
+        const boundaries = getBoundaries();
+        
+        // If current position is outside new boundaries, adjust it
+        if (xOffset < boundaries.minX) xOffset = boundaries.minX;
+        if (xOffset > boundaries.maxX) xOffset = boundaries.maxX;
+        if (yOffset < boundaries.minY) yOffset = boundaries.minY;
+        if (yOffset > boundaries.maxY) yOffset = boundaries.maxY;
+        
+        setTranslate(xOffset, yOffset, sidebar);
+    });
+
+    function setTranslate(xPos, yPos, el) {
+        el.css('transform', `translate3d(${xPos}px, ${yPos}px, 0)`);
+    }
+});
+
 $(document).ready(function() {
     // BOLD
     $('.bold-button').on('click', function() {
@@ -42,61 +153,70 @@ $(document).ready(function() {
         }
     });
 
-    // UNDO
-    $('.undo-button').on('click', function() {
-        document.execCommand('undo', false, null);
-    });
+    // UNDO/REDO - Now handled by UndoRedoManager
 
-    // REDO
-    $('.redo-button').on('click', function() {
-        document.execCommand('redo', false, null);
-    });
+    // HOME BUTTON - Functionality moved to sidebar navigation
 
-    // HOME BUTTON - Return to project selection
-    $('.home-button').on('click', function() {
-        // Show confirmation dialog before proceeding
-        showQuestionModal(
-            "Are you sure you want to close this project? Any unsaved changes will be lost.",
-            "Cancel",
-            "Close Project",
-            // Cancel callback - do nothing
-            function() {
-                console.log('Home button action cancelled by user');
-            },
-            // Close Project callback - proceed with original functionality
-            function() {                    
-                // Clear production state
-                if (typeof clearProductionState === 'function') {
-                    clearProductionState();
+
+    // Function to load view mode content (for sidebar navigation)
+    window.loadViewMode = function() {
+        const viewContent = document.getElementById('view-content');
+        if (!viewContent) return;
+
+        // Extract all values before cloning to ensure they're preserved
+        const originalTable = $('.container');
+        const shotData = [];
+        
+        // Collect shot data from the original table before cloning
+        originalTable.find('tr.event_highlighted').each(function() {
+            const row = $(this);
+            const shotCell = row.find('td:nth-child(2)');
+            const shotRows = shotCell.find('.shot-input-row');
+            const rowData = [];
+            
+            if (shotRows.length > 0) {
+                shotRows.each(function() {
+                    const shotRow = $(this);
+                    const shotType = shotRow.find('.shot-type-select').val() || '';
+                    const shotSubject = shotRow.find('.shotSubject').val() || '';
+                    let customText = '';
+                    let isCustom = false;
+                    
+                    if (shotType === 'CUSTOM') {
+                        customText = shotRow.find('.custom-shot-type').val() || '';
+                        isCustom = true;
+                    }
+                    
+                    rowData.push({
+                        shotType: shotType,
+                        shotSubject: shotSubject,
+                        customText: customText,
+                        isCustom: isCustom
+                    });
+                });
+            } else {
+                // Fallback for old format
+                const shotType = shotCell.find('.shot-type-select').val() || '';
+                const shotSubject = shotCell.find('.shotSubject').val() || '';
+                let customText = '';
+                let isCustom = false;
+                
+                if (shotType === 'CUSTOM') {
+                    customText = shotCell.find('.custom-shot-type').val() || '';
+                    isCustom = true;
                 }
                 
-                // Clear project name from session storage
-                sessionStorage.removeItem('projectName');
-                
-                // Hide main content and show project selection
-                $('.main-content').hide();
-                $('#logged_out_view').hide();
-                
-                // Force show project selection with explicit CSS
-                const projectLogin = $('#project-login');
-                projectLogin.show();
-                
-                // Override the CSS !important rule by setting style attribute directly
-                projectLogin[0].style.setProperty('display', 'flex', 'important');
-                projectLogin[0].style.setProperty('visibility', 'visible', 'important');
-                projectLogin[0].style.setProperty('opacity', '1', 'important');
-                
-                // Clear the project input field
-                $('#projectName').val('');
-                
-                // Reset the page title
-                document.title = 'PaperworkPro';
+                rowData.push({
+                    shotType: shotType,
+                    shotSubject: shotSubject,
+                    customText: customText,
+                    isCustom: isCustom
+                });
             }
-        );
-    });
+            
+            shotData.push(rowData);
+        });
 
-    // VIEW MODE
-    $('.view-button').on('click', function() {
         const tableClone = $('.container').clone();
         const productionTitle = $('.production-title').text();
         
@@ -116,32 +236,215 @@ $(document).ready(function() {
         });
 
         // Handle shot type cells specifically
-        tableClone.find('tr.event_highlighted').each(function() {
+        tableClone.find('tr.event_highlighted').each(function(index) {
             const row = $(this);
             const shotCell = row.find('td:nth-child(2)');
             const scriptCell = row.find('td:nth-child(3)');
             const cameraNum = shotCell.find('.cameraNum').val() || '';
             const cameraPos = shotCell.find('.cameraPos').val() || '';
-            const shotTypeSelect = shotCell.find('.shot-type-select');
-            const customInput = shotCell.find('.custom-shot-type');
             
-            // Get the selected shot type value correctly
-            let shotType;
-            if(customInput.val() !== '') {
-                shotType = customInput.val();
+            // Use the extracted shot data instead of trying to read from cloned table
+            const rowShotData = shotData[index] || [];
+            let shotTypesAndSubjects = '';
+            
+            if (rowShotData.length > 0) {
+                // Process each shot from the extracted data
+                rowShotData.forEach((shot, shotIndex) => {
+                    let shotType = shot.shotType;
+                    const shotSubject = shot.shotSubject;
+                    
+                    // Check if it's a custom shot type
+                    if (shot.isCustom && shot.customText) {
+                        shotType = shot.customText;
+                    }
+                    
+                    if (shotType && shotSubject) {
+                        if (shotIndex > 0) shotTypesAndSubjects += '<br>';
+                        shotTypesAndSubjects += `<strong>${shotType}</strong>: ${shotSubject}`;
+                    }
+                });
             } else {
-                const originalSelects = $('.container .shot-type-select');
-                tableClone.find('.shot-type-select').each(function(index) {
-                    const originalSelect = originalSelects.eq(index);
-                    const selectedText = originalSelect.find('option:selected').text();
-                    shotType = selectedText;
-                    if(shotType === 'SHOT TYPE') {
-                        shotType = '';
+                // Fallback for old format
+                const shotType = shotCell.find('.shot-type-select').val() || '';
+                const shotSubject = shotCell.find('.shotSubject').val() || '';
+                let customText = '';
+                let isCustom = false;
+                
+                if (shotType === 'CUSTOM') {
+                    customText = shotCell.find('.custom-shot-type').val() || '';
+                    isCustom = true;
+                }
+                
+                if (shotType && shotSubject) {
+                    let displayShotType = shotType;
+                    if (isCustom && customText) {
+                        displayShotType = customText;
+                    }
+                    shotTypesAndSubjects = `<strong>${displayShotType}</strong>: ${shotSubject}`;
+                }
+            }
+            
+            // Update the shot cell content
+            shotCell.html(`
+                <div class="view-shot-content">
+                    ${shotTypesAndSubjects}
+                    ${cameraNum ? `<br><small>Camera: ${cameraNum}</small>` : ''}
+                    ${cameraPos ? `<br><small>Position: ${cameraPos}</small>` : ''}
+                </div>
+            `);
+            
+            // Update the script cell content
+            const scriptContent = scriptCell.find('.editable-cell').map(function() {
+                return $(this).text();
+            }).get().join('<br>');
+            
+            scriptCell.html(`
+                <div class="view-script-content">
+                    ${scriptContent}
+                </div>
+            `);
+        });
+
+        // Create the view content
+        const viewHTML = `
+            <div class="view-container">
+                <h2>${productionTitle || 'Untitled Production'}</h2>
+                <div class="view-table-container">
+                    ${tableClone.html()}
+                </div>
+            </div>
+        `;
+        
+        viewContent.innerHTML = viewHTML;
+        
+        // Apply view-specific styles
+        viewContent.querySelectorAll('.view-shot-content, .view-script-content').forEach(el => {
+            el.style.padding = '10px';
+            el.style.border = '1px solid var(--border-color)';
+            el.style.borderRadius = '4px';
+            el.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+        });
+    };
+
+    // VIEW MODE - Updated for new navigation system
+    $(document).on('click', '.view-button', function() {
+        // Extract all values before cloning to ensure they're preserved
+        const originalTable = $('.container');
+        const shotData = [];
+        
+        // Collect shot data from the original table before cloning
+        originalTable.find('tr.event_highlighted').each(function() {
+            const row = $(this);
+            const shotCell = row.find('td:nth-child(2)');
+            const shotRows = shotCell.find('.shot-input-row');
+            const rowData = [];
+            
+            if (shotRows.length > 0) {
+                shotRows.each(function() {
+                    const shotRow = $(this);
+                    const shotType = shotRow.find('.shot-type-select').val() || '';
+                    const shotSubject = shotRow.find('.shotSubject').val() || '';
+                    let customText = '';
+                    let isCustom = false;
+                    
+                    if (shotType === 'CUSTOM') {
+                        customText = shotRow.find('.custom-shot-type').val() || '';
+                        isCustom = true;
+                    }
+                    
+                    rowData.push({
+                        shotType: shotType,
+                        shotSubject: shotSubject,
+                        customText: customText,
+                        isCustom: isCustom
+                    });
+                });
+            } else {
+                // Fallback for old format
+                const shotType = shotCell.find('.shot-type-select').val() || '';
+                const shotSubject = shotCell.find('.shotSubject').val() || '';
+                let customText = '';
+                let isCustom = false;
+                
+                if (shotType === 'CUSTOM') {
+                    customText = shotCell.find('.custom-shot-type').val() || '';
+                    isCustom = true;
+                }
+                
+                rowData.push({
+                    shotType: shotType,
+                    shotSubject: shotSubject,
+                    customText: customText,
+                    isCustom: isCustom
+                });
+            }
+            
+            shotData.push(rowData);
+        });
+        
+
+        
+        const tableClone = $('.container').clone();
+        const productionTitle = $('.production-title').text();
+        
+        // Store the original top positions as CSS variables
+        tableClone.find('tr.event_highlighted').each(function() {
+            const row = $(this);
+            const shotCell = row.find('td:nth-child(2)');
+            const scriptCell = row.find('td:nth-child(3)');
+            
+            // Store the original top positions as CSS variables
+            shotCell.find('.editable-cell, .shot-type-flex-container').each(function() {
+                const topValue = $(this).css('top');
+                if (topValue && topValue !== 'auto') {
+                    $(this).css('--original-top', topValue);
+                }
+            });
+        });
+
+        // Handle shot type cells specifically
+        tableClone.find('tr.event_highlighted').each(function(index) {
+            const row = $(this);
+            const shotCell = row.find('td:nth-child(2)');
+            const scriptCell = row.find('td:nth-child(3)');
+            const cameraNum = shotCell.find('.cameraNum').val() || '';
+            const cameraPos = shotCell.find('.cameraPos').val() || '';
+            
+            // Use the extracted shot data instead of trying to read from cloned table
+            const rowShotData = shotData[index] || [];
+            let shotTypesAndSubjects = '';
+            
+            if (rowShotData.length > 0) {
+                // Process each shot from the extracted data
+                rowShotData.forEach((shot, shotIndex) => {
+                    let shotType = shot.shotType;
+                    const shotSubject = shot.shotSubject;
+                    
+                    // Check if it's a custom shot type
+                    if (shot.isCustom && shot.customText) {
+                        shotType = shot.customText;
+                    }
+                    
+                    // Always show shot subject if it exists, regardless of shot type
+                    if (shotSubject && shotSubject.trim()) {
+                        if (shotTypesAndSubjects) {
+                            shotTypesAndSubjects += '\n';
+                        }
+                        if (shotType && shotType !== 'SHOT TYPE') {
+                            shotTypesAndSubjects += `${shotType}: ${shotSubject}`;
+                        } else {
+                            shotTypesAndSubjects += shotSubject;
+                        }
+                    } else if (shotType && shotType !== 'SHOT TYPE') {
+                        // Show shot type even if no subject
+                        if (shotTypesAndSubjects) {
+                            shotTypesAndSubjects += '\n';
+                        }
+                        shotTypesAndSubjects += shotType;
                     }
                 });
             }
             
-            const shotSubject = shotCell.find('.shotSubject').val() || '';
             const extraInfo = shotCell.find('.extraInfo').val() || '';
 
             // Get the original top position from the style attribute
@@ -151,9 +454,8 @@ $(document).ready(function() {
             const newContent = `
                 <div style="position: relative; top: ${originalTop}; display: flex; flex-direction: column; gap: 4px;">
                     <div style="margin-bottom: 4px;">${cameraNum}${cameraPos}</div>
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                        <span style="white-space: nowrap;">${shotType}</span>
-                        <span style="margin-left: 8px;">${shotSubject}</span>
+                    <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4px;">
+                        <span style="white-space: pre-line;">${shotTypesAndSubjects}</span>
                     </div>
                     <div>${extraInfo}</div>
                 </div>
@@ -231,7 +533,7 @@ $(document).ready(function() {
             const insertTitle = $(this).find('.insertTitle').val() || 'Ven: Title';
             const insertIn = $(this).find('.insertIn').val() || 'In: Music';
             const insertOut = $(this).find('.insertOut').val() || 'Out: Music';
-            const timeValue = ($(this).find('input[type="time"]')).val();
+            const timeValue = ($(this).find('input[type="time"]')).val() || '00:00';
             const [minutes, seconds] = timeValue.split(':');
 
             // Create a formatted insert display
@@ -267,8 +569,8 @@ $(document).ready(function() {
                         width: 794px !important;
                         table-layout: fixed;
                         margin: 0 auto;
-                        border-collapse: separate !important;
-                        border-spacing: 0 10px;
+                        border-collapse: collapse !important;
+                        border-spacing: 0 !important;
                     }
                     td, th{
                         border: none !important;
@@ -359,8 +661,8 @@ $(document).ready(function() {
                         font-size: 24px;
                         font-weight: bold;
                         padding: 8px 16px;
-                        margin-top: 100px;
-                        margin-bottom: -75px;
+                        margin-top: 150px;
+                        margin-bottom: 0px;
                         margin-left: 250px;
                         outline: none !important;
                         border: none !important;
@@ -417,6 +719,24 @@ $(document).ready(function() {
                         text-align: left;
                         vertical-align: top !important;
                         padding-top: 8px !important;
+                    }
+                    
+                    /* Fix table spacing to prevent overlap with production title */
+                    table {
+                        margin-top: 60px !important;
+                        margin-left: 250px !important;
+                        border-collapse: collapse !important;
+                        width: calc(100% - 250px) !important;
+                    }
+                    
+                    /* Ensure proper spacing for the first row */
+                    tr:first-child {
+                        margin-top: 20px !important;
+                    }
+                    
+                    /* Add spacing to the body to push content down */
+                    body {
+                        padding-top: 50px !important;
                     }
                 </style>
             </head>
