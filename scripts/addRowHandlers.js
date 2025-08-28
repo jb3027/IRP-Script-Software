@@ -192,7 +192,10 @@ $(document).ready(function() {
         timeInput.focus();
     });
 
-    // ADD CUT ON CLICK
+    // ADD/REMOVE CUT ON CLICK
+    // If user clicks cut button while in script column:
+    // - If there's already a cut line: removes it (preserves text)
+    // - If no cut line: creates a new one with selected text
     $('.addCut-button').on('click', function() {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -212,13 +215,23 @@ $(document).ready(function() {
             span.className = 'cut-line';
             span.textContent = text;
             span.style.transform = 'translateY(5px)';
+            // Store the original text as a data attribute for restoration
+            span.setAttribute('data-original-text', text);
+            // Make the cut line extend to the left to cover camera number input area
+            span.style.marginLeft = '-800px';
+            span.style.paddingLeft = '800px';
+            span.style.position = 'absolute';
+            span.style.zIndex = '1000';
+            span.style.top = '40px';
             return span;
         }
 
         function addSlashAfter(element) {
-            const textNode = document.createTextNode(" / ");
-            element.after(textNode);
-            return textNode;
+            const slashSpan = document.createElement('span');
+            slashSpan.textContent = " / ";
+            slashSpan.className = 'cut-line-slash';
+            element.after(slashSpan);
+            return slashSpan;
         }
 
         function moveCursorAfter(node) {
@@ -230,62 +243,36 @@ $(document).ready(function() {
         }
 
         if (existingCutLine) {
-            showQuestionModal(
-                "Remove or Add new event?", // question
-                "Remove", // option 1
-                "Add new event", // option 2
-
-                // REMOVE
-                function() {
-                    const selection = window.getSelection();
-                    const range = selection.getRangeAt(0);
-                    let newText = selection.toString();
-                    // Removes the '/' cut within the highlight
-                    newText = newText.replace(/ \/ /g, ' ').trim();           
-
-                    // Get the cell containing the selection
-                    const cell = range.commonAncestorContainer.nodeType === 1 
-                        ? range.commonAncestorContainer.closest('td')
-                        : range.commonAncestorContainer.parentElement.closest('td');
-                    
-                    // Find and remove the existing cut line
-                    const existingCutLine = cell.querySelector('.cut-line');
-                    if (existingCutLine) {
-                        // Remove the cut line and the following slash
-                        const nextNode = existingCutLine.nextSibling;
-                        if (nextNode && nextNode.nodeType === Node.TEXT_NODE && nextNode.textContent.includes('/')) {
-                            nextNode.remove();
-                        }
-                        existingCutLine.remove();
-                    }
-                },
-                // ADD TO NEW EVENT
-                function() {
-                    const selectedText = selection.toString();
-
-                    $('.addEvent-button').trigger('click');
-                    updateEventNumbers();
-
-                    const newRow = cell.closest('tr').nextElementSibling;
-                    const newScriptCell = newRow.cells[2];
-
-                    const cutLineSpan = createCutLine(selectedText);
-                    newScriptCell.appendChild(cutLineSpan);
-                    addSlashAfter(cutLineSpan);
-
-                    range.deleteContents();
-                    if (cell.textContent.trim() === '') {
-                        cell.textContent = '';
-                    }
-                }
-            );
+            // Get the original text that was cut
+            const originalText = existingCutLine.getAttribute('data-original-text') || existingCutLine.textContent;
+            
+            // Remove the existing cut line and slash
+            const nextNode = existingCutLine.nextSibling;
+            if (nextNode && (nextNode.nodeType === Node.TEXT_NODE && nextNode.textContent.includes('/')) || 
+                (nextNode.nodeType === Node.ELEMENT_NODE && nextNode.classList.contains('cut-line-slash'))) {
+                nextNode.remove();
+            }
+            existingCutLine.remove();
+            
+            // Restore the original text to the cell
+            const textNode = document.createTextNode(originalText);
+            cell.appendChild(textNode);
+            
+            // Position cursor at the end of the restored text
+            const newRange = document.createRange();
+            newRange.setStartAfter(textNode);
+            newRange.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+            
+            return;
         } else {
             try {
                 const newSpan = createCutLine(selectedText);
                 range.deleteContents();
                 range.insertNode(newSpan);
-                const textNode = addSlashAfter(newSpan);
-                moveCursorAfter(textNode);
+                const slashSpan = addSlashAfter(newSpan);
+                moveCursorAfter(slashSpan);
             } catch (e) {
             }
         }

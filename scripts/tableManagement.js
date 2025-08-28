@@ -14,17 +14,19 @@ function createShotTypeCell(shotType, firstTime) {
         <div class="shot-type-wrapper" data-shot-group="0">
             <div class="shot-inputs-container">
                 <div class="shot-input-row" data-shot-index="0">
-                    <select class="form-control shot-type-select">
-                        <option value="">SHOT TYPE</option>
-                        <option value="ES">ES</option>
-                        <option value="WS">WS</option>
-                        <option value="2S">2S</option>
-                        <option value="3S">3S</option>
-                        <option value="MS">MS</option>
-                        <option value="CU">CU</option>
-                    </select>
+                    <div class="shot-type-subject-wrapper">
+                        <select class="form-control shot-type-select">
+                            <option value="">SHOT TYPE</option>
+                            <option value="ES">ES</option>
+                            <option value="WS">WS</option>
+                            <option value="2S">2S</option>
+                            <option value="3S">3S</option>
+                            <option value="MS">MS</option>
+                            <option value="CU">CU</option>
+                        </select>
+                        <textarea class="editable-text shotSubject" name="shotSubject" autocomplete="off" placeholder="Shot Subject" style="resize: none; width: 120px;"></textarea>
+                    </div>
                     <textarea class="custom-shot-type" autocomplete="off" style="display:none; width: 100% !important; max-width: 100% !important; min-width: 100% !important; overflow: hidden !important; box-sizing: border-box !important; resize: none;"></textarea>
-                    <textarea class="editable-text shotSubject" name="shotSubject" autocomplete="off" placeholder="Shot Subject" style="resize: none;"></textarea>
                     <button class="remove-shot-btn" title="Remove this shot type and subject" style="display:none">×</button>
                 </div>
                 <div class="add-shot-btn" title="Add another shot type and subject">

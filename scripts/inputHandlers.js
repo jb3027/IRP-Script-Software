@@ -79,9 +79,11 @@ $(document).ready(function() {
     $(document).on('DOMNodeInserted', '.shot-input-row', function() {
         // Don't auto-resize newly added rows immediately
         $(this).find('.shotSubject').css({
-            'flex': '0 0 120px',
             'width': '120px',
-            'display': 'flex'
+            'display': 'inline-block',
+            'margin-left': '8px',
+            'vertical-align': 'top',
+            'transform': 'translateY(30px)'
         });
     });
     
@@ -113,10 +115,14 @@ $(document).ready(function() {
                 
                 // Ensure shot subject is always visible and properly positioned
                 $textarea.css({
-                    'display': 'flex',
+                    'display': 'inline-block',
                     'visibility': 'visible',
                     'opacity': '1',
-                    'position': 'relative'
+                    'position': 'relative',
+                    'width': '120px',
+                    'margin-left': '8px',
+                    'vertical-align': 'top',
+                    'transform': 'translateY(30px)'
                 });
             });
         }, 200);
@@ -131,10 +137,14 @@ $(document).ready(function() {
         // Ensure all shot subjects are visible and properly positioned
         $('.shotSubject').each(function() {
             $(this).css({
-                'display': 'flex',
+                'display': 'inline-block',
                 'visibility': 'visible',
                 'opacity': '1',
-                'position': 'relative'
+                'position': 'relative',
+                'width': '120px',
+                'margin-left': '8px',
+                'vertical-align': 'top',
+                'transform': 'translateY(30px)'
             });
         });
     }, 100);
@@ -360,3 +370,53 @@ function formatTimeInput(element) {
 // Make functions globally available
 window.formatTime = formatTime;
 window.formatTimeInput = formatTimeInput; 
+
+// Mutation Observer to watch for new shot input rows and apply positioning immediately
+const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList') {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.nodeType === 1 && node.classList && node.classList.contains('shot-input-row')) {
+                    // New shot input row added - apply positioning immediately
+                    setTimeout(function() {
+                        const $row = $(node);
+                        const $shotType = $row.find('.shot-type-select');
+                        const $shotSubject = $row.find('.shotSubject');
+                        
+                        // Force inline layout
+                        $row.css({
+                            'display': 'block',
+                            'white-space': 'nowrap',
+                            'overflow': 'visible'
+                        });
+                        
+                        // Force shot type and subject inline
+                        $shotType.css({
+                            'display': 'inline-block',
+                            'width': '120px',
+                            'vertical-align': 'top',
+                            'float': 'none',
+                            'clear': 'none'
+                        });
+                        
+                        $shotSubject.css({
+                            'display': 'inline-block',
+                            'width': '120px',
+                            'margin-left': '8px',
+                            'vertical-align': 'top',
+                            'transform': 'translateY(30px)',
+                            'float': 'none',
+                            'clear': 'none'
+                        });
+                    }, 10);
+                }
+            });
+        }
+    });
+});
+
+// Start observing the document for new shot input rows
+observer.observe(document.body, {
+    childList: true,
+    subtree: true
+}); 

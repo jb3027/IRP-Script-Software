@@ -832,7 +832,7 @@ function forceShotSubjectInline() {
         
         // Force inline positioning with !important equivalent
         $shotSubject.attr('style', function(i, style) {
-            return (style || '') + '; display: inline-block !important; float: none !important; clear: none !important; position: static !important; width: 120px !important; margin-left: 8px !important; vertical-align: top !important;';
+            return (style || '') + '; display: inline-block !important; float: none !important; clear: none !important; position: relative !important; width: 120px !important; margin-left: 8px !important; top: 30px !important; transform: translateY(30px) !important;';
         });
         
         // Also apply via CSS as backup
@@ -840,10 +840,11 @@ function forceShotSubjectInline() {
             'display': 'inline-block',
             'float': 'none',
             'clear': 'none',
-            'position': 'static',
+            'position': 'relative',
             'width': '120px',
             'margin-left': '8px',
-            'vertical-align': 'top'
+            'top': '30px',
+            'transform': 'translateY(30px)'
         });
         
         // Force remove any conflicting classes or attributes

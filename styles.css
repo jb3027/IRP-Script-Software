@@ -1607,21 +1607,19 @@ tr.event_highlighted td:not(:last-child) .shot-type-select {
     background-color: transparent !important; /* Transparent to show cell background */
 }
 
-/* SHOT SUBJECT TEXTAREA */
+/* SHOT SUBJECT TEXTAREA - Simplified */
 .shotSubject {
-    min-height: 30px !important;
-    height: auto !important;
-    line-height: 1.2 !important;
-    overflow: hidden !important;
-    word-wrap: break-word !important;
-    white-space: pre-wrap !important;
-    resize: none !important;
-    max-height: none !important; /* Remove any max-height constraints */
-    display: flex !important; /* Use flex display to align with shot type dropdown */
-    flex-shrink: 0 !important; /* Prevent flexbox from shrinking the textarea */
-    background-color: transparent !important; /* Allow background to show through */
-    border: none !important;
-    outline: none !important;
+    min-height: 30px;
+    height: auto;
+    line-height: 1.2;
+    overflow: hidden;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    resize: none;
+    max-height: none;
+    background-color: transparent;
+    border: none;
+    outline: none;
 }
 
 /* Ensure shot subject inherits row background */
@@ -2886,9 +2884,7 @@ div[contenteditable]:not(.production-title) {
 }
 
 .shotSubject {
-    flex: 1; 
-    min-width: 0; 
-    color: var(--text-white) !important;
+    color: var(--text-white);
 }
 
 /* CUSTOM SHOT TYPE */
@@ -3353,19 +3349,11 @@ td:nth-child(3) {
 .cut-line {
     position: relative;
     display: inline;
+    border-bottom: 2px solid var(--accent-green);
+    text-decoration: none;
 }
 
-.cut-line::after {
-    content: '';
-    position: absolute;
-    left: -350px;
-    right: 0;
-    bottom: -3px;
-    height: 2px;
-    background-color: var(--accent-green);
-    z-index: 1;
-    pointer-events: none;
-}
+/* Removed conflicting ::after pseudo-element that was overriding JavaScript inline styles */
 
 /* SHOT TYPE SELECT */
 .shot-type-select {
@@ -4456,25 +4444,170 @@ td:nth-child(2) > div {
     justify-content: flex-start !important;
 }
 
-/* Maximum specificity shot subject positioning - override JavaScript inline styles */
-#event-table td:nth-child(2) .shot-type-flex-container .shot-type-wrapper .shot-inputs-container .shot-input-row .shotSubject,
-#event-table td:nth-child(2) .shot-type-flex-container .shot-type-wrapper .shot-inputs-container .shot-input-row textarea[name="shotSubject"],
-#event-table td:nth-child(2) .shot-type-flex-container .shot-type-wrapper .shot-inputs-container .shot-input-row .editable-text.shotSubject {
+/* Simple wrapper to keep shot type and subject together */
+.shot-type-subject-wrapper {
     display: inline-block !important;
-    position: static !important;
-    float: none !important;
-    clear: none !important;
-    margin-left: 8px !important;
-    vertical-align: top !important;
+    white-space: nowrap !important;
+}
+
+.shot-type-subject-wrapper .shot-type-select {
     width: 120px !important;
-    flex: 0 0 120px !important;
     margin-right: 8px !important;
-    transform: translateY(-4px) !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
+}
+
+/* Ensure shot type and subject are properly aligned using flexbox */
+.shot-type-subject-wrapper {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+}
+
+
+
+/* Maximum specificity for cut line positioning - ensure 5px down offset */
+#event-table td:nth-child(3) .cut-line,
+#event-table td:nth-child(3) span.cut-line,
+#event-table td:nth-child(3) .editable-text .cut-line {
+    transform: translateY(5px) !important;
+    position: relative !important;
+    top: 5px !important;
+}
+
+/* Additional specificity for any cut line in script column */
+#event-table td[contenteditable="true"] .cut-line,
+#event-table td:nth-child(3) .cut-line {
+    transform: translateY(5px) !important;
+    position: relative !important;
+    top: 5px !important;
+}
+
+/* Ensure cut line extends properly to the left - script mode only */
+#event-table td:nth-child(3) .cut-line {
+    position: absolute !important;
+    overflow: visible !important;
+    margin-left: -800px !important;
+    padding-left: 800px !important;
+    z-index: 1000 !important;
+    top: 30px !important;
+}
+
+/* Make first column completely hide cut line in script mode */
+#event-table th:first-child,
+#event-table td:first-child {
+    position: relative !important;
+    z-index: 1001 !important;
+    background: white !important;
+    overflow: hidden !important;
+}
+
+/* Ensure cut line is completely hidden behind event number column */
+#event-table td:first-child .cut-line,
+#event-table td:first-child span.cut-line {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Hide cut line overflow beyond table boundaries in script mode */
+#event-table {
+    overflow: hidden !important;
+    position: relative !important;
     z-index: 1 !important;
+}
+
+/* Ensure table background hides cut line overflow */
+.container {
+    overflow: hidden !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Ensure consistent cut line positioning for all rows - script mode only */
+#event-table td:nth-child(3) .cut-line,
+#event-table td:nth-child(3) span.cut-line {
+    margin-left: -800px !important;
+    padding-left: 800px !important;
+    position: absolute !important;
+    overflow: visible !important;
+    z-index: 1000 !important;
+    top: 30px !important;
+}
+
+/* Navigation button hover - only green text, no background */
+.mode-nav-btn:hover {
+    background: transparent !important;
+    color: var(--accent-green) !important;
+}
+
+.mode-nav-btn:hover .mode-text {
+    color: var(--accent-green) !important;
+}
+
+/* View mode cut line positioning - extend from slash to halfway across event number column */
+body.view-mode .cut-line,
+body.view-mode span.cut-line,
+body.view-mode #event-table td:nth-child(3) .cut-line,
+body.view-mode #event-table td:nth-child(3) span.cut-line {
+    transform: translateY(0px) !important;
+    position: relative !important;
+    top: 0px !important;
+    margin-left: -250px !important;
+    padding-left: 250px !important;
+}
+
+/* Specific styling for the black slash after cut lines */
+.cut-line-slash {
+    color: black !important;
+    transform: none !important;
+    position: static !important;
+    top: auto !important;
+    display: inline !important;
+}
+
+/* Position any text nodes that come after cut lines (like the slash) */
+#event-table td:nth-child(3) .cut-line + *,
+#event-table td:nth-child(3) .cut-line ~ * {
+    transform: none !important;
+    position: static !important;
+    top: auto !important;
+    display: inline !important;
+}
+
+/* View mode cut line slash positioning and color */
+body.view-mode .cut-line + *,
+body.view-mode .cut-line ~ * {
+    transform: translateY(-25px) !important;
+    position: relative !important;
+    top: -25px !important;
+    display: inline-block !important;
+    color: var(--accent-green) !important;
+}
+
+/* Make event number column overlap cut line in view mode */
+.view-mode th:first-child,
+.view-mode td:first-child {
+    position: relative !important;
+    z-index: 1001 !important;
+    background: white !important;
+}
+
+/* Add spacing between rows in view mode */
+.view-mode tr {
+    margin-bottom: 10px !important;
+}
+
+.view-mode td {
+    padding-bottom: 10px !important;
+}
+
+/* Force view mode cut line positioning with maximum specificity */
+body.view-mode #event-table td:nth-child(3) .cut-line,
+body.view-mode #event-table td:nth-child(3) span.cut-line {
+    transform: translateY(-35px) !important;
+    position: relative !important;
+    top: -35px !important;
+    margin-left: -150px !important;
+    padding-left: 150px !important;
 }
 
 

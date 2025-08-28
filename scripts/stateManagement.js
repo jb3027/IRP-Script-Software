@@ -368,7 +368,7 @@ function rebuildTableFromState() {
             if (shot.isCustom) {
                 const shotTypeSelect = `<select class="form-control shot-type-select" style="display:none; width:120px; visibility:hidden;">${shotTypeSelectHTML}</select>`;
                 const customInput = `<textarea class="custom-shot-type" autocomplete="off" style="display:block; width: 100% !important; max-width: 100% !important; min-width: 100% !important; overflow: hidden !important; box-sizing: border-box !important; resize: none;">${shot.customText || ''}</textarea>`;
-                const shotSubject = `<textarea class="editable-text shotSubject" name="shotSubject" autocomplete="off" placeholder="Shot Subject" style="resize: none; flex: 0 0 120px; width: 120px; display: inline-block;">${shot.shotSubject || ''}</textarea>`;
+                const shotSubject = `<textarea class="editable-text shotSubject" name="shotSubject" autocomplete="off" placeholder="Shot Subject" style="resize: none; flex: 0 0 120px; width: 120px; display: inline-block; margin-top: 10px;">${shot.shotSubject || ''}</textarea>`;
                 
                 shotTypeWrapperContent += `
                     <div class="shot-input-row" data-shot-index="${index}">
@@ -382,7 +382,7 @@ function rebuildTableFromState() {
             } else {
                 const shotTypeSelect = `<select class="form-control shot-type-select" style="flex: 0 0 120px; width: 120px;">${shotTypeSelectHTML}</select>`;
                 const customInput = '';
-                const shotSubject = `<textarea class="editable-text shotSubject" name="shotSubject" autocomplete="off" placeholder="Shot Subject" style="resize: none; flex: 0 0 120px; width: 120px; display: inline-block;">${shot.shotSubject || ''}</textarea>`;
+                const shotSubject = `<textarea class="editable-text shotSubject" name="shotSubject" autocomplete="off" placeholder="Shot Subject" style="resize: none; flex: 0 0 120px; width: 120px; display: inline-block; margin-top: 10px;">${shot.shotSubject || ''}</textarea>`;
                 
                 shotTypeWrapperContent += `
                     <div class="shot-input-row" data-shot-index="${index}">

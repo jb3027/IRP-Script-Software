@@ -260,7 +260,7 @@ $(document).ready(function() {
                     
                     if (shotType && shotSubject) {
                         if (shotIndex > 0) shotTypesAndSubjects += '<br>';
-                        shotTypesAndSubjects += `<strong>${shotType}</strong>: ${shotSubject}`;
+                        shotTypesAndSubjects += `<strong>${shotType}</strong> ${shotSubject}`;
                     }
                 });
             } else {
@@ -280,7 +280,7 @@ $(document).ready(function() {
                     if (isCustom && customText) {
                         displayShotType = customText;
                     }
-                    shotTypesAndSubjects = `<strong>${displayShotType}</strong>: ${shotSubject}`;
+                    shotTypesAndSubjects = `<strong>${displayShotType}</strong> ${shotSubject}`;
                 }
             }
             
@@ -326,8 +326,57 @@ $(document).ready(function() {
         });
     };
 
+    // Event table row click handler - auto-focus script column
+    $(document).on('click', '#event-table tbody tr', function(e) {
+        // Don't auto-focus if user clicked on a specific input field or button
+        if (e.target.tagName === 'INPUT' || 
+            e.target.tagName === 'TEXTAREA' || 
+            e.target.tagName === 'SELECT' || 
+            e.target.tagName === 'BUTTON' ||
+            e.target.closest('button') ||
+            e.target.closest('input') ||
+            e.target.closest('textarea') ||
+            e.target.closest('select')) {
+            return;
+        }
+        
+        // Find the script column (3rd column, index 2) and focus it
+        const scriptCell = $(this).find('td:nth-child(3)');
+        if (scriptCell.length > 0) {
+            // Make the cell editable and focus it
+            scriptCell.attr('contenteditable', 'true');
+            scriptCell.focus();
+            
+            // Place cursor at the end of the content
+            const range = document.createRange();
+            const selection = window.getSelection();
+            range.selectNodeContents(scriptCell[0]);
+            range.collapse(false); // false = collapse to end
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    });
+
     // VIEW MODE - Updated for new navigation system
     $(document).on('click', '.view-button', function() {
+        // Switch to script mode first before opening view mode
+        // Use the sidebar navigation's script mode switching logic
+        if (window.sidebarNav) {
+            // Remove active class from all mode buttons
+            document.querySelectorAll('.mode-nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to script button
+            const scriptModeBtn = document.getElementById('script-mode-btn');
+            if (scriptModeBtn) {
+                scriptModeBtn.classList.add('active');
+            }
+            
+            // Navigate to script page and show script table
+            window.sidebarNav.navigateToPage('script');
+            $('.container').show();
+            $('.running-order-container').hide();
+        }
+        
         // Extract all values before cloning to ensure they're preserved
         const originalTable = $('.container');
         const shotData = [];
@@ -431,7 +480,7 @@ $(document).ready(function() {
                             shotTypesAndSubjects += '\n';
                         }
                         if (shotType && shotType !== 'SHOT TYPE') {
-                            shotTypesAndSubjects += `${shotType}: ${shotSubject}`;
+                            shotTypesAndSubjects += `${shotType} ${shotSubject}`;
                         } else {
                             shotTypesAndSubjects += shotSubject;
                         }
@@ -750,11 +799,15 @@ $(document).ready(function() {
         // Add this after the document.write to ensure styles are applied
         viewWindow.document.close();
         viewWindow.addEventListener('load', function() {
-            // Force a repaint of cut lines
+            // Force a repaint of cut lines and apply view mode positioning
             const cutLines = viewWindow.document.querySelectorAll('.cut-line');
             cutLines.forEach(line => {
                 line.style.display = 'inline';
                 line.style.position = 'relative';
+                line.style.transform = 'translateY(0px)';
+                line.style.top = '0px';
+                line.style.marginLeft = '-250px';
+                line.style.paddingLeft = '250px';
                 // Force a repaint
                 line.offsetHeight;
             });
@@ -774,5 +827,8 @@ $(document).ready(function() {
         });
         
         viewWindow.document.close();
+        
+        // Focus the new window
+        viewWindow.focus();
     });
 }); 
