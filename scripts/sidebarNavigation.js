@@ -526,10 +526,10 @@ class SidebarNavigation {
         }
         
         // Initialize camera cards functionality if available
-        if (typeof initializeCameraCards === 'function') {
-            initializeCameraCards();
+        if (typeof loadCameraCards === 'function') {
+            loadCameraCards();
         } else {
-            console.log('initializeCameraCards function not found, camera cards should still work');
+            console.log('loadCameraCards function not found, camera cards should still work');
         }
     }
 
@@ -693,7 +693,8 @@ class SidebarNavigation {
 let sidebarNav;
 document.addEventListener('DOMContentLoaded', () => {
     sidebarNav = new SidebarNavigation();
+    // Make it globally accessible after initialization
+    window.sidebarNav = sidebarNav;
+    console.log('SidebarNavigation initialized successfully');
 });
 
-// Make it globally accessible
-window.sidebarNav = sidebarNav;

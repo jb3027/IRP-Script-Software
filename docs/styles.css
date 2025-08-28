@@ -4456,5 +4456,26 @@ td:nth-child(2) > div {
     justify-content: flex-start !important;
 }
 
+/* Maximum specificity shot subject positioning - override JavaScript inline styles */
+#event-table td:nth-child(2) .shot-type-flex-container .shot-type-wrapper .shot-inputs-container .shot-input-row .shotSubject,
+#event-table td:nth-child(2) .shot-type-flex-container .shot-type-wrapper .shot-inputs-container .shot-input-row textarea[name="shotSubject"],
+#event-table td:nth-child(2) .shot-type-flex-container .shot-type-wrapper .shot-inputs-container .shot-input-row .editable-text.shotSubject {
+    display: inline-block !important;
+    position: static !important;
+    float: none !important;
+    clear: none !important;
+    margin-left: 8px !important;
+    vertical-align: top !important;
+    width: 120px !important;
+    flex: 0 0 120px !important;
+    margin-right: 8px !important;
+    transform: translateY(-4px) !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: 1 !important;
+}
+
 
 

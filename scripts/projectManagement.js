@@ -158,7 +158,7 @@ function clearAllProductionData() {
         }
     });
     
-    console.log('All production data cleared - starting fresh!');
+    // Production data cleared
 }
 
 function loadExistingProduction() {
