@@ -79,8 +79,10 @@ const sourceFiles = [
     'scripts/modalHandlers.js',
     'scripts/projectManagement.js',
     'scripts/runningOrder.js',
+    'scripts/sidebarNavigation.js',
     'scripts/stateManagement.js',
     'scripts/tableManagement.js',
+    'scripts/undoRedoManager.js',
     'scripts/uiEventHandlers.js'
 ];
 
