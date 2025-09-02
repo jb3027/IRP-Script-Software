@@ -250,7 +250,8 @@ $(document).ready(function() {
 
 
         // Add event listeners for all editable cells to save changes
-        $(document).on('blur', '.actual-time-cell', function() {
+        // Use delegated events but only for running order container elements
+        $(document).on('blur', '.running-order-container .actual-time-cell', function() {
             const itemNumber = $(this).data('item-number');
             const actualTime = $(this).text();
             console.log(`Saving actual time for item ${itemNumber}: ${actualTime}`);
@@ -266,7 +267,8 @@ $(document).ready(function() {
         });
 
         // Save any other editable content in the running order
-        $(document).on('blur', '[contenteditable="true"]', function() {
+        // IMPORTANT: Only target elements within .running-order-container
+        $(document).on('blur', '.running-order-container [contenteditable="true"]', function() {
             console.log('=== BLUR EVENT TRIGGERED ===');
             console.log('Element that lost focus:', this);
             console.log('Element classes:', $(this).attr('class'));

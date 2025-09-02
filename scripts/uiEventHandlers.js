@@ -340,7 +340,28 @@ $(document).ready(function() {
             return;
         }
         
-        // Find the script column (3rd column, index 2) and focus it
+        // Don't auto-focus if user clicked on the SHOT column (2nd column) of Item or Insert rows
+        const $row = $(this);
+        const clickedCell = $(e.target).closest('td');
+        const cellIndex = clickedCell.index();
+        
+        // If clicked on SHOT column (index 1) and row is Item or Insert, do nothing
+        if (cellIndex === 1 && ($row.hasClass('item_highlighted') || $row.hasClass('insert_highlighted'))) {
+            return;
+        }
+        
+        // If clicked on DETAILS column (index 3), let the default behavior handle it
+        // The DETAILS column is editable for all row types
+        if (cellIndex === 3) {
+            // Ensure the cell is editable and focus it
+            clickedCell.attr('contenteditable', 'true');
+            clickedCell.focus();
+            
+            // Place cursor at the click position (default behavior will handle this)
+            return;
+        }
+        
+        // For other columns, auto-focus the script column (3rd column, index 2)
         const scriptCell = $(this).find('td:nth-child(3)');
         if (scriptCell.length > 0) {
             // Make the cell editable and focus it
@@ -567,22 +588,15 @@ $(document).ready(function() {
             });
         }
         
-        // Call setDuration function
-        setDuration();
-
-        // Replace 'New Item' with what the user has inputted
-        tableClone.find('td:nth-child(3) .item-content').each(function() {
-            const userInput = $(this).val() || $(this).text() || 'New Item';
-            const span = $('<span style="text-decoration: underline; margin-left: -8px; display: inline-block;">').text(userInput);
-            $(this).replaceWith(span);
-        });
-
         // Replace Inserts with what the user has inputted
+        // NOTE: Process inserts BEFORE calling setDuration() to preserve time values
         tableClone.find('td:nth-child(3) .insert-content').each(function() {
             const insertTitle = $(this).find('.insertTitle').val() || 'Ven: Title';
             const insertIn = $(this).find('.insertIn').val() || 'In: Music';
             const insertOut = $(this).find('.insertOut').val() || 'Out: Music';
-            const timeValue = ($(this).find('input[type="time"]')).val() || '00:00';
+            // Get the time value BEFORE setDuration replaces the input
+            const timeInput = $(this).find('input[type="time"]');
+            const timeValue = timeInput.val() || timeInput.attr('value') || '00:00';
             const [minutes, seconds] = timeValue.split(':');
 
             // Create a formatted insert display
@@ -598,6 +612,16 @@ $(document).ready(function() {
             `;
             
             $(this).replaceWith(formattedInsert);
+        });
+
+        // Call setDuration function AFTER processing inserts
+        setDuration();
+
+        // Replace 'New Item' with what the user has inputted
+        tableClone.find('td:nth-child(3) .item-content').each(function() {
+            const userInput = $(this).val() || $(this).text() || 'New Item';
+            const span = $('<span style="text-decoration: underline; margin-left: -8px; display: inline-block;">').text(userInput);
+            $(this).replaceWith(span);
         });
         
         // Create new window/tab and write content

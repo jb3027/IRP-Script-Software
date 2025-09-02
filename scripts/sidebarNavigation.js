@@ -109,18 +109,10 @@ class SidebarNavigation {
                 const inputName = input.attr('name') || '';
                 const inputValue = input.val() || '';
                 
-                // Only look for camera number inputs - be very specific
-                // Must contain 'camera' AND a number, but NOT 'position'
-                if ((inputClass.includes('camera') || inputName.includes('camera') || 
-                     inputClass.includes('Camera') || inputName.includes('Camera')) &&
-                    !inputClass.includes('position') && !inputName.includes('position') &&
-                    !inputClass.includes('Position') && !inputName.includes('Position') &&
-                    !inputClass.includes('pos') && !inputName.includes('pos') &&
-                    !inputClass.includes('Pos') && !inputName.includes('Pos') &&
-                    !inputClass.includes('location') && !inputName.includes('location') &&
-                    !inputClass.includes('Location') && !inputName.includes('Location') &&
-                    !inputClass.includes('place') && !inputName.includes('place') &&
-                    !inputClass.includes('Place') && !inputName.includes('Place')) {
+                // Look specifically for cameraNum class or name
+                // This is more precise than looking for "camera" substring
+                if ((inputClass.includes('cameraNum') || inputName === 'cameraNum') &&
+                    !inputClass.includes('cameraPos') && inputName !== 'cameraPos') {
                     
                     // Only add if the value contains a number (actual camera number)
                     // and looks like a camera number (not a position description)
