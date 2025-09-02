@@ -158,7 +158,7 @@ window.onload = function() {
             if (logoutContainer && window.kindeAuth) {
                 logoutContainer.style.display = 'flex';
             }
-        } else if (isKindeinLoggedIn === 'true') {
+        } else if (isKindeLoggedIn === 'true') {
             // Authenticated but no project selected - only show project-login if no project is being created
             if (!sessionStorage.getItem('projectName')) {
                 $('#logged_out_view').hide();

@@ -593,12 +593,17 @@ function loadProductionFromFile(fileContent) {
         const loadedState = JSON.parse(fileContent);
         
         // Basic validation to ensure the loaded file is a valid production
+        // Note: We allow empty events array since a new production might not have any events yet
         if (!loadedState.name || !Array.isArray(loadedState.events)) {
             console.error('Invalid file format: Missing name or events array');
+            console.error('Validation details:', {
+                name: loadedState.name,
+                events: loadedState.events,
+                isArray: Array.isArray(loadedState.events)
+            });
             alert('The selected file is not a valid PaperworkPro production.');
             return false;
         }
-        
         
         // Update the global state
         productionState = loadedState;
