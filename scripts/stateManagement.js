@@ -228,6 +228,9 @@ function extractRowData(row) {
             itemCellContainerClone.find('span:first-child').remove();
             rowObject.content = itemCellContainerClone.html().trim();
             
+            // Extract the DETAILS field for item rows (4th column)
+            rowObject.details = rowJQuery.find('td:nth-child(4)').html();
+            
             // Try to preserve existing actualTime from state if available
             const existingItemInState = productionState.events.find(event => 
                 event.type === 'item' && event.itemNumber == rowObject.itemNumber
@@ -442,17 +445,19 @@ function rebuildTableFromState() {
     }
 
     function createItemRow(event) {
+        const detailCellContent = event.details || '';
+        
         return `
             <tr class="item_highlighted">
                 <td contenteditable="false" style="text-align:center"></td>
-                <td contenteditable="true"></td>
+                <td contenteditable="false" style="pointer-events: none; user-select: none;"></td>
                 <td contenteditable="false">
                     <div class="item-cell-container">
                         <span contenteditable="false" style="text-decoration: underline;"><b>ITEM ${event.itemNumber}: &nbsp;</b></span>
                         ${event.content || ''}
                     </div>
                 </td>
-                <td contenteditable="true" style="text-align:center"></td>
+                <td contenteditable="true" style="text-align:center">${detailCellContent}</td>
                 <td style="border:none; width:90px">
                     <div class="row-actions">
                         <button class="row-button drag" title="Drag Row"><i class="fas fa-grip-vertical"></i></button>
@@ -490,7 +495,7 @@ function rebuildTableFromState() {
         return `
             <tr class="insert_highlighted">
                 <td contenteditable="false" style="text-align:center"></td>
-                <td contenteditable="true" style="text-align:center"></td>
+                <td contenteditable="false" style="text-align:center; pointer-events: none; user-select: none;"></td>
                 <td contenteditable="true">${insertCellContent}</td>
                 <td contenteditable="true" style="text-align:center">${detailCellContent}</td>
                 <td style="border:none; width:90px">
