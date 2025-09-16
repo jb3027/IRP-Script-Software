@@ -340,6 +340,12 @@ $(document).ready(function() {
             return;
         }
         
+        // Don't auto-focus if user is trying to select text (has a text selection)
+        const selection = window.getSelection();
+        if (selection.toString().length > 0) {
+            return;
+        }
+        
         // Don't auto-focus if user clicked on the SHOT column (2nd column) of Item or Insert rows
         const $row = $(this);
         const clickedCell = $(e.target).closest('td');

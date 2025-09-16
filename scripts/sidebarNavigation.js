@@ -157,8 +157,27 @@ class SidebarNavigation {
             dropdownOptions.empty();
             
             if (camList.length === 0) {
-                dropdownOptions.append('<div style="padding: 10px; color: #666; text-align: center;">No cameras found</div>');
-                return;
+                // Show "No cameras found" message and don't allow navigation
+                dropdownOptions.append('<div style="padding: 10px; color: #666; text-align: center; cursor: default;">No cameras found</div>');
+                dropdownOptions.addClass('active');
+                
+                // Set width for the dropdown
+                const buttonWidth = $(this).outerWidth();
+                const dropdownWidth = buttonWidth - 20;
+                dropdownOptions.css({
+                    'width': dropdownWidth + 'px',
+                    'max-width': dropdownWidth + 'px',
+                    'min-width': dropdownWidth + 'px'
+                });
+                
+                // Add click outside to close functionality
+                $(document).one('click', function(e) {
+                    if (!$(e.target).closest('.dropdown').length) {
+                        dropdownOptions.removeClass('active');
+                    }
+                });
+                
+                return; // Don't proceed to show camera options
             } else {
                 camList.forEach((camera) => {
                     const cameraOption = $(`<div style="margin: 5px 0;"><button class="btn button3 createCamCard-button" id="${camera}" title="Create camera card for Camera ${camera}"> CAMERA ${camera}</button></div>`);
@@ -176,6 +195,13 @@ class SidebarNavigation {
                 'width': dropdownWidth + 'px',
                 'max-width': dropdownWidth + 'px',
                 'min-width': dropdownWidth + 'px'
+            });
+            
+            // Add click outside to close functionality
+            $(document).one('click', function(e) {
+                if (!$(e.target).closest('.dropdown').length) {
+                    dropdownOptions.removeClass('active');
+                }
             });
         });
     }
@@ -258,12 +284,11 @@ class SidebarNavigation {
                         this.triggerViewMode();
                         break;
                     case 'camera-cards':
-                        console.log('Switching to camera cards mode');
-                        // Show camera cards page and ensure proper visibility
-                        this.navigateToPage('camera-cards');
-                        // Hide script table and running order
-                        $('.container').hide();
-                        $('.running-order-container').hide();
+                        console.log('Camera cards mode button clicked');
+                        // Don't navigate to camera cards page - let the dropdown handle everything
+                        // The dropdown will show cameras if available, or "No cameras found" if not
+                        // Only navigate to camera cards page when a specific camera is selected from dropdown
+                        console.log('Camera cards mode - dropdown will handle navigation');
                         break;
                     case 'floor-plan':
                         console.log('Switching to floor plan mode');
@@ -517,11 +542,17 @@ class SidebarNavigation {
             console.warn('Camera cards page not found');
         }
         
-        // Initialize camera cards functionality if available
-        if (typeof loadCameraCards === 'function') {
+        // Only initialize camera cards functionality if cameras exist
+        // This prevents showing "No Camera Assignments Found" when navigating directly
+        if (typeof loadCameraCards === 'function' && this.hasCameras()) {
             loadCameraCards();
         } else {
-            console.log('loadCameraCards function not found, camera cards should still work');
+            console.log('No cameras found or loadCameraCards function not found');
+            // If no cameras found, redirect back to script page
+            if (!this.hasCameras()) {
+                console.log('No cameras found, redirecting to script page');
+                this.navigateToPage('script');
+            }
         }
     }
 
@@ -676,6 +707,61 @@ class SidebarNavigation {
     // Public method to refresh current page
     refreshCurrentPage() {
         this.loadPageContent(this.currentPage);
+    }
+
+    // Check if there are any cameras in the script
+    hasCameras() {
+        let camList = [];
+        
+        // Method 1: Look for camera number inputs specifically
+        const allInputs = $('#event-table input');
+        allInputs.each(function(index) {
+            const input = $(this);
+            const inputClass = input.attr('class') || '';
+            const inputName = input.attr('name') || '';
+            const inputValue = input.val() || '';
+            
+            // Look specifically for cameraNum class or name
+            if ((inputClass.includes('cameraNum') || inputName === 'cameraNum') &&
+                !inputClass.includes('cameraPos') && inputName !== 'cameraPos') {
+                
+                // Only add if the value contains a number (actual camera number)
+                if (inputValue && inputValue.trim() !== '' && 
+                    inputValue.trim() !== 'Camera Number' && 
+                    /\d/.test(inputValue.trim()) &&
+                    !inputValue.toLowerCase().includes('position') &&
+                    !inputValue.toLowerCase().includes('pos') &&
+                    !inputValue.toLowerCase().includes('location') &&
+                    !inputValue.toLowerCase().includes('place')) {
+                    
+                    camList.push(inputValue.trim());
+                }
+            }
+        });
+        
+        // Method 2: Look for camera number text specifically (not positions)
+        const allCells = $('#event-table td');
+        allCells.each(function(index) {
+            const cell = $(this);
+            const cellText = cell.text().trim();
+            
+            // Look for patterns like "Camera 1", "CAM 2" but exclude "Camera Position"
+            if ((cellText.match(/camera\s*\d+/i) || cellText.match(/cam\s*\d+/i)) &&
+                !cellText.toLowerCase().includes('position') &&
+                !cellText.toLowerCase().includes('pos') &&
+                !cellText.toLowerCase().includes('location') &&
+                !cellText.toLowerCase().includes('place')) {
+                const match = cellText.match(/\d+/);
+                if (match) {
+                    camList.push(match[0]);
+                }
+            }
+        });
+        
+        // Remove duplicates
+        camList = [...new Set(camList)];
+        
+        return camList.length > 0;
     }
 
 

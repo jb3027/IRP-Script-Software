@@ -186,10 +186,9 @@ $(document).ready(function() {
         
         // Update the data attribute and clear values
         $newRow.attr('data-shot-index', newIndex);
-        $newRow.find('.shot-type-select').val('');
+        $newRow.find('.shot-type-select').val('SHOT TYPE'); // Set default to "SHOT TYPE"
         $newRow.find('.shotSubject').val('');
         $newRow.find('.custom-shot-type').val('').hide();
-        $newRow.find('.remove-shot-btn').show();
         
         // Ensure the cloned row has all the necessary functionality
         $newRow.find('.shot-type-select').show();
@@ -201,9 +200,7 @@ $(document).ready(function() {
         // Move the add button below the new row
         $this.insertAfter(container.find('.shot-input-row').last());
         
-
-        
-        // Update remove button visibility
+        // Update remove button visibility AFTER adding the new row
         updateRemoveButtonVisibility(wrapper);
         
         // Remove cursor focus from the table
@@ -212,8 +209,11 @@ $(document).ready(function() {
 
     });
 
-    // Add event handlers for remove shot button
-    $(document).on('click', '.remove-shot-btn', function() {
+    // Add event handlers for remove shot button - multiple event types for better compatibility
+    $(document).on('click mousedown', '.remove-shot-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
         const $this = $(this);
         const $row = $this.closest('.shot-input-row');
         const wrapper = $this.closest('.shot-type-wrapper');
@@ -237,15 +237,12 @@ $(document).ready(function() {
         
         rows.each(function(index) {
             const $row = $(this);
-            const $removeBtn = $row.find('.remove-shot-btn');
             
             if (currentRowCount === 1) {
-                // Only one row - hide remove button to ensure minimum row requirement
-                $removeBtn.hide();
+                // Only one row - add single-row class to hide remove button
                 $row.addClass('single-row');
             } else {
-                // Multiple rows - show remove button and remove single-row class
-                $removeBtn.show();
+                // Multiple rows - remove single-row class to show remove button
                 $row.removeClass('single-row');
             }
         });

@@ -433,12 +433,9 @@ function syncItemTimeWithInsertDurations(itemNumber, newItemTime) {
     });
     
     if (insertRows.length === 0) {
-        console.log(`⚠️ No insert rows found for item ${itemNumber}`);
         return;
     }
-    
-    console.log(`✅ Found ${insertRows.length} insert rows for item ${itemNumber}`);
-    
+        
     // Convert new item time to seconds
     const [newMinutes, newSeconds] = newItemTime.split(':');
     const newTotalSeconds = parseInt(newMinutes) * 60 + parseInt(newSeconds);
@@ -598,8 +595,9 @@ function updateRunningOrderItemTime(itemNumber) {
                 .trim();
             
             const wordCount = content ? content.split(' ').length : 0;
-            const wordsPerSecond = 2.5;
-            totalSeconds += wordCount * wordsPerSecond;
+            // Average person speaks at 115 words per minute = 1.917 words per second
+            const wordsPerSecond = 115 / 60; // 1.917 words per second
+            totalSeconds += wordCount / wordsPerSecond;
         }
     }
     

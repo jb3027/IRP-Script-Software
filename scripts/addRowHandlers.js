@@ -210,19 +210,54 @@ $(document).ready(function() {
         const selectedText = selection.toString();
         const existingCutLine = cell.querySelector('.cut-line');
 
+        function calculateTextPosition() {
+            // If no text is selected, find the last line with content
+            if (!selectedText.trim()) {
+                const cellText = cell.textContent || cell.innerText || '';
+                const lines = cellText.split('\n');
+                // Find the last non-empty line
+                for (let i = lines.length - 1; i >= 0; i--) {
+                    if (lines[i].trim() !== '') {
+                        return i + 1; // Return 1-based line number
+                    }
+                }
+                return 1; // If all lines are empty, return 1
+            }
+            
+            // Get the range's start position within the cell
+            const rangeStart = range.startOffset;
+            const cellText = cell.textContent || cell.innerText || '';
+            
+            // Count newlines before the selection start
+            const textBeforeSelection = cellText.substring(0, rangeStart);
+            const newlineCount = (textBeforeSelection.match(/\n/g) || []).length;
+            
+            return newlineCount + 1; // Return 1-based line number
+        }
+
         function createCutLine(text) {
             const span = document.createElement('span');
             span.className = 'cut-line';
             span.textContent = text;
-            span.style.transform = 'translateY(5px)';
             // Store the original text as a data attribute for restoration
             span.setAttribute('data-original-text', text);
-            // Make the cut line extend to the left to cover camera number input area
+            
+            // Calculate the line position and set appropriate top offset
+            const linePosition = calculateTextPosition();
+            const lineHeight = 20; // Approximate line height in pixels
+            const baseOffset = 30; // Base offset from CSS
+            const calculatedTop = baseOffset + (linePosition - 1) * lineHeight;
+            
+            span.style.position = 'absolute';
+            span.style.top = calculatedTop + 'px';
+            span.style.left = '0';
+            span.style.right = '0';
+            span.style.zIndex = '1000';
             span.style.marginLeft = '-800px';
             span.style.paddingLeft = '800px';
-            span.style.position = 'absolute';
-            span.style.zIndex = '1000';
-            span.style.top = '40px';
+            span.style.overflow = 'visible';
+            span.style.transform = 'translateY(5px)';
+            
             return span;
         }
 
@@ -242,6 +277,54 @@ $(document).ready(function() {
             selection.addRange(newRange);
         }
 
+        function alignColumnsWithCutLine() {
+            const row = cell.closest('tr');
+            if (!row) return;
+            
+            const textPos = getTextPosition();
+            const lineHeight = 20;
+            const baseOffset = 30;
+            const cutLineTop = baseOffset + (textPos.lineNumber - 1) * lineHeight + 5; // +5 for translateY
+            
+            // Calculate how much padding to add to extend cells upward
+            const extraPadding = Math.max(0, cutLineTop - 30); // Extra padding needed
+            
+            // Add padding to camera number (first column) to extend it upward
+            const cameraCell = row.cells[0];
+            if (cameraCell) {
+                cameraCell.style.paddingTop = (extraPadding + 5) + 'px'; // Extend upward
+            }
+            
+            // Add padding to shot type and subject (second column) to extend it upward
+            const shotTypeCell = row.cells[1];
+            if (shotTypeCell) {
+                shotTypeCell.style.paddingTop = (extraPadding + 5) + 'px'; // Extend upward
+            }
+            
+            // Add padding to extra info (fourth column) to extend it upward
+            const extraInfoCell = row.cells[3];
+            if (extraInfoCell) {
+                extraInfoCell.style.paddingTop = (extraPadding + 5) + 'px'; // Extend upward
+            }
+            
+            // Adjust row height to accommodate the cut line and extended cells
+            const totalHeight = cutLineTop + 40; // Cut line + space for elements below
+            row.style.minHeight = totalHeight + 'px';
+        }
+
+        function resetColumnAlignment() {
+            const row = cell.closest('tr');
+            if (!row) return;
+            
+            // Reset all cell padding
+            Array.from(row.cells).forEach(cell => {
+                cell.style.paddingTop = '';
+            });
+            
+            // Reset row height
+            row.style.minHeight = '';
+        }
+
         if (existingCutLine) {
             // Get the original text that was cut
             const originalText = existingCutLine.getAttribute('data-original-text') || existingCutLine.textContent;
@@ -258,6 +341,9 @@ $(document).ready(function() {
             const textNode = document.createTextNode(originalText);
             cell.appendChild(textNode);
             
+            // Reset column alignment
+            resetColumnAlignment();
+            
             // Position cursor at the end of the restored text
             const newRange = document.createRange();
             newRange.setStartAfter(textNode);
@@ -273,7 +359,11 @@ $(document).ready(function() {
                 range.insertNode(newSpan);
                 const slashSpan = addSlashAfter(newSpan);
                 moveCursorAfter(slashSpan);
+                
+                // Align other columns with the cut line
+                alignColumnsWithCutLine();
             } catch (e) {
+                console.error('Error creating cut line:', e);
             }
         }
     });

@@ -1628,8 +1628,8 @@ tr.event_highlighted td:not(:last-child) .shotSubject {
 }
 
 .shot-type-select option {
-    background-color: var(--secondary-bg) !important;
-    color: var(--text-white) !important;
+    background-color: white !important;
+    color: #333 !important;
     padding: 8px !important;
 }
 
@@ -1975,30 +1975,7 @@ li {
     background-size: none !important;
     background-repeat: none !important;
     background-position: none !important;
-    color: white !important;
-    border: none !important;
-}
-
-/* FORCE HOVER BACKGROUND - Override any inherited background styles */
-#camera-cards-mode-btn + .dropdown .options button:hover,
-#camera-cards-mode-btn ~ .dropdown .options button:hover,
-#camera-cards-mode-btn .dropdown .options button:hover,
-#camera-cards-mode-btn + .dropdown .options .createCamCard-button:hover,
-#camera-cards-mode-btn ~ .dropdown .options .createCamCard-button:hover,
-#camera-cards-mode-btn .dropdown .options .createCamCard-button:hover,
-#camera-cards-mode-btn + .dropdown .options .btn:hover,
-#camera-cards-mode-btn ~ .dropdown .options .btn:hover,
-#camera-cards-mode-btn .dropdown .options .btn:hover,
-#camera-cards-mode-btn + .dropdown .options .button3:hover,
-#camera-cards-mode-btn ~ .dropdown .options .button3:hover,
-#camera-cards-mode-btn .dropdown .options .button3:hover {
-    background: var(--accent-green) !important;
-    background-color: var(--accent-green) !important;
-    background-image: none !important;
-    background-size: none !important;
-    background-repeat: none !important;
-    background-position: none !important;
-    color: white !important;
+    color: var(--accent-green)!important;
     border: none !important;
 }
 
@@ -2017,31 +1994,6 @@ li {
     border: none !important;
 }
 
-/* Force override any inherited styles with maximum specificity */
-.mode-nav-toolbar .dropdown .options *,
-.mode-nav-toolbar .dropdown .options div,
-.mode-nav-toolbar .dropdown .options span {
-    background: white !important;
-    background-color: white !important;
-    background-image: none !important;
-}
-
-/* NUCLEAR OVERRIDE - Force white background on dropdown container and all children */
-.mode-nav-toolbar .dropdown .options,
-.mode-nav-toolbar .dropdown .options *,
-.mode-nav-toolbar .dropdown .options div,
-.mode-nav-toolbar .dropdown .options span,
-.mode-nav-toolbar .dropdown .options button,
-.mode-nav-toolbar .dropdown .options .btn,
-.mode-nav-toolbar .dropdown .options .button3,
-.mode-nav-toolbar .dropdown .options .createCamCard-button {
-    background: white !important;
-    background-color: white !important;
-    background-image: none !important;
-    background-size: none !important;
-    background-repeat: none !important;
-    background-position: none !important;
-}
 
 /* ULTRA NUCLEAR - Target the exact HTML structure by ID */
 #camera-options,
@@ -2058,151 +2010,6 @@ li {
     background-size: none !important;
     background-repeat: none !important;
     background-position: none !important;
-}
-
-/* FINAL NUCLEAR - Target the exact dropdown structure */
-.mode-nav-toolbar .dropdown .options#camera-options,
-.mode-nav-toolbar .dropdown .options#camera-options *,
-.mode-nav-toolbar .dropdown .options#camera-options div,
-.mode-nav-toolbar .dropdown .options#camera-options span,
-.mode-nav-toolbar .dropdown .options#camera-options button,
-.mode-nav-toolbar .dropdown .options#camera-options .btn,
-.mode-nav-toolbar .dropdown .options#camera-options .button3,
-.mode-nav-toolbar .dropdown .options#camera-options .createCamCard-button {
-    background: white !important;
-    background-color: white !important;
-    background-image: none !important;
-    background-size: none !important;
-    background-repeat: none !important;
-    background-position: none !important;
-}
-
-/* ULTRA SPECIFIC OVERRIDE - Target exact nav bar dropdown structure */
-#camera-cards-mode-btn + .dropdown .options,
-#camera-cards-mode-btn ~ .dropdown .options,
-#camera-cards-mode-btn .dropdown .options {
-    background: white !important;
-    background-color: white !important;
-    background-image: none !important;
-    border: 1px solid #ddd !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    min-width: 160px !important;
-    max-width: 160px !important;
-    left: 3px !important;
-    box-shadow: none !important;
-}
-
-/* NUCLEAR OPTION - Override ALL button3 and createCamCard-button styles */
-.mode-nav-toolbar .dropdown .options .button3,
-.mode-nav-toolbar .dropdown .options .createCamCard-button,
-.mode-nav-toolbar .dropdown .options .btn,
-.mode-nav-toolbar .dropdown .options button {
-    background: white !important;
-    background-color: white !important;
-    background-image: none !important;
-    border: none !important;
-    color: #333 !important;
-    padding: 8px 12px !important;
-    margin: 0 !important;
-    width: 100% !important;
-    text-align: left !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    transition: background-color 0.2s ease !important;
-    display: block !important;
-    height: auto !important;
-    line-height: 1.2 !important;
-}
-
-/* ULTRA NUCLEAR - Override with maximum specificity and !important */
-.mode-nav-toolbar .dropdown .options .button3,
-.mode-nav-toolbar .dropdown .options .createCamCard-button,
-.mode-nav-toolbar .dropdown .options .btn,
-.mode-nav-toolbar .dropdown .options button,
-.mode-nav-toolbar .dropdown .options .button3 *,
-.mode-nav-toolbar .dropdown .options .createCamCard-button *,
-.mode-nav-toolbar .dropdown .options .btn *,
-.mode-nav-toolbar .dropdown .options button * {
-    background: white !important;
-    background-color: white !important;
-    background-image: none !important;
-    background-size: none !important;
-    background-repeat: none !important;
-    background-position: none !important;
-}
-
-/* FINAL NUCLEAR - Target the exact HTML structure with attribute selectors */
-.mode-nav-toolbar .dropdown .options [class*="button3"],
-.mode-nav-toolbar .dropdown .options [class*="createCamCard"],
-.mode-nav-toolbar .dropdown .options [class*="btn"],
-.mode-nav-toolbar .dropdown .options [class*="button"],
-.mode-nav-toolbar .dropdown .options [id*="camera"],
-.mode-nav-toolbar .dropdown .options [style*="background"] {
-    background: white !important;
-    background-color: white !important;
-    background-image: none !important;
-    background-size: none !important;
-    background-repeat: none !important;
-    background-position: none !important;
-}
-
-/* Override any inline styles that might be set by JavaScript */
-.mode-nav-toolbar .dropdown .options .button3[style*="background"],
-.mode-nav-toolbar .dropdown .options .createCamCard-button[style*="background"],
-.mode-nav-toolbar .dropdown .options .btn[style*="background"],
-.mode-nav-toolbar .dropdown .options button[style*="background"] {
-    background: white !important;
-    background-color: white !important;
-}
-
-#camera-cards-mode-btn + .dropdown .options *,
-#camera-cards-mode-btn ~ .dropdown .options *,
-#camera-cards-mode-btn .dropdown .options * {
-    background: white !important;
-    background-color: white !important;
-    background-image: none !important;
-}
-
-#camera-cards-mode-btn + .dropdown .options button,
-#camera-cards-mode-btn ~ .dropdown .options button,
-#camera-cards-mode-btn .dropdown .options button,
-#camera-cards-mode-btn + .dropdown .options .createCamCard-button,
-#camera-cards-mode-btn ~ .dropdown .options .createCamCard-button,
-#camera-cards-mode-btn .dropdown .options .createCamCard-button {
-    background: white !important;
-    background-color: white !important;
-    background-image: none !important;
-    border: none !important;
-    color: #333 !important;
-    padding: 8px 12px !important;
-    margin: 0 !important;
-    width: 100% !important;
-    text-align: left !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    transition: background-color 0.2s ease !important;
-    display: block !important;
-    height: auto !important;
-    line-height: 1.2 !important;
-}
-
-#camera-cards-mode-btn + .dropdown .options button:hover,
-#camera-cards-mode-btn ~ .dropdown .options button:hover,
-#camera-cards-mode-btn .dropdown .options button:hover,
-#camera-cards-mode-btn + .dropdown .options .createCamCard-button:hover,
-#camera-cards-mode-btn ~ .dropdown .options .createCamCard-button:hover,
-#camera-cards-mode-btn .dropdown .options .createCamCard-button:hover {
-    background: var(--accent-green) !important;
-    background-color: var(--accent-green) !important;
-    background-image: none !important;
-    background-size: none !important;
-    background-repeat: none !important;
-    background-position: none !important;
-    color: white !important;
 }
 
 .sidebar.collapsed ~ .content-wrapper .mode-nav-toolbar {
@@ -2274,18 +2081,21 @@ li {
     letter-spacing: 0.5px;
 }
 
-/* Style for "No cameras found" message to match nav bar colors */
+/* Style for "No cameras found" message - Minimal design */
 .mode-nav-toolbar .dropdown .options div[style*="color: #666"] {
     color: #666 !important;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    padding: 8px 16px !important;
+    text-align: center !important;
+    cursor: default !important;
+    background: white !important;
+    border-radius: 12px !important;
+    margin: 0 !important;
+    width: 100% !important;
 }
 
-/* Add missing active state rule */
-.mode-nav-toolbar .dropdown .options.active {
-    display: block !important;
-}
 
 @media (max-width: 768px) {
     .nav-toolbar {
@@ -2616,57 +2426,80 @@ li {
     display: none;
 }
 
-/* Camera Options Dropdown */
-.dropdown #camera-options,
-.dropdown .options#camera-options,
-#camera-options.options,
-div#camera-options.options,
-div.options#camera-options {
-    /* Hidden by default */
+/* Camera Options Dropdown - Minimal White Box */
+.mode-nav-toolbar .dropdown .options {
     display: none !important;
     position: absolute !important;
     top: 100% !important;
-    background: rgba(10, 26, 26, 0.95) !important;
-    border: 1px solid rgba(74, 253, 203, 0.2) !important;
+    left: 0 !important;
+    background: white !important;
     border-radius: 12px !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
     z-index: 99999 !important;
     max-height: 300px !important;
     overflow-y: auto !important;
-    margin-top: 5px !important;
-    /* Width will be set by JavaScript */
-    box-sizing: border-box !important;
+    padding: 0 !important;
+    width: calc(100% - 4px) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
 }
 
-.dropdown #camera-options.active,
-.dropdown .options#camera-options.active,
-#camera-options.options.active,
-div#camera-options.options.active,
-div.options#camera-options.active {
+.mode-nav-toolbar .dropdown .options.active {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    /* Ensure it's positioned correctly when active */
-    position: absolute !important;
-    top: 100% !important;
 }
 
-#camera-options .createCamCard-button {
-    width: 100%;
-    text-align: left;
-    padding: 12px 16px;
-    border: none;
-    background: transparent;
-    color: var(--text-white);
-    transition: all 0.3s ease;
-    border-radius: 8px;
-    margin: 2px 8px;
-    width: calc(100% - 16px);
+/* Camera dropdown buttons - Minimal white box design */
+.mode-nav-toolbar .dropdown .options button,
+.mode-nav-toolbar .dropdown .options .createCamCard-button,
+.mode-nav-toolbar .dropdown .options .btn,
+.mode-nav-toolbar .dropdown .options .button3 {
+    width: 100% !important;
+    text-align: center !important;
+    padding: 8px 16px !important;
+    margin: 0 !important;
+    border: none !important;
+    background: white !important;
+    color: #333 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    border-radius: 0 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
 }
 
-#camera-options .createCamCard-button:hover {
-    background: rgba(74, 253, 203, 0.1);
-    color: var(--accent-color);
+/* First button gets top rounded corners */
+.mode-nav-toolbar .dropdown .options button:first-child,
+.mode-nav-toolbar .dropdown .options .createCamCard-button:first-child,
+.mode-nav-toolbar .dropdown .options .btn:first-child,
+.mode-nav-toolbar .dropdown .options .button3:first-child {
+    border-radius: 12px 12px 0 0 !important;
+}
+
+/* Last button gets bottom rounded corners */
+.mode-nav-toolbar .dropdown .options button:last-child,
+.mode-nav-toolbar .dropdown .options .createCamCard-button:last-child,
+.mode-nav-toolbar .dropdown .options .btn:last-child,
+.mode-nav-toolbar .dropdown .options .button3:last-child {
+    border-radius: 0 0 12px 12px !important;
+}
+
+/* Single button gets all rounded corners */
+.mode-nav-toolbar .dropdown .options button:only-child,
+.mode-nav-toolbar .dropdown .options .createCamCard-button:only-child,
+.mode-nav-toolbar .dropdown .options .btn:only-child,
+.mode-nav-toolbar .dropdown .options .button3:only-child {
+    border-radius: 12px !important;
+}
+
+.mode-nav-toolbar .dropdown .options button:hover,
+.mode-nav-toolbar .dropdown .options .createCamCard-button:hover,
+.mode-nav-toolbar .dropdown .options .btn:hover,
+.mode-nav-toolbar .dropdown .options .button3:hover {
+    background: #2bc198 !important;
+    color: white !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(43, 193, 152, 0.3) !important;
 }
 
 /* Ensure dropdown container has relative positioning */
@@ -3574,29 +3407,37 @@ td:nth-child(3) {
 
 /* Remove Button for Additional Shot Inputs */
 .remove-shot-btn {
-    display: flex;
-    width: 16px;
-    height: 16px;
-    border: 1px solid #e74c3c;
-    border-radius: 50%;
-    background-color: transparent;
-    color: #e74c3c;
-    font-size: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    position: absolute;
-    right: -8px; /* Position to overlap with shot type inputs on the right */
-    top: 8px; /* Align to top of the row */
-    z-index: 1000; /* Higher z-index to ensure it's on top */
-    pointer-events: auto; /* Ensure button is clickable */
+    display: none !important; /* Hidden by default */
+    width: 18px !important;
+    height: 18px !important;
+    border: 1px solid #e74c3c !important;
+    border-radius: 50% !important;
+    background-color: transparent !important;
+    color: #e74c3c !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+    position: absolute !important;
+    right: -10px !important; /* Position to overlap with shot type inputs on the right */
+    top: 6px !important; /* Align to top of the row */
+    z-index: 10000 !important; /* Much higher z-index to ensure it's on top */
+    pointer-events: auto !important; /* Ensure button is clickable */
+    opacity: 1 !important; /* Ensure button is visible */
+    visibility: visible !important; /* Ensure button is visible */
+}
+
+/* Show remove button when there are multiple rows */
+.shot-input-row:not(.single-row) .remove-shot-btn {
+    display: flex !important;
 }
 
 .remove-shot-btn:hover {
-    background-color: #e74c3c;
-    color: white;
+    background-color: #e74c3c !important;
+    color: white !important;
+    transform: scale(1.1) !important;
 }
 
 .shot-type-select option {
@@ -4423,6 +4264,7 @@ td:nth-child(2) > div {
     float: none !important;
     clear: none !important;
     margin-left: 8px !important;
+    margin-top: 4px !important; /* Move shot subject down slightly */
     vertical-align: top !important;
     width: 120px !important;
     flex: 0 0 120px !important;
@@ -4465,30 +4307,29 @@ td:nth-child(2) > div {
 
 
 /* Maximum specificity for cut line positioning - ensure 5px down offset */
+/* Cut line positioning for script column - consistent absolute positioning */
 #event-table td:nth-child(3) .cut-line,
 #event-table td:nth-child(3) span.cut-line,
 #event-table td:nth-child(3) .editable-text .cut-line {
+    position: absolute !important;
+    overflow: visible !important;
+    margin-left: -800px !important;
+    padding-left: 800px !important;
+    z-index: 1000 !important;
+    /* top position will be set dynamically by JavaScript */
     transform: translateY(5px) !important;
-    position: relative !important;
-    top: 5px !important;
 }
 
 /* Additional specificity for any cut line in script column */
 #event-table td[contenteditable="true"] .cut-line,
-#event-table td:nth-child(3) .cut-line {
-    transform: translateY(5px) !important;
-    position: relative !important;
-    top: 5px !important;
-}
-
-/* Ensure cut line extends properly to the left - script mode only */
 #event-table td:nth-child(3) .cut-line {
     position: absolute !important;
     overflow: visible !important;
     margin-left: -800px !important;
     padding-left: 800px !important;
     z-index: 1000 !important;
-    top: 30px !important;
+    /* top position will be set dynamically by JavaScript */
+    transform: translateY(5px) !important;
 }
 
 /* Make first column completely hide cut line in script mode */
@@ -4530,7 +4371,7 @@ td:nth-child(2) > div {
     position: absolute !important;
     overflow: visible !important;
     z-index: 1000 !important;
-    top: 30px !important;
+    /* top position will be set dynamically by JavaScript */
 }
 
 /* Navigation button hover - only green text, no background */

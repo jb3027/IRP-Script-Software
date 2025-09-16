@@ -13,10 +13,10 @@ function createShotTypeCell(shotType, firstTime) {
     const selectHTML = `
         <div class="shot-type-wrapper" data-shot-group="0">
             <div class="shot-inputs-container">
-                <div class="shot-input-row" data-shot-index="0">
+                <div class="shot-input-row single-row" data-shot-index="0">
                     <div class="shot-type-subject-wrapper">
                         <select class="form-control shot-type-select">
-                            <option value="">SHOT TYPE</option>
+                            <option value="SHOT TYPE" selected>SHOT TYPE</option>
                             <option value="ES">ES</option>
                             <option value="WS">WS</option>
                             <option value="2S">2S</option>
